@@ -7,15 +7,17 @@
 
 %% ********************** Yes/no task
 
-% Generate some artificial data to be used in illustrating the YN analyses.
+% Generate some artificial data for illustrating the YN analyses.
 
-mydist = Normal(50,5);                 % Hypothesized underlying distribution
-Cs = mydist.InverseCDF(.10:.20:.90);   % Values at which to run tests
+mydist = Normal(50,5);                 % Hypothesized underlying distribution of X's
+Cs = mydist.InverseCDF(.10:.20:.90);   % A set of stimulus values at which to run tests.
+                                       % At each test the result will be "Yes" if Cs>X and "no" if Cs<X.
 Ns = 100*ones(size(Cs));               % Repeat the test 100 times at each value
-pSmaller = [.05 .31 .51 .71 .95];      % Approximately the CDF values, with some error thrown in so that the
+PrCgreaterthanX = ...
+    [.05 .31 .51 .71 .95];             % The proportion of times that X is less than Cs(i) for each i.
+                                       % These are approximately the CDF values of the Cs, but not exactly so that the
                                        % distribution parameters will need some adjustment
-pGreater = 1 - pSmaller;               % Proportion of times an X value is greater than Cs(i)
-Gs = Ns .* pGreater;                   % Number of times observed value is greater than Cs(i)
+Gs = Ns .* PrCgreaterthanX;               % Number of observations of Cs(i) greater than X
 
 %% Illustrate the command YNProbitLnLikelihood:
 %  Compute the log-likelihood of a dataset (in this case, an artificial dataset)
@@ -48,15 +50,18 @@ mydist.YNProbitChiSq(Cs,Ns,Gs)   % Note that the chi-square is a little smaller 
 
 
 
-%% ********************** mAFC task
+%% ********************** mAFC tasks
 
 % Generate some artificial data to be used in illustrating the mAFC analyses.
+% In these tasks each response is "correct" or "incorrect".
+% Each response is correct if (Cs>X) || ( (Cs<X) && (there is a correct guess from mAFC alternatives) )
 
 mAFC = 3;  % 3-alternative forced-choice task
 
-mydist = Normal(50,5);                   % Hypothesized underlying distribution
-pCorrect = pSmaller + (1-pSmaller)/mAFC; % pCorrect = pSmaller plus correct guesses
-Gs = Ns .* pCorrect;                     % Number of times the observed response is correct
+mydist = Normal(50,5);            % Hypothesized underlying distribution
+pCorrect = PrCgreaterthanX + ...
+    (1-PrCgreaterthanX)/mAFC;     % pCorrect = PrCgreaterthanX plus correct guesses
+Gs = Ns .* pCorrect;              % Number of times the observed response is correct
 
 %% Illustrate the command mAFCProbitLnLikelihood:
 %  Compute the log-likelihood of the artificial data

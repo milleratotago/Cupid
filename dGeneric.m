@@ -484,6 +484,8 @@ classdef dGeneric < handle  % Calls by reference
         end
         
         function thisval=YNProbitLnLikelihood(obj,Constants, NTrials, NGreater)
+            % Greater is the number of times that the Constant value is greater
+            % than the value in the distribution. NGreater should increase with C.
             assert(obj.Initialized,UninitializedError(obj));
             NObservations = numel(Constants);
             % Probit.tex explains why no binomial coefficient is needed.
@@ -491,13 +493,15 @@ classdef dGeneric < handle  % Calls by reference
             for I = 1:NObservations
                 p = CDF(obj,Constants(I));
                 omp = 1 - p;
-                p = log(p) * (NTrials(I) - NGreater(I));
-                omp = log(omp) * NGreater(I);
+                p = log(p) * NGreater(I);
+                omp = log(omp) * (NTrials(I) - NGreater(I));
                 thisval = p + omp + thisval;
             end
         end
         
         function thisval=YNProbitChiSq(obj, Constants, NTrials, NGreater)
+            % Greater is the number of times that the Constant value is greater
+            % than the value in the distribution. NGreater should increase with C.
             assert(obj.Initialized,UninitializedError(obj));
             NObservations = numel(Constants);
             thisval = 0;
@@ -505,7 +509,7 @@ classdef dGeneric < handle  % Calls by reference
                 p = CDF(obj,Constants(I));
                 omp = 1 - p;
                 Obsp = NGreater(I) / NTrials(I);
-                Obsp = 1 - Obsp;
+                % Obsp = 1 - Obsp; % This would be appropriate if NGreater would decrease with C.
                 thisval = NTrials(I) * (p-Obsp)^2 / (p * omp) + thisval;
             end
         end
