@@ -553,7 +553,7 @@ classdef utGeneric < matlab.unittest.TestCase
                 return
             end
             
-            NGreater = testCase.ProbitNTrials .* (1 - testCase.ProbitBinCDFs);
+            NGreater = testCase.ProbitNTrials .* testCase.ProbitBinCDFs;
             
             % Save current parameters & then perturb them slightly, to see whether estimation process recovers the original parms:
             HoldParms = testCase.Dist.ParmValues;
@@ -580,7 +580,7 @@ classdef utGeneric < matlab.unittest.TestCase
                 return
             end
             
-            NGreater = testCase.ProbitNTrials .* (1 - testCase.ProbitBinCDFs);
+            NGreater = testCase.ProbitNTrials .* testCase.ProbitBinCDFs;
             
             % Save current parameters & then perturb them slightly, to see whether estimation process recovers the original parms:
             HoldParms = testCase.Dist.ParmValues;
