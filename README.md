@@ -10,6 +10,9 @@ cumulative density functions, hazard function, mean, variance, skewness, kurtosi
 and it can generate random numbers.
 It can also estimate parameter values (i.e., by maximum likelihood and
 several other methods).
+Parameters estimates can be constrained within a single distribution, and it is possible
+to estimate the parameters of multiple distributions jointly while specifying constraints
+among the parameters of different distributions.
 More than 40 standard distributions (e.g., normal, exponential, gamma, ...) have already
 been implemented, and it is easy to add new ones.
 (Any distribution for which you know either the PDF or the CDF can be added; everything
