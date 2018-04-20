@@ -123,6 +123,7 @@ if Continuous && Fast
     [t0, r0] = ClassTest(?utRNGammaMn,          Parallel,runner); tests = [tests t0]; results = [results r0];
     [t0, r0] = ClassTest(?utRNGammaMS,          Parallel,runner); tests = [tests t0]; results = [results r0];
     [t0, r0] = ClassTest(?utRosin,              Parallel,runner); tests = [tests t0]; results = [results r0];
+    [t0, r0] = ClassTest(?utStudRng,            Parallel,runner); tests = [tests t0]; results = [results r0];
     [t0, r0] = ClassTest(?utt,                  Parallel,runner); tests = [tests t0]; results = [results r0];
     [t0, r0] = ClassTest(?utTriangularCW,       Parallel,runner); tests = [tests t0]; results = [results r0];
     [t0, r0] = ClassTest(?utUniform,            Parallel,runner); tests = [tests t0]; results = [results r0];

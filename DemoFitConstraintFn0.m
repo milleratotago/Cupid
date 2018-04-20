@@ -1,4 +1,4 @@
-function [Parmsets, Penalty] = DemoFitConstrainedFn0(Parms)
+function [Dists, Penalty] = DemoFitConstrainedFn0(Dists,Parms)
 % Example: Function to implement the constraint sigma>0.1*mu.
 %
 % Parms is a vector of 2 suggested parameter values from fminsearch.
@@ -7,10 +7,13 @@ function [Parmsets, Penalty] = DemoFitConstrainedFn0(Parms)
 % (That is, we will square the second parameter to get the
 % suggested sigma, thereby insuring that sigma is positive.)
 
+% Compute suggested parameter values based on fminsearch's suggestions.
 Mu = Parms(1);
 SD = Parms(2)^2;
-Parmsets{1} = [Mu SD];  % This is the vector of suggested parameters for
-                        % the normal distribution.
+
+% Reset the distribution to have the parameter values
+% corresponding to fminsearch's suggestions in Parms.
+Dists{1}.ResetParms([Mu SD]);
 
 % Compute a penalty to be added to the error score
 % when the parameters do not satisfy the constraint.

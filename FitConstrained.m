@@ -1,4 +1,4 @@
-function [Dists, ErrScores] = FitConstrained(Dists,Datasets,sErrorFn,ConstraintFn,StartingVals)
+function [Dists, ErrScores, Penalty] = FitConstrained2(Dists,Datasets,sErrorFn,ConstraintFn,StartingVals)
 % function to fit one or more Cupid probability distributions whose parameters
 % are constrained in some way.
 %
@@ -18,7 +18,6 @@ function [Dists, ErrScores] = FitConstrained(Dists,Datasets,sErrorFn,ConstraintF
 %   (These will also be the first parameter values passed to ConstraintFn.)
 
 NDists = numel(Dists);
-
 
 Invert = sErrorFn(1) == '-';
 if Invert
@@ -45,14 +44,13 @@ for iDist=1:NDists
 end
 
 %EndingVals = fminsearcharb(@ConstraintedErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
-EndingVals = fminsearch(@ConstraintedErrFn,StartingVals); % ,SearchOptions);
+fminsearch(@ConstraintedErrFn,StartingVals); % ,SearchOptions);
 
             function thiserrval=ConstraintedErrFn(X)
-                [Parms, Penalty] = ConstraintFn(X);
-                for iDist=1:NDists
-                   ResetParms(Dists{iDist},Parms{iDist})
+                [Dists, Penalty] = ConstraintFn(Dists,X);
+                for iDistInner=1:NDists
                    % Note that multiple arguments may be passed for each dataset via the {:} operator.
-                   ErrScores(iDist) = Dists{iDist}.(sErrorFn)(Datasets{iDist}{:});
+                   ErrScores(iDistInner) = Dists{iDistInner}.(sErrorFn)(Datasets{iDistInner}{:});
                 end
                 thiserrval = sum(ErrScores);
                 if Invert
