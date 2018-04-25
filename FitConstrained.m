@@ -1,13 +1,13 @@
-function [Dists, ErrScores, Penalty] = FitConstrained2(Dists,Datasets,sErrorFn,ConstraintFn,StartingVals)
-% function to fit one or more Cupid probability distributions whose parameters
-% are constrained in some way.
+function [Dists, FitFnVals, Penalty] = FitConstrained(Dists,Datasets,sFitFn,ConstraintFn,StartingVals,varargin)
+% Fit one or more Cupid probability distributions whose parameters are constrained in some way.
 %
 % Dists: a cell array of probability distributions (i.e., descendants of dGeneric)
 % Datasets: a cell array of data sets, one per distribution. Dists{i} is fit to Datasets{i}
-% sErrorFn: a string naming the function measuring the error in the fit of Dists{i} to Datasets{i}.
+% sFitFn: a string naming the function measuring the fit of Dists{i} to Datasets{i}.
 %   This must be one of the following error functions in dGeneric:
 %   '-LnLikelihood', 'MomentError', 'GofFChiSq', 'PercentileError',
 %   '-YNProbitLnLikelihood', 'YNProbitChiSq', '-mAFCProbitLnLikelihood', 'mAFCProbitChiS'
+%   '-' means that FitConstrained should minimize the inverse of the function.
 % ConstraintFn: a user-written function that enforces the parameter constraints.
 %   This function takes as input a vector of parameter values supplied by fminsearch.
 %   Its outputs are (1) a cell array Parms, where Parms{i} is the
@@ -16,15 +16,18 @@ function [Dists, ErrScores, Penalty] = FitConstrained2(Dists,Datasets,sErrorFn,C
 %   the desired constraints.
 % StartingVals: Initial values of the parameters that will be passed to fminsearch.
 %   (These will also be the first parameter values passed to ConstraintFn.)
+% varargin, if present, should be a set of search options from optimset.
+
+SearchOptions = varargin;
 
 NDists = numel(Dists);
 
-Invert = sErrorFn(1) == '-';
+Invert = sFitFn(1) == '-';
 if Invert
-    sErrorFn = sErrorFn(2:end);
+    sFitFn = sFitFn(2:end);
 end
 
-ErrScores = zeros(NDists,1);
+FitFnVals = zeros(NDists,1);
 
 % Special handling is required because some error functions take a single data argument
 % (e.g., LnLikelihood takes a vector of observations),
@@ -44,15 +47,15 @@ for iDist=1:NDists
 end
 
 %EndingVals = fminsearcharb(@ConstraintedErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
-fminsearch(@ConstraintedErrFn,StartingVals); % ,SearchOptions);
+fminsearch(@ConstraintedErrFn,StartingVals,SearchOptions{:});
 
             function thiserrval=ConstraintedErrFn(X)
                 [Dists, Penalty] = ConstraintFn(Dists,X);
                 for iDistInner=1:NDists
                    % Note that multiple arguments may be passed for each dataset via the {:} operator.
-                   ErrScores(iDistInner) = Dists{iDistInner}.(sErrorFn)(Datasets{iDistInner}{:});
+                   FitFnVals(iDistInner) = Dists{iDistInner}.(sFitFn)(Datasets{iDistInner}{:});
                 end
-                thiserrval = sum(ErrScores);
+                thiserrval = sum(FitFnVals);
                 if Invert
                     thiserrval = -thiserrval;
                 end

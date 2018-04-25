@@ -4,16 +4,15 @@ classdef Mixture < dContinuous % dEither % Probably fastest to handle Mixtures o
     % The final pk is ignored can be omitted.
     
     properties(SetAccess = protected)
-        NDists,          % Number of distributions that contribute to the mixture.
-        BasisRV,         % Cell array with the individual distributions in the mixture.
-        CumNParms,       % Cumulative count of parameters up to & including the i'th distrib (includes MixtureP's).
-        DistParmCodes,   % Cell array with parmcodes for each distribution separately.
+        NDists           % Number of distributions that contribute to the mixture.
+        BasisRV          % Cell array with the individual distributions in the mixture.
+        CumNParms        % Cumulative count of parameters up to & including the i'th distrib (includes MixtureP's).
+        DistParmCodes    % Cell array with parmcodes for each distribution separately.
         % Note: The P arrays have NDist positions but the last one is always fixed, because its P is determined by the others.
         % Therefore, the last P is NOT counted as a parameter.
-        MixtureP,        % Probability of each distribution within the mixture.
-        CumulativeP,     % Cumulative probability of all distributions up to & including the i'th one.
-        DistParmP,       % List of parmcodes for the individual MixtureP's.  Last one always 'f'
-        PreviousParmCodes  % Holds the parmcodes passed last time; recompute DistParmP & DistParmCodes if this changes.
+        MixtureP         % Probability of each distribution within the mixture.
+        CumulativeP      % Cumulative probability of all distributions up to & including the i'th one.
+        DistParmP        % List of parmcodes for the individual MixtureP's.  The last one is always 'f'
     end
     
     properties
@@ -33,8 +32,38 @@ classdef Mixture < dContinuous % dEither % Probably fastest to handle Mixtures o
                     throw(ME);
                 otherwise
                     Setup(obj,varargin(:));
+                    SetAdjustMixturePs(obj,false);
                     ResetParms(obj,[obj.ParmValues]);
             end
+        end
+
+        function SetAdjustMixturePs(obj,truefalse)
+            obj.AdjustMixturePs = truefalse;
+            % Assemble DefaultParmCodes & count NDistParms & CumNParms
+            if obj.AdjustMixturePs
+                ParmCodeForP = 'r';
+            else
+                ParmCodeForP = 'f';
+            end
+            obj.NDistParms = 0;
+            obj.DefaultParmCodes = '';
+            for iDist=1:obj.NDists
+                if iDist == obj.NDists
+                    ParmCodeForP = 'f';
+                end
+                if ParmCodeForP == 'r'
+                    obj.NDistParms = obj.NDistParms + 1;
+                end
+                obj.DistParmP(iDist) = ParmCodeForP;
+                if iDist < obj.NDists
+                    obj.DefaultParmCodes = [obj.DefaultParmCodes ParmCodeForP];
+                end
+                obj.DefaultParmCodes = [obj.DefaultParmCodes obj.BasisRV{iDist}.DefaultParmCodes];
+                obj.NDistParms = obj.NDistParms + obj.BasisRV{iDist}.NDistParms;
+                obj.CumNParms(iDist) = obj.NDistParms;
+            end
+            obj.NDistParms = obj.NDistParms + obj.NDists - 1;  % Count the free P's
+            % fprintf('NDistParms is %f and parmcodes is %s\n',obj.NDistParms,obj.DefaultParmCodes);
         end
         
         function Setup(obj,s)
@@ -47,7 +76,6 @@ classdef Mixture < dContinuous % dEither % Probably fastest to handle Mixtures o
             obj.CumNParms =zeros(obj.NDists,1);
             obj.DistParmP = char(obj.NDists);
             obj.DistParmCodes = cell(obj.NDists,1);
-            obj.PreviousParmCodes = '9';   % Reset to an impossible value so that new ones will be computed by CheckNewParmCodes.
             nextptr = 0;
             for iDist=1:obj.NDists
                 nextptr = nextptr + 1;
@@ -77,31 +105,6 @@ classdef Mixture < dContinuous % dEither % Probably fastest to handle Mixtures o
                 assert(false,'Mixture can only handle continuous Basis distributions (so far)');
             end
             
-            % Assemble DefaultParmCodes & count NDistParms & CumNParms
-            if obj.AdjustMixturePs
-                ParmCodeForP = 'r';
-            else
-                ParmCodeForP = 'f';
-            end
-            obj.NDistParms = 0;
-            obj.DefaultParmCodes = '';
-            for iDist=1:obj.NDists
-                if iDist == obj.NDists
-                    ParmCodeForP = 'f';
-                end
-                if ParmCodeForP == 'r'
-                    obj.NDistParms = obj.NDistParms + 1;
-                end
-                obj.DistParmP(iDist) = ParmCodeForP;
-                if iDist < obj.NDists
-                    obj.DefaultParmCodes = [obj.DefaultParmCodes ParmCodeForP];
-                end
-                obj.DefaultParmCodes = [obj.DefaultParmCodes obj.BasisRV{iDist}.DefaultParmCodes];
-                obj.NDistParms = obj.NDistParms + obj.BasisRV{iDist}.NDistParms;
-                obj.CumNParms(iDist) = obj.NDistParms;
-            end
-            obj.NDistParms = obj.NDistParms + obj.NDists - 1;  % Count the free P's
-            %             fprintf('NDistParms is %f and parmcodes is %s\n',obj.NDistParms,obj.DefaultParmCodes);
         end
         
         function BuildMyName(obj)

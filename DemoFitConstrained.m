@@ -260,7 +260,8 @@ ConstraintFn = @DemoFitConstraintFn6;   % This user-supplied function converts f
                                         % into suggested parameter values for the distributions that are being fit.
 
 % Now perform the actual fit:
-[Dists, ErrScores] = FitConstrained(Dists,Datasets,sErrorFn,ConstraintFn,StartingVals);
+SearchOptions = optimset('MaxFunEvals',10^6);  % By the way, SearchOptions can be used
+[Dists, ErrScores] = FitConstrained(Dists,Datasets,sErrorFn,ConstraintFn,StartingVals,SearchOptions);
 disp(['The fitted distributions are ' Dists{1}.StringName ' and ' Dists{2}.StringName]);
 disp('The constraint implies that the fitted distributions should have equal means and std devs:');
 fprintf('The estimated mean and standard deviation of Dist1 are %f and %f.\n',Dists{1}.Mean,Dists{1}.SD);
