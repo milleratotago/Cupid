@@ -187,10 +187,14 @@ disp(['The fitted distributions are ' Dists{1}.StringName ' and ' Dists{2}.Strin
 disp('The constraint implies that the CDFs of these distributions evaluated at s=50 should sum to 1.0:');
 disp(['The actual sum is ' num2str(Dists{1}.CDF(s) + Dists{2}.CDF(s))]);
 
+disp(' ');
 
 %%
 disp('Example 5: Constrain some properties of the distributions--here, their means and SDs--')
 disp('rather than constraining their parameters.');
+disp('In this example, fminsearch can suggest any real parameter values that it wants, and this');
+disp('could cause the search to fail if an illegal parameter value is suggested (e.g., negative variance)');
+disp('See Example 7 for a more bullet-proof approach.');
 
 % Clear these variables so that MATLAB will not be confused by their previous types.
 clear Dists;
@@ -224,10 +228,7 @@ fprintf('The estimated mean and standard deviation of Dist1 are %f and %f.\n',Di
 fprintf('The estimated mean and standard deviation of Dist2 are %f and %f.\n',Dists{2}.Mean,Dists{2}.SD);
 
 
-
-
-
-
+disp(' ');
 
 %%
 disp('Example 6: Constrain one distribution to be a mixture of two others.')
@@ -262,8 +263,44 @@ ConstraintFn = @DemoFitConstraintFn6;   % This user-supplied function converts f
 % Now perform the actual fit:
 SearchOptions = optimset('MaxFunEvals',10^6);  % By the way, SearchOptions can be used
 [Dists, ErrScores] = FitConstrained(Dists,Datasets,sErrorFn,ConstraintFn,StartingVals,SearchOptions);
+disp(['The fitted distributions are ' Dists{1}.StringName ', ' Dists{2}.StringName  ', and ' Dists{3}.StringName]);
+
+disp(' ');
+
+%%
+disp('Example 7: Constrain two distributions to produce the same mean and standard deviation.')
+disp('This example relies on the distribution-specific functions ParmsToReals and RealsToParms')
+disp('to constrain each distribution''s parameter values to their possible ranges.');
+disp('This is better than Example5 because it ensures that no illegal parameter combinations are tried.');
+
+% Clear these variables so that MATLAB will not be confused by their previous types.
+clear Dists;
+clear Datasets;
+
+% First generate a fake dataset (see **NOTE**).
+n1=200; n2=190;  % arbitrary sample sizes
+TrueDist1 = Normal(105,18);
+TrueDist2 = RNGamma(11,1/8);
+Datasets{1} = TrueDist1.Random(n1,1);   % Data from distributions.
+Datasets{2} = TrueDist2.Random(n2,1);
+% Note that the constraint is not truly satisfied because these distributions
+% do not have the same variance.
+% Now we are done generating the fake datasets.
+
+% Set some parameters defining the desired fit:
+Dists{1} = Normal(100,10);
+Dists{2} = RNGamma(10,1/10);
+sErrorFn = '-LnLikelihood';   % The name of the error function to be minimized; see FitConstrained.m for a list of the options.
+StartingVals = [Dists{1}.ParmsToReals(Dists{1}.ParmValues) Dists{2}.ParmsToReals(Dists{2}.ParmValues)];      % Starting values for the parameters expected by DemoFitConstraintFn7.
+ConstraintFn = @DemoFitConstraintFn7;   % This user-supplied function converts fminsearch's suggested parameter values
+                                        % into suggested parameter values for the distributions that are being fit.
+
+% Now perform the actual fit:
+SearchOptions = optimset('MaxFunEvals',10^6);  % By the way, SearchOptions can be used
+[Dists, ErrScores] = FitConstrained(Dists,Datasets,sErrorFn,ConstraintFn,StartingVals,SearchOptions);
 disp(['The fitted distributions are ' Dists{1}.StringName ' and ' Dists{2}.StringName]);
 disp('The constraint implies that the fitted distributions should have equal means and std devs:');
 fprintf('The estimated mean and standard deviation of Dist1 are %f and %f.\n',Dists{1}.Mean,Dists{1}.SD);
 fprintf('The estimated mean and standard deviation of Dist2 are %f and %f.\n',Dists{2}.Mean,Dists{2}.SD);
 
+disp(' ');
