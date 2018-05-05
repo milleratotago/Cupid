@@ -1,5 +1,7 @@
 %% Modify this script inside the **** OPTIONS **** section.
 
+sThisClass = 'BinomialMixed';
+
 % Some standard lines:
 import matlab.unittest.TestSuite  % avoids having to specify this as a qualifier on its method names:
 runner = matlab.unittest.TestRunner.withTextOutput();
@@ -29,7 +31,6 @@ global GlobalSkipAllEst
   warning off backtrace;   % Display 1-line warning messages.
 % warning on backtrace;    % Display full warning messages.
 
-sThisClass = 'StudRng';
 ThisClass = eval(['?ut' sThisClass]);       % Specify the class of unit tests to run.
 DiaryName = [sThisClass '.err'];  % Specify a name for the output diary file.
 if exist(DiaryName,'file')>0

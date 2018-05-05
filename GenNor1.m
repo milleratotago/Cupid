@@ -1,19 +1,22 @@
 classdef GenNor1 < dContinuous
     % This is version 1 of https://en.wikipedia.org/wiki/Generalized_normal_distribution
-    % "General Error Distribution",
+    % 
     
     % Notes:
     % This family includes the normal distribution when \beta =2 (with mean \mu and variance \alpha^{2}/2 
-    % and it includes the Laplace distribution when \beta =1.
+    % and it includes the Laplace distribution when \beta =1. That is:
+    %    GenNor1(mu,scale,1) = Laplace(mu,scale)
+    %    GenNor1(mu,scale,2) = Normal(mu,scale)
     % As \beta \rightarrow \infty, the density converges pointwise to a uniform density on
     %  (\mu -\alpha ,\mu +\alpha ).
     
     % This code requires the gamma and incomplete gamma functions
 
-    % The distribution may also be called the "Error Distribution" by Evans, Hasting, & Peacock (1993), p. 57.
-    %  and "Subbotin's distribution" by Johnson, Kotz, & Balakrishnan, 1995, Vol 2, p. 195
-    % GenNor1(mu,scale,1) = Laplace(mu,scale)
-    % GenNor1(mu,scale,2) = Normal(mu,scale)
+    % The distribution may also be called:
+    %   "General Error Distribution"
+    %   the "Error Distribution" by Evans, Hasting, & Peacock (1993), p. 57.
+    %   "Subbotin's distribution" by Johnson, Kotz, & Balakrishnan, 1995, Vol 2, p. 195
+    % More info in: Mineo, A., & Ruggieri, M. (2005). A software tool for the exponential power distribution: The normalp package. Journal of Statistical Software, 12, 1-24.
     
     properties(SetAccess = protected)
         Mu     % Location, Real
@@ -100,6 +103,33 @@ classdef GenNor1 < dContinuous
             thiscdf(X<obj.LowerBound) = 0;
             thiscdf(X>obj.UpperBound) = 1;
         end
+
+% It may be possible to add InverseCDF using a GammaBasis = RNGamma(1/obj.Beta,obj.Beta).
+% Since the RNGammaInverseCDF must also be found numerically, though, this does not
+% seem to be faster: if anything, slightly slower.  I did not check accuracy.
+%         function thisval=InverseCDF(obj,P)
+%             assert(obj.Initialized,UninitializedError(obj));
+%             GammaBasis = RNGamma(1/obj.Beta,obj.Beta);  % NEWJEFF: Make as part of object?
+%             TwoAlphaBeta = 2*obj.Alpha*obj.Beta;
+%             thisval=zeros(size(P));
+%             for i=1:numel(P)
+%                 TopHalf = P(i) >= 0.5;
+%                 if TopHalf
+%                     ZP = P(i) - 0.5;
+%                 else
+%                     ZP = 0.5 - P(i);
+%                 end
+%                 ZP = ZP * 2;
+%                 ZZ = GammaBasis.InverseCDF(ZP);
+%                 ZZ = ZZ*TwoAlphaBeta;
+%                 Z = ZZ^(1/obj.Beta);
+%                 if TopHalf
+%                     thisval(i) = obj.Mu + Z;
+%                 else
+%                     thisval(i) = obj.Mu - Z;
+%                 end
+%             end
+%         end
         
         function thisval=Mean(obj)
             assert(obj.Initialized,UninitializedError(obj));

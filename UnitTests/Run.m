@@ -1,6 +1,6 @@
 function Run(ThisCase)
-    
-    %% Main script to run a set of tests
+
+%% Main script to run a set of tests
 
 % Defaults:
 % clc
@@ -10,13 +10,13 @@ import matlab.unittest.TestSuite  % avoids having to specify this as a qualifier
 runner = matlab.unittest.TestRunner.withTextOutput();
 global WantPlots
 global GlobalSkipAllEst
-OneClass = false;
+DiaryRoot = '00';
+
 Continuous = false;
 Discrete = false;
 Derived = false;
 Fast = false;
 Slow = false;
-DiaryName = '00';
 
 
 % **************** OPTIONS START HERE ****************
@@ -31,7 +31,7 @@ WantPlots = false;
 % GlobalSkipAllEst = true;
 GlobalSkipAllEst = false;
 if GlobalSkipAllEst
-    DiaryName = [DiaryName 'GSE'];
+    DiaryRoot = [DiaryRoot 'GSE'];
 end
 
 Parallel = false;
@@ -46,43 +46,28 @@ warning off backtrace;   % Display 1-line warning messages.
 switch ThisCase
     case 1
         Continuous = true;        Fast = true;
-        DiaryName = [DiaryName 'CntFas'];
     case 2
         Continuous = true;        Slow = true;
-        DiaryName = [DiaryName 'CntSlo'];
     case 3
         Derived = true;          Fast = true;
-        DiaryName = [DiaryName 'DrvFas'];
     case 4
         Derived = true;          Slow = true;
-        DiaryName = [DiaryName 'DrvSlo'];
     case 5
         Discrete = true;         Fast = true;
-        DiaryName = [DiaryName 'DisFas'];
     case 6
         Discrete = true;         Slow = true;
-        DiaryName = [DiaryName 'DisSlo'];
 end
 
-DiaryName = [DiaryName '.err'];
-if exist(DiaryName,'file')>0
-    delete(DiaryName)  % Delete old version of err file
-end
 
 % **************** OPTIONS END HERE ****************
 
 tests = [];
 results = [];
 
-diary(DiaryName);
-
 time0 = tic;
 
-if OneClass
-    [t0, r0] = ClassTest(ThisClass,             Parallel,runner); tests = [tests t0]; results = [results r0];
-end						
-
-if Continuous && Fast				
+if Continuous && Fast
+    StartDiary([DiaryRoot 'CntFas']);
     [t0, r0] = ClassTest(?utBeta,               Parallel,runner); tests = [tests t0]; results = [results r0];
     [t0, r0] = ClassTest(?utCauchy,             Parallel,runner); tests = [tests t0]; results = [results r0];
     [t0, r0] = ClassTest(?utChi,                Parallel,runner); tests = [tests t0]; results = [results r0];
@@ -131,9 +116,11 @@ if Continuous && Fast
     [t0, r0] = ClassTest(?utUniGap,             Parallel,runner); tests = [tests t0]; results = [results r0];
     [t0, r0] = ClassTest(?utWald2,              Parallel,runner); tests = [tests t0]; results = [results r0];
     [t0, r0] = ClassTest(?utWeibull,            Parallel,runner); tests = [tests t0]; results = [results r0];
-end						
+    diary('off');
+end
 
-if Continuous && Slow				
+if Continuous && Slow
+    StartDiary([DiaryRoot 'CntSlo']);
     [t0, r0] = ClassTest(?utChiSqNoncentral,    Parallel,runner); tests = [tests t0]; results = [results r0];
     [t0, r0] = ClassTest(?utExpSumT,            Parallel,runner); tests = [tests t0]; results = [results r0];
     [t0, r0] = ClassTest(?utFNoncentral,        Parallel,runner); tests = [tests t0]; results = [results r0];
@@ -147,14 +134,30 @@ if Continuous && Slow
     [t0, r0] = ClassTest(?utTriangularGCWP,     Parallel,runner); tests = [tests t0]; results = [results r0];
     [t0, r0] = ClassTest(?utVonMises,           Parallel,runner); tests = [tests t0]; results = [results r0];
     [t0, r0] = ClassTest(?utWald,               Parallel,runner); tests = [tests t0]; results = [results r0];
-end						
-
-if Discrete && Fast				
-    [t0, r0] = ClassTest(?utBinomial,           Parallel,runner); tests = [tests t0]; results = [results r0];
+    diary('off');
 end
 
-if Derived && Fast				
-    % This section takes ~14 min non-parallel	
+if Discrete && Fast
+    StartDiary([DiaryRoot 'DisFas']);
+    [t0, r0] = ClassTest(?utBinomial,           Parallel,runner); tests = [tests t0]; results = [results r0];
+    [t0, r0] = ClassTest(?utBinomialMixe,       Parallel,runner); tests = [tests t0]; results = [results r0];
+    [t0, r0] = ClassTest(?utGeometric,          Parallel,runner); tests = [tests t0]; results = [results r0];
+    [t0, r0] = ClassTest(?utPoisson,            Parallel,runner); tests = [tests t0]; results = [results r0];
+    % [t0, r0] = ClassTest(?utRankDist,            Parallel,runner); tests = [tests t0]; results = [results r0];
+    [t0, r0] = ClassTest(?utUniformInt,         Parallel,runner); tests = [tests t0]; results = [results r0];
+    diary('off');
+end
+
+if Discrete && Slow
+    StartDiary([DiaryRoot 'DisSlo']);
+%    [t0, r0] = ClassTest(?utBinomial,           Parallel,runner); tests = [tests t0]; results = [results r0];
+%    [t0, r0] = ClassTest(?utPoisson,            Parallel,runner); tests = [tests t0]; results = [results r0];
+    diary('off');
+end
+
+if Derived && Fast
+    % This section takes ~14 min non-parallel
+    StartDiary([DiaryRoot 'DrvFas']);
     [t0, r0] = ClassTest(?utAddTrans,           Parallel,runner); tests = [tests t0]; results = [results r0];
     [t0, r0] = ClassTest(?utArcsinTrans,        Parallel,runner); tests = [tests t0]; results = [results r0];
     [t0, r0] = ClassTest(?utExpTrans,           Parallel,runner); tests = [tests t0]; results = [results r0];
@@ -178,10 +181,12 @@ if Derived && Fast
     [t0, r0] = ClassTest(?utTruncatedX,         Parallel,runner); tests = [tests t0]; results = [results r0];
     [t0, r0] = ClassTest(?utTruncatedXlow,      Parallel,runner); tests = [tests t0]; results = [results r0];
     [t0, r0] = ClassTest(?utTruncatedXhi,       Parallel,runner); tests = [tests t0]; results = [results r0];
-end						
-						
-if Derived && Slow				
-    % This section takes 330 min non-parallel	
+    diary('off');
+end
+
+if Derived && Slow
+    % This section takes 330 min non-parallel
+    StartDiary([DiaryRoot 'DrvSlo']);
     [t0, r0] = ClassTest(?utAttainP,            Parallel,runner); tests = [tests t0]; results = [results r0];
     [t0, r0] = ClassTest(?utConvolution,        Parallel,runner); tests = [tests t0]; results = [results r0];
     [t0, r0] = ClassTest(?utDifference,         Parallel,runner); tests = [tests t0]; results = [results r0];
@@ -189,6 +194,7 @@ if Derived && Slow
     [t0, r0] = ClassTest(?utMinBound,           Parallel,runner); tests = [tests t0]; results = [results r0];
     [t0, r0] = ClassTest(?utOrder,              Parallel,runner); tests = [tests t0]; results = [results r0];
     [t0, r0] = ClassTest(?utOrderIID,           Parallel,runner); tests = [tests t0]; results = [results r0];
+    diary('off');
 end
 
 % Note: When running parallel, MATLAB reports xxx seconds testing time, but it appears to sum the
@@ -199,7 +205,6 @@ wantloc=strfind(s,'Totals:');
 fprintf(['Summary of test result totals:\n' s(wantloc+8:end)]);
 totalmins_elapsed = toc(time0) / 60
 
-diary('off');
 
 if (totalmins_elapsed > 5) && WantBeep
     DoneBeep;
@@ -216,7 +221,7 @@ result2 = run(failedTests)
 
 
 
-%% 
+%%
 Parallel = false;
 
 if Parallel
@@ -238,4 +243,13 @@ end
 % runtests('utAddTrans','ParameterName','parm3')
 
 
+end
+
+
+function StartDiary(DiaryName)
+DiaryName = [DiaryName '.err'];
+if exist(DiaryName,'file')>0
+    delete(DiaryName)  % Delete old version of err file
+end
+diary(DiaryName);
 end

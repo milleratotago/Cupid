@@ -67,7 +67,7 @@ classdef dGeneric < handle  % Calls by reference
     end
     
     properties(SetAccess = public)  % These properties can be changed without restriction
-        XNearlyZero, XNearlyOne, CDFNearlyZero, CDFNearlyOne
+        XNearlyZero, XNearlyOne, CDFNearlyZero, CDFNearlyOne, PDFNearlyZero
         SearchOptions     % A MATLAB optimset used in parameter searching.
         UseSplinePDF      % Boolean indicating whether the PDF is to be approximated with splines
         UseSplineCDF      % Boolean indicating whether the CDF is to be approximated with splines
@@ -97,6 +97,7 @@ classdef dGeneric < handle  % Calls by reference
             obj.Initialized = false;
             obj.NameBuilding = true;
             obj.XNearlyZero = 0.1e-10;
+            obj.PDFNearlyZero = 0.1e-10;
             obj.CDFNearlyZero = 0.1e-10;
             obj.XNearlyOne = 1 - obj.XNearlyZero;
             obj.CDFNearlyOne = 1 - obj.CDFNearlyZero;
@@ -473,12 +474,15 @@ classdef dGeneric < handle  % Calls by reference
                 obj.StoredXs = NBinsOrListOfX;
             end
             obj.StoredCDFs = obj.StoredXs;  % Just copying the size
-            SumCDF = 0;
-            obj.StoredCDFs(1) = integral(@(x) PDF(obj,x),obj.LowerBound,obj.StoredXs(1),'AbsTol',obj.IntegralPDFAbsTol,'RelTol',obj.IntegralPDFRelTol);
-            for iel=2:numel(obj.StoredXs)
-                obj.StoredCDFs(iel) =  integral(@(x) PDF(obj,x),obj.StoredXs(iel-1),obj.StoredXs(iel),'AbsTol',obj.IntegralPDFAbsTol,'RelTol',obj.IntegralPDFRelTol)
+            if obj.DistType==Continuous
+                obj.StoredCDFs(1) = integral(@(x) PDF(obj,x),obj.LowerBound,obj.StoredXs(1),'AbsTol',obj.IntegralPDFAbsTol,'RelTol',obj.IntegralPDFRelTol);
+                for iel=2:numel(obj.StoredXs)
+                    obj.StoredCDFs(iel) =  integral(@(x) PDF(obj,x),obj.StoredXs(iel-1),obj.StoredXs(iel),'AbsTol',obj.IntegralPDFAbsTol,'RelTol',obj.IntegralPDFRelTol)
+                end
+                obj.StoredCDFs = cumsum(obj.StoredCDFs);
+            else
+                obj.StoredCDFs = obj.CDF(obj.StoredXs);
             end
-            obj.StoredCDFs = cumsum(obj.StoredCDFs);
             obj.UseStoredCDFs = true;
             obj.HaveStoredCDFs = true;
         end

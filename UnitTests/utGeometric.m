@@ -1,8 +1,7 @@
-classdef utBinomial < utDiscrete;
+classdef utGeometric < utDiscrete;
     
     properties (ClassSetupParameter)
-        parmN = struct('p2',2,    'p4',4     , 'p20',20, 'p100',100 , 'p500',500 );
-        parmp = struct('p_1',0.1, 'p_83',.83 , 'p_8',.8, 'p_55',.55 , 'p_73',.73 );
+        parmp = struct('p_1',0.1, 'p_33',.33 , 'p_55',.55 , 'p_73',.73, 'p_84',.84 );
     end
     
     properties
@@ -11,7 +10,7 @@ classdef utBinomial < utDiscrete;
 
     methods
         
-        function testCase=utBinomial(varargin)  % Constructor
+        function testCase=utGeometric(varargin)  % Constructor
             testCase=testCase@utDiscrete(varargin{:});
         end
         
@@ -19,9 +18,9 @@ classdef utBinomial < utDiscrete;
     
     methods (TestClassSetup, ParameterCombination='sequential')
         
-        function ClassSetup(testCase,parmN,parmp)
+        function ClassSetup(testCase,parmp)
             % Computations specific to the normal distribution.
-            testCase.Dist = Binomial(parmN,parmp);
+            testCase.Dist = Geometric(parmp);
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 
             testCase.xvalues = testCase.Dist.LowerBound:testCase.Dist.UpperBound;
@@ -31,19 +30,19 @@ classdef utBinomial < utDiscrete;
             testCase.xMLE = testCase.Dist.InverseCDF( (1:2:(2*npoints-1)) / (2*npoints) );
             
             % Compute whatever values known are known from other sources:
-            testCase.Expected.Mean = parmN*parmp;
-            testCase.Expected.Variance = parmN*parmp*(1-parmp);
             
             % Adjust tolerances as appropriate for this distribution & parameters:
             SetTolerances(testCase,0.005);
-            testCase.KurtRelTol = 0.01;  % Kurtosis not so accurate
 
+            if parmp>.6  % not enough probability in different bins to do Probit estimation
+                testCase.SkipAllProbitEst = true;
+            end
             utGenericMethodSetup(testCase);   % Initialize many standard computations
 
         end
         
     end  % TestClassSetup
     
-end  % utBinomial
+end  % utGeometric
 
 

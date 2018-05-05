@@ -89,6 +89,7 @@ classdef utGeneric < matlab.unittest.TestCase
         SkipMLEst
         SkipMomentEst
         SkipAllEst
+        SkipAllProbitEst
     end
     
     methods
@@ -119,6 +120,7 @@ classdef utGeneric < matlab.unittest.TestCase
             testCase.SkipMLEst = false;
             testCase.SkipMomentEst = false;
             testCase.SkipAllEst = false;
+            testCase.SkipAllProbitEst = false;
         end
         
         function SetTolerances(testCase,DefaultTolerance)
@@ -183,7 +185,7 @@ classdef utGeneric < matlab.unittest.TestCase
         
         function NCorrect = MakeProbitmAFCData(testCase)
             % The data to be fit are a set of bins defined by the original distribution,
-            % and the value of 1-CDF for each of those bins, adjusted for guessing.
+            % and the value of CDF for each of those bins, adjusted for guessing.
             GuessProb = 1 / testCase.ProbitmAFC;
             NCorrect = testCase.ProbitNTrials .* (GuessProb + (1 - GuessProb) * testCase.ProbitBinCDFs);
         end
@@ -226,13 +228,20 @@ classdef utGeneric < matlab.unittest.TestCase
             testCase.Computed.PctileSkew99 = testCase.Dist.PctileSkew(0.99);
             
             % Make bins for probit testing:
-            testCase.ProbitBinMax = testCase.Dist.MakeBinSet(testCase.ProbitNBins,false);
+            testCase.ProbitBinMax = testCase.Dist.MakeBinSet(1/testCase.ProbitNBins);
             testCase.ProbitBinMax = testCase.ProbitBinMax(2:end-1);  % omit the 2 most extreme bins to avoid edge effects
             testCase.ProbitBinCDFs = testCase.Dist.CDF(testCase.ProbitBinMax);
             testCase.ProbitNTrials = ones(size(testCase.ProbitBinCDFs))*testCase.ProbitNPerBin;
             
         end
         
+        function tf = TooFewForProbit(testCase,Complain)       
+            tf = (testCase.Dist.DistType == 'd') && (testCase.ProbitNBins >= testCase.Dist.NValues);
+            if tf && Complain
+                 warning('Not enough discrete values to do probit estimation.');
+            end
+        end
+
     end  % methods
     
     methods(TestClassSetup) % TestMethodSetup
@@ -268,17 +277,18 @@ classdef utGeneric < matlab.unittest.TestCase
         
         function Hazardcheck(testCase)
             % Make sure the hazard function can be computed & is always positive.
-            testCase.verifyGreaterThanOrEqual(testCase.Computed.Hazard,0,'Found negative Hazard function values');
+            Useable = testCase.Computed.CDF < 1;
+            testCase.verifyGreaterThanOrEqual(testCase.Computed.Hazard(Useable),0,'Found negative Hazard function values');
             % Check that the Hazard function values are consistent with the PDF/CDF values:
-            HazardFromPDFCDF = testCase.Computed.PDF ./ (1 - testCase.Computed.CDF);
-            testCase.verifyEqual(testCase.Computed.Hazard,HazardFromPDFCDF,'AbsTol',testCase.HazAbsTol,'RelTol',testCase.HazRelTol,'Hazard function values are not consistent with PDF/CDF values within HazAbsTol/HazRelTol.');
+            HazardFromPDFCDF = testCase.Computed.PDF(Useable) ./ (1 - testCase.Computed.CDF(Useable));
+            testCase.verifyEqual(testCase.Computed.Hazard(Useable),HazardFromPDFCDF,'AbsTol',testCase.HazAbsTol,'RelTol',testCase.HazRelTol,'Hazard function values are not consistent with PDF/CDF values within HazAbsTol/HazRelTol.');
             CheckIfExpectedKnown(testCase,'Hazard',testCase.HazAbsTol,testCase.HazRelTol);
         end
         
         function InverseCDFcheck(testCase)
             % Make sure the CDF can be computed & is always in the range 0-1.
             testCase.verifyEqual(testCase.Computed.InverseCDF,testCase.xvalues,'AbsTol',testCase.XAbsTol,'RelTol',testCase.XRelTol,'InverseCDF values do not match original xvalues within XAbsTol/XRelTol.');
-            CheckIfExpectedKnown(testCase,'InverseCDF',testCase.XAbsTol,testCase.XRelTol);
+            % CheckIfExpectedKnown(testCase,'InverseCDF',testCase.XAbsTol,testCase.XRelTol);  % This test would be redundant because Expected was simply set to xvalues
         end
         
         function Moments(testCase)
@@ -364,9 +374,17 @@ classdef utGeneric < matlab.unittest.TestCase
                 RandVals = testCase.Dist.Random(testCase.ChiSqNRands,1);
                 testCase.verifyGreaterThanOrEqual(RandVals,testCase.MinRand,'Generated random number(s) below the lower bound.');
                 testCase.verifyLessThanOrEqual(RandVals,testCase.MaxRand,'Generated random number(s) greater than the upper bound.');
-                BinMax = testCase.Dist.MakeBinSet(testCase.ChiSqNBins,false);
+                BinMax = testCase.Dist.MakeBinSet(1/testCase.ChiSqNBins);
                 BinProb = testCase.Dist.FindBinProbs(BinMax);
                 [~, obschisqp] = obschisq(RandVals,BinMax,BinProb);
+%                 if testCase.Dist.DistType=='c'
+%                     [~, obschisqp] = obschisq(RandVals,BinMax,BinProb);
+%                 elseif testCase.Dist.DistType=='d'
+%                     [~, obschisqp] = obschisqd(RandVals,BinMax,BinProb);
+%                 else
+%                     warning('CheckRandom only implemented for continuous & discrete distributions.');
+%                     return;
+%                 end
                 PassedChisqTest = obschisqp > testCase.ChiSqCriticalp;
             end
             testCase.verifyTrue(PassedChisqTest,'Random numbers failed the chi-square test.');
@@ -496,7 +514,10 @@ classdef utGeneric < matlab.unittest.TestCase
             UpperX = testCase.Dist.InverseCDF(UpperP);
             TargetpDiff = UpperP - LowerP;
             %           fprintf('%8.3f %8.3f\n',[ObsPercentiles',TargetCDF']');  % testing
-            
+            if LowerX >= UpperX
+                warning('Cannot perform PctBoundsEstTest for this distribution because LowerX >= UpperX');
+                return;
+            end
             % Save current parameters & then perturb them slightly, to see whether estimation process recovers the original parms:
             HoldParms = testCase.Dist.ParmValues;
             testCase.Dist.PerturbParms(testCase.EstParmCodes);
@@ -524,9 +545,9 @@ classdef utGeneric < matlab.unittest.TestCase
                 return
             end
             
-            BinMax = testCase.Dist.MakeBinSet(testCase.ChiSqEstNBins,false);
+            BinMax = testCase.Dist.MakeBinSet(1/testCase.ChiSqEstNBins);
             BinCDFs = testCase.Dist.CDF(BinMax);
-            BinProbs = diff([0; BinCDFs]);
+            BinProbs = diff([0 BinCDFs]);
             
             % Save current parameters & then perturb them slightly, to see whether estimation process recovers the original parms:
             HoldParms = testCase.Dist.ParmValues;
@@ -544,15 +565,15 @@ classdef utGeneric < matlab.unittest.TestCase
             % Reinstate the original parameter values:
             testCase.Dist.ResetParms(HoldParms);
         end
-        
+
         function ProbitYNMaxLikEstTest(testCase)
             % The data to be fit are a set of bins defined by the original distribution, and the value of 1-CDF for each of those bins.
             
             global GlobalSkipAllEst;
-            if GlobalSkipAllEst || testCase.SkipAllEst
+            if GlobalSkipAllEst || testCase.SkipAllEst || testCase.SkipAllProbitEst || TooFewForProbit(testCase,true)
                 return
             end
-            
+
             NGreater = testCase.ProbitNTrials .* testCase.ProbitBinCDFs;
             
             % Save current parameters & then perturb them slightly, to see whether estimation process recovers the original parms:
@@ -576,7 +597,7 @@ classdef utGeneric < matlab.unittest.TestCase
             % The data to be fit are a set of bins defined by the original distribution, and the value of 1-CDF for each of those bins.
             
             global GlobalSkipAllEst;
-            if GlobalSkipAllEst || testCase.SkipAllEst
+            if GlobalSkipAllEst || testCase.SkipAllEst || testCase.SkipAllProbitEst || TooFewForProbit(testCase,false)
                 return
             end
             
@@ -603,7 +624,7 @@ classdef utGeneric < matlab.unittest.TestCase
             % The data to be fit are a set of bins defined by the original distribution, and the value of 1-CDF for each of those bins.
             
             global GlobalSkipAllEst;
-            if  GlobalSkipAllEst || testCase.SkipAllEst
+            if  GlobalSkipAllEst || testCase.SkipAllEst || testCase.SkipAllProbitEst || TooFewForProbit(testCase,false)
                 return
             end
             
@@ -630,7 +651,7 @@ classdef utGeneric < matlab.unittest.TestCase
             % The data to be fit are a set of bins defined by the original distribution, and the value of 1-CDF for each of those bins.
             
             global GlobalSkipAllEst;
-            if  GlobalSkipAllEst || testCase.SkipAllEst
+            if  GlobalSkipAllEst || testCase.SkipAllEst || testCase.SkipAllProbitEst || TooFewForProbit(testCase,false)
                 return
             end
             

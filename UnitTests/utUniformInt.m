@@ -1,8 +1,8 @@
-classdef utBinomial < utDiscrete;
+classdef utUniformInt < utDiscrete;
     
     properties (ClassSetupParameter)
-        parmN = struct('p2',2,    'p4',4     , 'p20',20, 'p100',100 , 'p500',500 );
-        parmp = struct('p_1',0.1, 'p_83',.83 , 'p_8',.8, 'p_55',.55 , 'p_73',.73 );
+        parmLo = struct('p2',2,   'p4',4   , 'p20',20, 'p100',100 , 'p500',500 );
+        parmHi = struct('p10',10, 'p83',83 , 'p80',80, 'p550',550 , 'p730',730 );
     end
     
     properties
@@ -11,7 +11,7 @@ classdef utBinomial < utDiscrete;
 
     methods
         
-        function testCase=utBinomial(varargin)  % Constructor
+        function testCase=utUniformInt(varargin)  % Constructor
             testCase=testCase@utDiscrete(varargin{:});
         end
         
@@ -19,9 +19,9 @@ classdef utBinomial < utDiscrete;
     
     methods (TestClassSetup, ParameterCombination='sequential')
         
-        function ClassSetup(testCase,parmN,parmp)
+        function ClassSetup(testCase,parmLo,parmHi)
             % Computations specific to the normal distribution.
-            testCase.Dist = Binomial(parmN,parmp);
+            testCase.Dist = UniformInt(parmLo,parmHi);
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 
             testCase.xvalues = testCase.Dist.LowerBound:testCase.Dist.UpperBound;
@@ -31,12 +31,13 @@ classdef utBinomial < utDiscrete;
             testCase.xMLE = testCase.Dist.InverseCDF( (1:2:(2*npoints-1)) / (2*npoints) );
             
             % Compute whatever values known are known from other sources:
-            testCase.Expected.Mean = parmN*parmp;
-            testCase.Expected.Variance = parmN*parmp*(1-parmp);
+            testCase.Expected.Mean = (parmLo+parmHi)/2;
             
             % Adjust tolerances as appropriate for this distribution & parameters:
             SetTolerances(testCase,0.005);
-            testCase.KurtRelTol = 0.01;  % Kurtosis not so accurate
+            % testCase.KurtRelTol = 0.01;  % Kurtosis not so accurate
+            
+            testCase.SkipAllEst = true;  % error when fminsearch suggests low/high crossover
 
             utGenericMethodSetup(testCase);   % Initialize many standard computations
 
@@ -44,6 +45,6 @@ classdef utBinomial < utDiscrete;
         
     end  % TestClassSetup
     
-end  % utBinomial
+end  % utUniformInt
 
 

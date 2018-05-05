@@ -281,7 +281,7 @@ Possible Further options:
         ColWidDP = '%12.4f';
         ColWid = '%12s';
         XbyInverseCheck = 'Computing X by CDF then InverseCDF.';
-        XbyInverseBigErrorTolerance = 10*cto.XbyInverseErrorTolerance;
+        % XbyInverseBigErrorTolerance = 10*cto.XbyInverseErrorTolerance;
         StringOut('Table of X Values at Percentiles and Functions of X:');
         S=sprintf([PctColWid ColWid ColWid ColWid ColWid ColWid],'Pctile','X','PDF','CDF','XbyInvCDF','Hazard');
         StringOut(S);
@@ -527,7 +527,7 @@ Possible Further options:
         if numel(find(cto.RandVals>dist.UpperBound)) > 0
             StringOut([cto.ErrorSignal ' WARNING: Random values greater than upperbound of ' num2str(dist.UpperBound)]);
         end
-        BinMax = MakeBinSet(dist,cto.NChiSqBins,false);
+        BinMax = MakeBinSet(dist,1/cto.NChiSqBins);
         BinProb = FindBinProbs(dist,BinMax);
         [obschisqval, obschisqp] = obschisq(cto.RandVals,BinMax,BinProb);
         StringOut(['RNG check yields ObsChiSq = ' num2str(obschisqval) ' with ' num2str(cto.NChiSqBins) ' bins and p = ' num2str(obschisqp)] );
@@ -617,7 +617,7 @@ Possible Further options:
         if cto.ChiSqEst
             StringOut('Example of Chi-Square bin-based Estimation:');
             % Choose bins based on the original distribution.
-            BinMax = MakeBinSet(dist,cto.NChiSqBins,false);
+            BinMax = MakeBinSet(dist,1/cto.NChiSqBins);
             BrainDeadHistc=histc(cto.RandVals,BinMax);
             BinProbs = BrainDeadHistc(1:numel(BinMax))/numel(cto.RandVals);
             StartError = GofFChiSq(dist,BinMax,BinProbs);
@@ -647,15 +647,22 @@ Possible Further options:
         
         % Probit estimation starts here.
         
+        % if ~(dist.DistType == 'c')
+        %     warning('Probit estimation testing only supported for continuous distributions.')
+        %     % NWJEFF: Problems with MakeBinSet now fixed?
+        %     return
+        % end
+        
         GuessProb = 1 / cto.ProbitmAFC;
-        NTrials = ones(cto.NProbitBins,1)*cto.NProbitTrialsPerBin;
+        NTrials = ones(1,cto.NProbitBins)*cto.NProbitTrialsPerBin;
         
         if cto.ProbitYNMaxLikEst || cto.ProbitYNMaxChiSq
             % Generate sample data for YN task:
+            NGreater = zeros(1,cto.NProbitBins);
             for iBin=1:cto.NProbitBins
                 BinMax(iBin)=InverseCDF(dist,(iBin-0.5)/cto.NProbitBins);
                 ThisP = CDF(dist,BinMax(iBin));
-                NGreater(iBin) = binornd(NTrials(iBin),1-ThisP);
+                NGreater(iBin) = binornd(NTrials(iBin),ThisP);
             end
         end
         
@@ -691,7 +698,7 @@ Possible Further options:
                 BinMax(iBin)=InverseCDF(dist,(iBin-0.5)/cto.NProbitBins);
                 ThisP = CDF(dist,BinMax(iBin));
                 ThisP = GuessProb + (1 - GuessProb) * ThisP;
-                NGreater(iBin) = binornd(NTrials(iBin),1-ThisP);
+                NGreater(iBin) = binornd(NTrials(iBin),ThisP);
             end
         end
         
@@ -747,7 +754,7 @@ Possible Further options:
         StringOut(sprintf('%*s %*s %*s',2*ColWid,'Stimulus Value',ColWid,'Observed Pr',ColWid,'Predicted Pr'));
         for iBin = 1:cto.NProbitBins
             StringOut(sprintf('%*.*f %*.*f %*.*f',2*ColWid,DP,BinMax(iBin),...
-                ColWid,DP,NGreater(iBin)/NTrials(iBin),ColWid,DP,1-CDF(dist,BinMax(iBin))));
+                ColWid,DP,NGreater(iBin)/NTrials(iBin),ColWid,DP,CDF(dist,BinMax(iBin))));
         end
     end
 
@@ -759,7 +766,6 @@ Possible Further options:
         for iBin = 1:cto.NProbitBins
             PredProb = CDF(dist,BinMax(iBin));
             PredProb = GuessProb + (1 - GuessProb) * PredProb;
-            PredProb = 1 - PredProb;
             StringOut(sprintf('%*.*f %*.*f %*.*f',2*ColWid,DP,BinMax(iBin),...
                 ColWid,DP,NGreater(iBin)/NTrials(iBin),ColWid,DP,PredProb));
         end

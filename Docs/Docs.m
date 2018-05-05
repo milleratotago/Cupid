@@ -258,8 +258,8 @@ mydist.RndLnLikelihood(6)
 % **************** Other Functionality
 
 %% MakeBinSet
-a=Uniform(0,1).MakeBinSet(10,true)
-Normal(0,1).MakeBinSet(5,false)
+a=Uniform(0,1).MakeBinSet(0.10)
+Normal(0,1).MakeBinSet(1/5)
 
 %% FnAfterReset
 Uniform(0,1).FnAfterReset(2,1:10,'Mean')

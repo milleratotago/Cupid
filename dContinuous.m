@@ -260,15 +260,17 @@ classdef dContinuous < dGeneric   % Calls by reference
             x = lowx:stepsize:highx;
         end
         
-        function BinMax=MakeBinSet(obj,NBins,EqualInX)
+        function BinMax=MakeBinSet(obj,MinPr)
             % This function creates an output vector of length NBins defining NBins bins covering the RV's range.
             % The bottom of the first bin is implicitly obj.LowerBound, and the top of bin I is BinMax(I).
             % BinMax(NBins) always equals obj.UpperBound.
             % If EqualInX is true, the bins divide the range from LowerBound to UpperBound
             % into equal-length intervals.  If it is false, the bins are equal in probability.
             % This function only works for continuous distributions.
-            BinMax = zeros(NBins,1);
+            NBins = ceil(1/MinPr);
+            BinMax = zeros(1,NBins);
             BinMax(NBins) = obj.UpperBound;
+            EqualInX = false;
             if EqualInX
                 BinWidth = (obj.UpperBound - obj.LowerBound) / NBins;
                 for iBin = 1:NBins-1
