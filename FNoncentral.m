@@ -34,7 +34,7 @@ classdef FNoncentral < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.dfnum = VerifyIntegerGE(obj,1,newparmvalues(1));
             obj.dfdenom = VerifyIntegerGE(obj,1,newparmvalues(2));
             obj.noncen = newparmvalues(3);

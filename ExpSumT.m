@@ -27,7 +27,7 @@ classdef ExpSumT < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.rate1 = newparmvalues(1);
             obj.rate2 = newparmvalues(2);
             obj.cutoff = newparmvalues(3);

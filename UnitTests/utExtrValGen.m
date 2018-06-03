@@ -25,7 +25,7 @@ classdef utExtrValGen < utContinuous;
             testCase.Dist = ExtrValGen(parmmu,parmscale,parmshape);
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 
-            testCase.Dist.DefaultParmCodes = 'frr';
+            testCase.EstParmCodes = 'frr';
 
             SetupXs(testCase,40,500);
 

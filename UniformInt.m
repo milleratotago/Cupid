@@ -1,5 +1,5 @@
 classdef UniformInt < dDiscrete
-    % UniformInt(Low,High): equally likely integers from Low to High
+    % UniformInt(Low,High): equally likely integers from Low to High, inclusive
     
     properties(SetAccess = protected)
         LowInt, HighInt, PrValue
@@ -13,7 +13,6 @@ classdef UniformInt < dDiscrete
             obj.NDistParms = 2;
             obj.ParmTypes = 'ii';
             obj.DefaultParmCodes = 'ii';
-            obj.UseStoredTables = false;
             switch nargin
                 case 0
                 case 2
@@ -26,10 +25,9 @@ classdef UniformInt < dDiscrete
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
-            obj.StoredTablesInitialized = false;
-            obj.LowInt = floor(newparmvalues(1));
-            obj.HighInt = floor(newparmvalues(2));
+            ClearBeforeResetParmsD(obj);
+            obj.LowInt = round(newparmvalues(1));
+            obj.HighInt = round(newparmvalues(2));
             ReInit(obj);
         end
         
@@ -42,10 +40,8 @@ classdef UniformInt < dDiscrete
         
         function []=ReInit(obj)
             assert(obj.LowInt<obj.HighInt,'UniformInt requires Low<High.');
-            obj.LowerBound = obj.LowInt;
-            obj.UpperBound = obj.HighInt;
-            obj.NValues = obj.UpperBound - obj.LowerBound + 1;
-            obj.PrValue = 1 / obj.NValues;
+            MakeTables(obj);
+            SetBinEdges(obj);
             obj.Initialized = true;
             if (obj.NameBuilding)
                 BuildMyName(obj);
@@ -66,54 +62,66 @@ classdef UniformInt < dDiscrete
             Parms = Reals;
         end
         
-        function thisval=LegalValue(obj,X)
-            thisval = zeros(size(X));
-            for i=1:numel(X)
-                if (floor(X(i))==ceil(X(i))) && (X(i)>=obj.LowerBound) && (X(i)<=obj.UpperBound)
-                    thisval(i) = true;
-                end
-            end
+        function []=MakeTables(obj)
+            obj.LowerBound = obj.LowInt;
+            obj.UpperBound = obj.HighInt;
+            obj.NValues = obj.UpperBound - obj.LowerBound + 1;
+            obj.PrValue = 1 / obj.NValues;
+            obj.DiscreteX = obj.LowerBound:obj.UpperBound;
+            obj.DiscretePDF = obj.PrValue*ones(1,obj.NValues);
+            obj.DiscreteCDF = cumsum(obj.DiscretePDF);
+            obj.DiscreteCDF(end) = 1;
         end
-        
+
+%         function thisval=LegalValue(obj,X)
+%             thisval = zeros(size(X));
+%             for i=1:numel(X)
+%                 if (floor(X(i))==ceil(X(i))) && (X(i)>=obj.LowerBound) && (X(i)<=obj.UpperBound)
+%                     thisval(i) = true;
+%                 end
+%             end
+%         end
+%         
         function thisval=NearestLegal(obj,X)
             thisval = round(X);
+            if thisval<obj.LowerBound
+                thisval = obj.LowerBound;
+            elseif thisval>obj.UpperBound
+                thisval = obj.UpperBound;
+            end
         end
-        
-        function thispdf=nPDF(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
-            thispdf = ones(size(X))*obj.PrValue;
-            Illegal = ~obj.LegalValue(X);
-            thispdf(Illegal) = 0;
-        end
-        
-        function thiscdf=nCDF(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
-            thiscdf = zeros(size(X));
-            thiscdf(X>=obj.LowerBound) = (floor(X(X>=obj.LowerBound))-obj.LowerBound + 1) / obj.NValues;
-            thiscdf(thiscdf>1) = 1;
-            % for i=1:numel(X)
-            %     if (X(i) < obj.LowerBound)
-            %     elseif (X(i) < obj.UpperBound)
-            %         thiscdf(i) = (floor(X(i))-obj.LowerBound + 1)/obj.NValues;
-            %     else
-            %         thiscdf(i) = 1;
-            %     end
-            % end
-        end
-        
-        function thisval=InverseCDF(obj,P)
-            thisval = ceil(P*obj.NValues-obj.Grain*eps(P*obj.NValues)) + obj.LowerBound - 1;
-        end
-        
-        function thisval=nIthValue(obj,I)
-            assert(obj.Initialized,UninitializedError(obj));
-            assert(min(I)>0&&max(I)<=obj.NValues,'Requested value at nonexistent position')
-            thisval = I - 1 + obj.LowerBound;
-        end
-        
-        function thisval=NextValue(obj,X)
-            thisval = X + 1;
-        end
+%         
+%         function thispdf=nPDF(obj,X)
+%             assert(obj.Initialized,UninitializedError(obj));
+%             thispdf = ones(size(X))*obj.PrValue;
+%             Illegal = ~obj.LegalValue(X);
+%             thispdf(Illegal) = 0;
+%         end
+%         
+%         function thiscdf=nCDF(obj,X)
+%             assert(obj.Initialized,UninitializedError(obj));
+%             thiscdf = zeros(size(X));
+%             thiscdf(X>=obj.LowerBound) = (floor(X(X>=obj.LowerBound))-obj.LowerBound + 1) / obj.NValues;
+%             thiscdf(thiscdf>1) = 1;
+%             % for i=1:numel(X)
+%             %     if (X(i) < obj.LowerBound)
+%             %     elseif (X(i) < obj.UpperBound)
+%             %         thiscdf(i) = (floor(X(i))-obj.LowerBound + 1)/obj.NValues;
+%             %     else
+%             %         thiscdf(i) = 1;
+%             %     end
+%             % end
+%         end
+%         
+%         function thisval=InverseCDF(obj,P)
+%             thisval = ceil(P*obj.NValues-obj.Grain*eps(P*obj.NValues)) + obj.LowerBound - 1;
+%         end
+%         
+%         function thisval=nIthValue(obj,I)
+%             assert(obj.Initialized,UninitializedError(obj));
+%             assert(min(I)>0&&max(I)<=obj.NValues,'Requested value at nonexistent position')
+%             thisval = I - 1 + obj.LowerBound;
+%         end
         
         function thisval=Mean(obj)
             assert(obj.Initialized,UninitializedError(obj));

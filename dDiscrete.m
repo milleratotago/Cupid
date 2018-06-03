@@ -1,7 +1,6 @@
 classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
     % dDiscrete is an abstract class for discrete distributions.
-    % It provides an option for computing and storing a complete table of
-    % all X's, PDF(X), and CDF(X) when the distribution is initialized.
+    % Every distribution is stored as a list of values with associated PDF and CDF.
     
 % Copyright (C) 2018 Jeffrey Owen Miller
 % 
@@ -21,218 +20,214 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
 %
 
     properties(SetAccess = protected)
-        StoredTablesInitialized,
-        StoredX, StoredPDF, StoredCDF
+        DiscreteX    % Sorted list of the X values in this distribution...
+        DiscretePDF  % ... and their probabilities...
+        DiscreteCDF  % ... and the cumulative probabilities <= X.
+        % These values define the minimum and maximums for each bin.
+        DiscreteXmin
+        DiscreteXmax
+        DiscreteCDFmax
+        StoredTablesInitialized
     end
     
     properties(SetAccess = public)
-        UseStoredTables   % Set to true if you want to use stored X/PDF/CDF tables.
-        Grain  % A graininess factor, multiplied by eps, when checking CDF equality
-        % If this is false, X/PDF/CDF are computed "on the fly".
+        XGrain     % A "graininess" factor for X that multiplies times eps(X) in checking Y values against DiscreteX values.
+                   % Y is accepted as equal to DiscreteX(i) if it is within XGrain*eps(DiscreteX(i))
+        CDFGrain   % A "graininess" factor for CDF.  P is accepted as equal to DiscreteCDF(i) if it is within CDFGrain*eps(DiscreteCDF(i))
     end
-    
-    methods(Abstract)
-        thisval=LegalValue(obj,X)
-        thisval=NearestLegal(obj,X)
-        thisval=nIthValue(obj,I)
-        thisval=NextValue(obj,X)   % Return the next- larger discrete value after X
-    end
-    
+
     methods
-        
-        % All descendants of the dDiscrete class must override nIthValue.
-        
-        % In addition, all descendants must override either
-        %    nPDF, nCDF,  or  MakeTables.
-        
-        % If a descendant is EVER used with computation on the fly
-        % (i.e., with "UseStoredTables" is sometimes false),
-        % that descendant must override either nPDF or nCDF.
-        
-        % Note that the generic version of MakeTables provided here calls nIthValue and nPDF.
-        
-        %       function thisval=nIthValue(obj,I)  % "native" IthValue of X computed directly ("on the fly").
-        %           ME = MException([obj.ThisFamilyName ':nIthValue'], ...
-        %               'function dDiscrete.nIthValue should have been overridden.');
-        %           throw(ME);
-        %       end
         
         function obj=dDiscrete(FamName)
             obj=obj@dGeneric(FamName);
             obj.DistType = 'd';
-            obj.UseStoredTables = false;
             obj.StoredTablesInitialized = false;
-            obj.Grain = 1;
+            obj.XGrain = 2;
+            obj.CDFGrain = 2;  % InverseCDF returns a too-small value where CDF is increasing slowly
+        end
+
+        function []=ClearBeforeResetParmsD(obj)
+            obj.Initialized = false;
+            obj.StoredTablesInitialized = false;
+        end
+
+        function []=TrimTables(obj,MinPDF,MaxCDF)
+            % Trim the tables to remove X values with too-small PDF or too-large CDF
+            HighPos = find(obj.DiscreteCDF>=MaxCDF,1);
+            if numel(HighPos)==0
+                HighPos = numel(obj.DiscreteX);
+            end
+            try % NWJEFF
+                Keep = (obj.DiscretePDF>=MinPDF) & (obj.DiscreteX<=obj.DiscreteX(HighPos));
+            catch
+                disp('Problem')
+            end
+            obj.DiscreteX = obj.DiscreteX(Keep);
+            obj.DiscretePDF = obj.DiscretePDF(Keep);
+            obj.DiscreteCDF = obj.DiscreteCDF(Keep);
+            obj.DiscreteCDF(end) = 1;
+            obj.NValues = numel(obj.DiscreteX);
+            obj.LowerBound = obj.DiscreteX(1);
+            obj.UpperBound = obj.DiscreteX(end);
         end
         
-        function []=MakeTables(obj)
-            obj.StoredX = zeros(obj.NValues,1);
-            obj.StoredPDF = zeros(obj.NValues,1);
-            obj.StoredCDF = zeros(obj.NValues,1);
-            sump = 0;
-            for ival = 1:obj.NValues
-                thisx = nIthValue(obj,ival);
-                obj.StoredX(ival) = thisx;
-                obj.StoredPDF(ival) = nPDF(obj,thisx);
-                sump = sump + obj.StoredPDF(ival);
-                obj.StoredCDF(ival) = sump;
-            end
+        function SetBinEdges(obj)
+            % After the DiscreteX values have been determined, set the edges of the bins.
+            % MakeTables should always call this at the end.
+            thistol = obj.XGrain * eps(obj.DiscreteX);
+            obj.DiscreteXmin = obj.DiscreteX - thistol;
+            obj.DiscreteXmax = obj.DiscreteX + thistol;
+            obj.DiscreteCDFmax = min(1,obj.DiscreteCDF + obj.CDFGrain * eps(obj.DiscreteCDF));
             obj.StoredTablesInitialized = true;
         end
         
-        function thispdf=nPDF(obj,X)       % "native" PDF of X computed directly ("on the fly").
-            thispdf = CDF(obj,X) - CDF(obj,X-eps(X));
+        function thisval=IthValue(obj,I)
+            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.StoredTablesInitialized
+                MakeTables(obj);
+            end
+            thisval = zeros(size(I));
+            for i=1:numel(I)
+                thisval(i) = obj.DiscreteX(I(i));
+            end
         end
         
-        function thiscdf=nCDF(obj,X)
+        function thisval=LegalValue(obj,X)
             assert(obj.Initialized,UninitializedError(obj));
-            thiscdf=zeros(size(X));
+            if ~obj.StoredTablesInitialized
+                MakeTables(obj);
+            end
+            thisval = zeros(size(X));
             for i=1:numel(X)
-                if X(i)<obj.LowerBound
-                elseif X(i)>=obj.UpperBound
-                    thiscdf(i) = 1;
-                else
-                    thiscdf(i) = 0;
-                    I = 0;
-                    StillLooking = true;
-                    while StillLooking
-                        I=I+1;
-                        LesserX = IthValue(obj,I);
-                        if LesserX <= X(i)
-                            thiscdf(i) = PDF(obj,LesserX) + thiscdf(i);
-                        end
-                        StillLooking = LesserX<X(i);
-                    end
-                end
+                i_of_x = find(X(i)<=obj.DiscreteXmax,1);
+                thisval(i) = X(i)>=obj.DiscreteXmin(i_of_x);
+            end
+        end
+        
+        function thisval=NearestLegal(obj,X)
+            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.StoredTablesInitialized
+                MakeTables(obj);
+            end
+            thisval = zeros(size(X));
+            for i=1:numel(X)
+                absdiffs = abs(X(i)-obj.DiscreteX);
+                [~, minpos] = min(absdiffs);
+                thisval(i) = obj.DiscreteX(minpos);
             end
         end
         
         function thispdf=PDF(obj,X)
             assert(obj.Initialized,UninitializedError(obj));
-            if obj.UseStoredTables
-                if ~obj.StoredTablesInitialized
-                    MakeTables(obj);
+            if ~obj.StoredTablesInitialized
+                MakeTables(obj);
+            end
+            thispdf = zeros(size(X));
+            for i=1:numel(X)
+                i_of_x = find(X(i)<=obj.DiscreteXmax,1);  % first bin such that X < DiscreteXmax
+                if (numel(i_of_x) == 1) && ( X(i) >= obj.DiscreteXmin(i_of_x) )
+                   thispdf(i) = obj.DiscretePDF(i_of_x);
                 end
-                thispdf = zeros(size(X));
-                for i=1:numel(X)
-                    i_of_x = find(obj.StoredX==X(i),1);
-                    if numel(i_of_x) == 0
-                        thispdf(i) = 0;
-                    else
-                        thispdf(i) = obj.StoredPDF(i_of_x);
-                    end
-                end
-            else
-                thispdf = nPDF(obj,X);
             end
         end
         
         function thiscdf=CDF(obj,X)
             assert(obj.Initialized,UninitializedError(obj));
-            if obj.UseStoredTables
-                if ~obj.StoredTablesInitialized
-                    MakeTables(obj);
-                end
-                thiscdf = zeros(size(X));
-                for i=1:numel(X)
-                    i_of_x = find(obj.StoredX>X(i),1);
-                    if numel(i_of_x) == 0
-                        thiscdf(i) = 1;
-                    elseif i_of_x == 1
-                        thiscdf(i) = 0;
-                    else
-                        thiscdf(i) = obj.StoredCDF(i_of_x-1);
-                    end
-                end
-            else
-                thiscdf = nCDF(obj,X);
+            if ~obj.StoredTablesInitialized
+                MakeTables(obj);
             end
-        end
-        
-        function thisval=IthValue(obj,I)
-            assert(obj.Initialized,UninitializedError(obj));
-            if obj.UseStoredTables
-                if ~obj.StoredTablesInitialized
-                    MakeTables(obj);
+            thiscdf = zeros(size(X));             
+            for i=1:numel(X)
+                i_of_x = find(X(i)<=obj.DiscreteXmax,1);
+                if (numel(i_of_x) == 0)
+                   thiscdf(i) = 1;
+                elseif i_of_x > 1
+                   thiscdf(i) = obj.DiscreteCDF(i_of_x);
+                elseif X(i)>obj.DiscreteXmin(1)  % X is in the first bin
+                   thiscdf(i) = obj.DiscreteCDF(1);
+                else
+                   thiscdf(i) = 0;      % X is below the first bin
                 end
-                thisval = zeros(size(I));
-                for i=1:numel(I)
-                    thisval(i) = obj.StoredX(I(i));
-                end
-            else
-                thisval = nIthValue(obj,I);
             end
         end
         
         function thisval=InverseCDF(obj,P)
             assert(obj.Initialized,UninitializedError(obj));
-            assert(min(P)>=0&&max(P)<=1,'InverseCDF requires 0<=P<=1');
+            if ~obj.StoredTablesInitialized
+                MakeTables(obj);
+            end
+%           Useful for debugging:
+%           try
+%           if min(P)<0
+%               disp('NJeff too small');
+%           elseif max(P)>obj.DiscreteCDFmax(end)
+%               disp('NJeff too large');
+%           end
+%           catch
+%               disp('Problem here');
+%           end
+%           if ~(min(P)>=0)&&(max(P)<=obj.DiscreteCDFmax(end))
+%               disp('Combined fail');
+%           end
+            assert((min(P)>=0)&&(max(P)<=obj.DiscreteCDFmax(end)),['InverseCDF requires 0<=P<=1 but found min(P) and max(P) of ' num2str(min(P)) ' and ' num2str(max(P))]);
             thisval=zeros(size(P));
             for iel=1:numel(thisval)
-                Sum = 0;
-                I = 0;
-                StillLooking = true;
-                while StillLooking
-                    I = I+1;
-                    X = IthValue(obj,I);
-                    ThisPDF = PDF(obj,X);
-                    Sum = ThisPDF + Sum;
-                    StillLooking = (Sum+obj.Grain*eps(Sum) < P(iel)) && (I < obj.NValues);
-                end
-                thisval(iel) = X;
+                i_of_p = find(obj.DiscreteCDFmax>=P(iel),1);
+                thisval(iel) = obj.DiscreteX(i_of_p);
             end
         end
         
         function thisval=Random(obj,varargin)
             assert(obj.Initialized,UninitializedError(obj));
-            thisval=rand(varargin{:});
-            for iel=1:numel(thisval)
-                sumpr=0;
-                ix=0;
-                StillLooking = true;
-                while StillLooking
-                    ix=ix+1;
-                    v=IthValue(obj,ix);
-                    sumpr=sumpr+PDF(obj,v);
-                    StillLooking = (sumpr<thisval(iel)) & (ix<obj.NValues);
-                end
-                thisval(iel)=v;
+            if ~obj.StoredTablesInitialized
+                MakeTables(obj);
+            end
+            thisrand = rand(varargin{:});
+            thisval = zeros(varargin{:});
+            for i=1:numel(thisrand)
+                i_of_r = find(thisrand(i)<=obj.DiscreteCDF,1);
+                thisval(i)=obj.DiscreteX(i_of_r);
             end
         end
         
-        function [FromI, ToI]=IRange(obj,FromX,ToX)
+        function [FromI,ToI]=IRange(obj,FromX,ToX)
             % Return the range of indices 1=smallest, etc, including
             % all values from FromX to ToX for a discrete random variable.
             assert(obj.Initialized,UninitializedError(obj));
-            I = 0;
-            StillLooking = true;
-            while StillLooking
-                I=I+1;
-                StillLooking = IthValue(obj,I) < FromX;
+            if ~obj.StoredTablesInitialized
+                MakeTables(obj);
             end
-            FromI = I;
-            I=I-1;
-            StillLooking = true;
-            while StillLooking
-                I=I+1;
-                StillLooking = (I <= obj.NValues) && (IthValue(obj,I) <= ToX);
+            FromI = find(FromX>=obj.DiscreteXmin,1,'last');
+            if numel(FromI)==0
+                FromI = 1;
             end
-            ToI = I - 1;
+            ToI = find(ToX<=obj.DiscreteXmax,1);
+            if numel(ToI)==0
+                ToI = obj.NValues;
+            end
+        end
+
+        function thisval=SumX_CToNxPDF(obj,FromI,ToI,C,N)
+            thisval = 0;
+            for i = FromI:ToI
+                XtoN = (obj.DiscreteX(i)-C)^N;
+                Pr = obj.DiscretePDF(i);
+                thisval = thisval + Pr * XtoN;
+            end
         end
         
         function thisval=IntegralXToNxPDF(obj,FromX,ToX,N)
             % Returns the sum from FromX to ToX of X^N * PDF.   Note that the
             %  function value for N == 0 should be one and this property can
             %  be used as a check of the accuracy of the computation of PDF.
+            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.StoredTablesInitialized
+                MakeTables(obj);
+            end
             thisval = 0;
             if FromX <= ToX
-                [FromI, ToI]=IRange(obj,FromX,ToX);
-                for I = FromI:ToI
-                    X = IthValue(obj,I);
-                    XtoN = X^N;
-                    Pr = PDF(obj,X);
-                    thisval = thisval + Pr * XtoN;
-                end
+                [FromI,ToI] = IRange(obj,FromX,ToX);
+                thisval = obj.SumX_CToNxPDF(FromI,ToI,0,N);
             end
         end
         
@@ -241,85 +236,107 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
             % Note that the function value for N == 0 should be one and this property can
             % be used as a check of the accuracy of the computation of PDF.
             assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.StoredTablesInitialized
+                MakeTables(obj);
+            end
             thisval = 0;
             if FromX <= ToX
-                [FromI, ToI]=IRange(obj,FromX,ToX);
-                for I = FromI:ToI
-                    X = IthValue(obj,I);
-                    Pr = PDF(obj,X);
-                    XtoN = (X-C)^N;
-                    thisval = thisval + Pr * XtoN;
-                end
+                [FromI,ToI] = IRange(obj,FromX,ToX);
+                thisval = obj.SumX_CToNxPDF(FromI,ToI,C,N);
             end
         end
         
-        function thisval=ConditionalRawMoment(obj,FromX,ToX,I)
+        function thisval=ConditionalMoment(obj,FromX,ToX,Around,N)
             assert(obj.Initialized,UninitializedError(obj));
-            ConditionalP = CDF(obj,ToX) - CDF(obj,FromX) + PDF(obj,FromX);
+            if ~obj.StoredTablesInitialized
+                MakeTables(obj);
+            end
+            thisval = 0;
+            if FromX > ToX
+                return;
+            end
+            [FromI,ToI] = IRange(obj,FromX,ToX);
+            ConditionalP = obj.DiscreteCDF(ToI) - obj.DiscreteCDF(FromI) + obj.DiscretePDF(FromI);
             if (ConditionalP == 0)
                 thisval = 0;
             else
-                thisval = IntegralXToNxPDF(obj,FromX,ToX,I) / ConditionalP;
+                thisval = obj.SumX_CToNxPDF(FromI,ToI,Around,N) / ConditionalP;
             end
         end
+
+        function thisval=ConditionalRawMoment(obj,FromX,ToX,N)
+            thisval = obj.ConditionalMoment(FromX,ToX,0,N);
+        end
         
-        function thisval=ConditionalCenMoment(obj,FromX,ToX,I)
-            assert(obj.Initialized,UninitializedError(obj));
-            ConditionalP = CDF(obj,ToX) - CDF(obj,FromX) + PDF(obj,FromX);
-            if (ConditionalP == 0)
-                thisval = 0;
-            else
-                ConditionalMu = ConditionalRawMoment(obj,FromX,ToX,1);
-                thisval = IntegralX_CToNxPDF(obj,FromX,ToX,ConditionalMu,I) / ConditionalP;
-            end
+        function thisval=ConditionalCenMoment(obj,FromX,ToX,N)
+            ConditionalMu = ConditionalMoment(obj,FromX,ToX,0,1);  % Conditional raw mean
+            thisval = obj.ConditionalMoment(FromX,ToX,ConditionalMu,N);
         end
         
         function thisval=IntegralCDF(obj,FromX,ToX,N)
             assert(obj.Initialized,UninitializedError(obj));
             thisval = 0;
-            for I = 1:obj.NValues
-                ThisX = IthValue(obj,I);
-                if (ThisX>=FromX) && (ThisX<=ToX)
-                    thisval = thisval + ThisX^N * CDF(obj,ThisX);
-                end
+            if FromX > ToX
+                return;
+            end
+            [FromI,ToI] = IRange(obj,FromX,ToX);
+            for i = FromI:ToI
+                XtoN = obj.DiscreteX(i)^N;
+                Pr = obj.DiscreteCDF(i);
+                thisval = thisval + Pr * XtoN;
             end
         end
         
         function thisval=MGFrng(obj,Theta,FromX,ToX)
             assert(obj.Initialized,UninitializedError(obj));
-            FromX = max(FromX,obj.LowerBound);
-            ToX = min(ToX,obj.UpperBound);
-            [FromI, ToI]=IRange(obj,FromX,ToX);
             thisval = 0;
-            for I = FromI:ToI
-                X = IthValue(obj,I);
-                if (X >= FromX) && (X <= ToX)
-                    thisval = thisval + exp(Theta*X) * PDF(obj,X);
-                end
+            if FromX > ToX
+                return;
+            end
+            % FromX = max(FromX,obj.LowerBound);
+            % ToX = min(ToX,obj.UpperBound);
+            [FromI, ToI]=IRange(obj,FromX,ToX);
+            for i = FromI:ToI
+                X = obj.DiscreteX(i);
+                thisval = thisval + exp(Theta*X) * obj.DiscretePDF(i);
             end
         end
         
         function x = XsToPlot(obj)
-            x = IthValue(obj,1:obj.NValues);
+            % x = IthValue(obj,1:obj.NValues);
+            x = MakeBinSetD(obj,.01);
         end
         
-        function BinMax=MakeBinSet(obj,MinPr)
-            % This function creates an output row vector BinMax defining edges of bins covering the RV's range.
+        function [BinMax,BinProb]=MakeBinSetD(obj,MinPr)
+            % This function creates an output row vector BinMax defining the top edges of bins covering the RV's range.
             % Each bin covers a probability of at least MinPr.  Edges are moved slightly above observations to
             % avoid numerical problems (e.g., with histcounts).
             PrUsed = 0;
             NSaved = 0;
-            BinMax = zeros(1,obj.NValues);
-            % ThisX = obj.LowerBound;
+
+            % Find the indices of the X's at the top of each bin:
+            BinIs = zeros(1,obj.NValues);  % Allocate the maximum space needed, if every value has its own bin.
             while (PrUsed<1-MinPr)
                 NSaved = NSaved + 1;
-                ThisX = obj.InverseCDF(min(1,PrUsed+MinPr));
-                PrUsed = obj.CDF(ThisX);
-                BinMax(NSaved) = (9*ThisX + obj.NextValue(ThisX))/10;  % Move bin 10% of the distance to the next observation.
-                % [NSaved, BinMax(NSaved), PrUsed, obj.UpperBound, obj.CDF(obj.UpperBound)]
+                i_of_p = find(obj.DiscreteCDFmax>=PrUsed+MinPr,1);
+                if numel(i_of_p)==0
+                    i_of_p = obj.NValues;  % Use the largest value
+                end
+                BinIs(NSaved) = i_of_p;
+                PrUsed = obj.DiscreteCDF(i_of_p);
             end
-            BinMax(NSaved) = obj.UpperBound;
-            BinMax(NSaved+1:end) = [];
+            if PrUsed<1
+                % NSaved = NSaved + 1;  % Add the remaining probability into the final bin
+                BinIs(NSaved) = numel(obj.DiscreteX);
+            end
+            BinIs(NSaved+1:end) = [];
+            try
+                BinMax = ((obj.DiscreteX(BinIs) + obj.DiscreteXmax(BinIs))/2);  % Good place for bin boundary
+            catch
+                disp('Error computing BinMax.');
+            end
+            BinCDF = obj.DiscreteCDF(BinIs);
+            BinProb = diff([0 BinCDF]);
         end
         
     end  % methods

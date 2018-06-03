@@ -2,7 +2,7 @@ classdef utLogistic < utContinuous;
     
     properties (ClassSetupParameter)
         parmmu   = struct( 'n100',-100 , 'n1',-1  , 'p0',0 , 'p5',5 , 'p25',25 , 'p250',250 );
-        parmbeta = struct( 'p_05',.05  , 'p_1',.1 , 'p1',1 , 'p5',5 , 'p10',10 , 'p100',100 );  % Roughly half of the SD
+        parmbeta = struct( 'p_05',.05  , 'p_1',.1 , 'p1',1 , 'p5',5 , 'p10',10 , 'p25',25 );  % Roughly half of the SD
     end
     
     properties

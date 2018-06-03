@@ -26,14 +26,14 @@ classdef utPhiTrans < utContinuous;
             switch parmCase
                 case 1
                     testCase.Dist = PhiTrans(Uniform(1,2));
-                    testCase.Dist.DefaultParmCodes = 'rr';
+                    testCase.EstParmCodes = 'rr';
                     % testCase.SkipAllEst = true;
                 case 2
                     testCase.Dist = PhiTrans(Normal(-1,1));
-                    testCase.Dist.DefaultParmCodes = 'rr';
+                    testCase.EstParmCodes = 'rr';
                 case 3
                     testCase.Dist = PhiTrans(RNGamma(10,10));
-                    testCase.Dist.DefaultParmCodes = 'rr';
+                    testCase.EstParmCodes = 'rr';
                     % testCase.SkipMLEst = true;
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)

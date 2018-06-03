@@ -1,4 +1,4 @@
-classdef MonotoneTrans < dTransOf1  % NWJEFF: Not documented.
+classdef MonotoneTrans < dTransMono  % NWJEFF: Not documented.
     % MonotoneTrans(BasisRV,TransFunc,InverseFunc) produces any monotonic transformation of the original BasisRV.
     % TransFunc is the function that does the transformation
     % InverseFunc is the function that does the inverse of the transformation
@@ -24,26 +24,14 @@ classdef MonotoneTrans < dTransOf1  % NWJEFF: Not documented.
     
     methods
         
-        function obj=MonotoneTrans(varargin)
-            obj=obj@dTransOf1('MonotoneTrans');
+        function obj=MonotoneTrans(BasisDist,TransFunc,InverseFunc)
+            obj=obj@dTransMono('MonotoneTrans',BasisDist);
             obj.NTransParms = 0;
             obj.TransParmCodes = '';
-            switch nargin
-                case 0
-                case 3
-                    BuildMyBasis(obj,varargin{1});
-                    obj.TransFunc = varargin{2};
-                    obj.InverseFunc = varargin{3};
-                    obj.DistType = obj.BasisRV.DistType;
-                    % NWJEFF: No parameters allowed.
-                    obj.NDistParms = obj.BasisRV.NDistParms;
-                    obj.DefaultParmCodes = obj.BasisRV.DefaultParmCodes;
-                    ResetParms(obj,[obj.BasisRV.ParmValues]);
-                otherwise
-                    ME = MException('MonotoneTrans:Constructor', ...
-                        'MonotoneTrans constructor needs 0 or 3 arguments.');
-                    throw(ME);
-            end
+            obj.TransFunc = TransFunc;
+            obj.InverseFunc = InverseFunc;
+            obj.PDFScaleFactorKnown = false;
+            obj.ReInit;
         end
         
         function BuildMyName(obj)
@@ -51,7 +39,7 @@ classdef MonotoneTrans < dTransOf1  % NWJEFF: Not documented.
         end
         
         function []=ResetParms(obj,newparmvalues)
-            ResetParms@dTransOf1(obj,newparmvalues);
+            ResetParms@dTransMono(obj,newparmvalues);
             ReInit(obj);
         end
         
@@ -60,20 +48,20 @@ classdef MonotoneTrans < dTransOf1  % NWJEFF: Not documented.
             obj.ResetParms(obj.BasisRV.ParmValues);
         end
         
-        function []=ReInit(obj)
-            obj.Initialized = true;
-            obj.Increasing = obj.TransFunc(obj.BasisRV.UpperBound) > obj.TransFunc(obj.BasisRV.LowerBound);
-            if obj.Increasing
-                obj.LowerBound = obj.TransFunc(obj.BasisRV.LowerBound);
-                obj.UpperBound = obj.TransFunc(obj.BasisRV.UpperBound);
-            else
-                obj.LowerBound = obj.TransFunc(obj.BasisRV.UpperBound);
-                obj.UpperBound = obj.TransFunc(obj.BasisRV.LowerBound);
-            end
-            if (obj.NameBuilding)
-                BuildMyName(obj);
-            end
-        end
+%        function []=ReInit(obj)
+%            obj.Initialized = true;
+%            obj.Increasing = obj.TransFunc(obj.BasisRV.UpperBound) > obj.TransFunc(obj.BasisRV.LowerBound);
+%            if obj.Increasing
+%                obj.LowerBound = obj.TransFunc(obj.BasisRV.LowerBound);
+%                obj.UpperBound = obj.TransFunc(obj.BasisRV.UpperBound);
+%            else
+%                obj.LowerBound = obj.TransFunc(obj.BasisRV.UpperBound);
+%                obj.UpperBound = obj.TransFunc(obj.BasisRV.LowerBound);
+%            end
+%            if (obj.NameBuilding)
+%                BuildMyName(obj);
+%            end
+%        end
         
         function parmvals = TransParmValues(obj)
             parmvals = [];
@@ -94,18 +82,19 @@ classdef MonotoneTrans < dTransOf1  % NWJEFF: Not documented.
         function TransParms = TransRealsToParms(obj,Reals,~)
             TransParms = [];
         end
-        
-        function thisval = nIthValue(obj,Ith)
-            thisval = obj.TransFunc(obj.BasisRV.nIthValue(Ith));
-        end
-        
-        function thispdf=PDF(obj,X)
-            thispdf = PDF@dContinuous(obj,X); % dEither(obj,X);
-        end
-        
-        function thisval = PDFScaleFactor(obj,~)
-            thisval = 1;  % Not needed because PDF is obtained by numerical differentiation of CDF.
-        end
+
+% NWJEFF: Delete        
+%        function thisval = nIthValue(obj,Ith)
+%            thisval = obj.TransFunc(obj.BasisRV.nIthValue(Ith));
+%        end
+%        
+%        function thispdf=PDF(obj,X)
+%            thispdf = PDF@dContinuous(obj,X); % dEither(obj,X);
+%        end
+%        
+%        function thisval = PDFScaleFactor(obj,~)
+%            thisval = 1;  % Not needed because PDF is obtained by numerical differentiation of CDF.
+%        end
         
     end  % methods
     

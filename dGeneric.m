@@ -27,14 +27,14 @@ classdef dGeneric < handle  % Calls by reference
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
         DistType,         % 'c', 'd', or 'm' for continuous, discrete, or mixed.
         NDistParms,       % Number of free parameters for this distribution
-        ThisFamilyName,   % A generic name for this type of distribution, e.g., "Normal".
+        FamilyName,   % A generic name for this type of distribution, e.g., "Normal".
         StringName,       % A name for the particular distribution with its parameters, e.g., "Normal(0,1)".
         ParmNames,        % Array of strings with names of the distribution parameters, e.g. "'mu' & 'sigma''
         ParmTypes,        % Reserved for future use: One character for each parameter indicating its type: 'r'=real, 'i'=integer.
         Initialized,      % Keeps track of whether legal parameter values have been set.
         LowerBound,       % Effective minimum/maximum values for the distribution.
         UpperBound,
-        NameBuilding,     % If true, generate ThisFamilyName each time parameters are reset.  (setting to false speeds estimation)
+        NameBuilding,     % If true, generate FamilyName each time parameters are reset.  (setting to false speeds estimation)
         NValues,          % Number of discrete values in discrete or mixed distribution.
         
         % Splines can be used to approximate the PDF of the distribution as follows:
@@ -57,6 +57,7 @@ classdef dGeneric < handle  % Calls by reference
         % integration is done.  A set of StoredXs is constructed, and CDFs for these Xs are
         % computed by numerical integration as usual.  Then, to get the CDF for Y, integration
         % is done only for the segment of the PDF from the next-smaller-X to Y.
+        % NWJEFF: I think this is only used for continuous; discrete does the same thing separately
         UseStoredCDFs   % Boolean to indicate whether stored CDFs are to be computed
         HaveStoredCDFs  % Boolean to indicate whether stored CDFs values have computed with latest parameter values
         StoredXs        % X values for which StoreCDFs stores the CDF values
@@ -92,8 +93,8 @@ classdef dGeneric < handle  % Calls by reference
     methods
         
         function obj=dGeneric(FamName)   % Constructor
-            obj.ThisFamilyName = FamName;
-            obj.ParmNames = properties(obj.ThisFamilyName);
+            obj.FamilyName = FamName;
+            obj.ParmNames = properties(obj.FamilyName);
             obj.Initialized = false;
             obj.NameBuilding = true;
             obj.XNearlyZero = 0.1e-10;
@@ -124,15 +125,13 @@ classdef dGeneric < handle  % Calls by reference
         
         % **************** Some house-keeping functions:
         
-        function []=CheckBeforeResetParms(obj,newparmvalues)  % NWJEFF: newparmvalues is not used
-            obj.Initialized = false;
-            obj.HaveSplinePDFs = false;
-            obj.HaveSplineCDFs = false;
-            obj.HaveSplineInvCDFs = false;
-            obj.HaveStoredCDFs = false;
-            % The following line is not correct for derived distributions, e.g. convolutions.
-            % It also causes problems when a child has fewer parameters than a parent distribution (e.g., Rosin / Weibull).
-            % assert(numel(newparmvalues)==obj.NDistParms,'Incorrect number of parameters supplied to SetParms.');
+        function []=ClearBeforeResetParms(obj)
+            switch obj.DistType
+                case 'c'
+                    obj.ClearBeforeResetParmsC;
+                case 'd'
+                    obj.ClearBeforeResetParmsD;
+            end
         end
         
         function [] = ResetSomeParms(obj, varargin)
@@ -191,7 +190,7 @@ classdef dGeneric < handle  % Calls by reference
         end
         
         function []=BuildMyName(obj)
-            s = obj.ThisFamilyName;
+            s = obj.FamilyName;
             parms = obj.ParmValues;
             if obj.NDistParms > 0
                 s = [s '('];
@@ -237,12 +236,12 @@ classdef dGeneric < handle  % Calls by reference
             if Iin < GE
                 Iout = GE;
                 if (obj.NameBuilding)
-                    warning([obj.ThisFamilyName ' parameter must be an integer >= ' sGE '; set to ' sGE '.']);
+                    warning([obj.FamilyName ' parameter must be an integer >= ' sGE '; set to ' sGE '.']);
                 end
             elseif ~iswholenumber(Iin)
                 Iout = round(Iin);
                 if (obj.NameBuilding)
-                    warning([obj.ThisFamilyName ' parameter must be an integer >= ' sGE '; ' sprintf('%f',Iin) ' rounded to ' num2str(Iout) '.']);
+                    warning([obj.FamilyName ' parameter must be an integer >= ' sGE '; ' sprintf('%f',Iin) ' rounded to ' num2str(Iout) '.']);
                 end
             else
                 Iout = round(Iin);
@@ -255,17 +254,17 @@ classdef dGeneric < handle  % Calls by reference
             if Iin < Min
                 Iout = Min;
                 if (obj.NameBuilding)
-                    warning([obj.ThisFamilyName ' parameter must be an integer >= ' sMin '; set to ' sMin '.']);
+                    warning([obj.FamilyName ' parameter must be an integer >= ' sMin '; set to ' sMin '.']);
                 end
             elseif Iin > Max
                 Iout = Max;
                 if (obj.NameBuilding)
-                    warning([obj.ThisFamilyName ' parameter must be an integer <= ' sMax '; set to ' sMax '.']);
+                    warning([obj.FamilyName ' parameter must be an integer <= ' sMax '; set to ' sMax '.']);
                 end
             elseif ~iswholenumber(Iin)
                 Iout = round(Iin);
                 if (obj.NameBuilding)
-                    warning([obj.ThisFamilyName ' parameter must be an integer between ' sMin ' and ' sMax ; rounded to ' Iout '.']);
+                    warning([obj.FamilyName ' parameter must be an integer between ' sMin ' and ' sMax ; rounded to ' Iout '.']);
                 end
             else
                 Iout = round(Iin);
@@ -274,17 +273,17 @@ classdef dGeneric < handle  % Calls by reference
         
         function thiserrorstring=UninitializedError(obj)
             % Return an error string with the distribution name
-            thiserrorstring=['Attempted to compute with ' obj.ThisFamilyName ' distribution before initializing it.'];
+            thiserrorstring=['Attempted to compute with ' obj.FamilyName ' distribution before initializing it.'];
         end
         
         function thiserrorstring=IllegalParm(obj)
             % Return an error string with the distribution name
-            thiserrorstring=['Attempted to access a non-existent parameter of ' obj.ThisFamilyName ' distribution.'];
+            thiserrorstring=['Attempted to access a non-existent parameter of ' obj.FamilyName ' distribution.'];
         end
         
         function thiserrorstring=GenericError(obj,S)
             % Return an error string with the distribution name
-            thiserrorstring=['Error in ' obj.ThisFamilyName ': ' S];
+            thiserrorstring=['Error in ' obj.FamilyName ': ' S];
         end
         
         % **************** Basic functions for all random variables:
@@ -480,6 +479,7 @@ classdef dGeneric < handle  % Calls by reference
                     obj.StoredCDFs(iel) =  integral(@(x) PDF(obj,x),obj.StoredXs(iel-1),obj.StoredXs(iel),'AbsTol',obj.IntegralPDFAbsTol,'RelTol',obj.IntegralPDFRelTol)
                 end
                 obj.StoredCDFs = cumsum(obj.StoredCDFs);
+                obj.StoredCDFs(end) = 1;
             else
                 obj.StoredCDFs = obj.CDF(obj.StoredXs);
             end
@@ -715,7 +715,7 @@ classdef dGeneric < handle  % Calls by reference
             SE = nan(1,NParms);
             thisrcond = rcond(FI);
             if thisrcond < obj.Smallrcond
-                warning([obj.ThisFamilyName ' gives nearly singular information matrix (i.e., rcond = ' num2str(thisrcond) ').  Parameters and information matrix follow:']);
+                warning(['Nearly singular information matrix (i.e., rcond = ' num2str(thisrcond) ' for ' obj.FamilyName '.  Parameter estimates and information matrix follow:']);
                 aOrigParms = OrigParms
                 aFI = FI
             end
@@ -1026,6 +1026,7 @@ classdef dGeneric < handle  % Calls by reference
             cdfy = CDF(obj,x);
             figure;
             [AX,H1,H2] = plotyy(x,pdfy,x,cdfy);
+            ylim(AX(2),[-0.02 1.02]);
             xlabel('X');
             title(obj.StringName)
             set(get(AX(1),'Ylabel'),'String','PDF(X)');
@@ -1155,7 +1156,20 @@ classdef dGeneric < handle  % Calls by reference
             thisInvCDF = ppval(obj.InvCDFSplineInfo,P);
         end
         
-    end  % methods
+        function [BinMax,BinProb]=MakeBinSet(obj,MinPr)
+            switch obj.DistType
+                case 'c'
+                    [BinMax,BinProb] = obj.MakeBinSetC(MinPr);
+                case 'd'
+                    [BinMax,BinProb] = obj.MakeBinSetD(MinPr);
+                otherwise
+                    ME = MException('dGeneric:MakeBinSet', ...
+                        ['Unsupported distribution type: ' obj.DistType]);
+                    throw(ME);
+            end
+        end
     
+    end  % methods
+
 end  % class dGeneric
 

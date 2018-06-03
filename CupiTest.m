@@ -82,7 +82,7 @@ end
 if cto.PDFIntvsCDF
     PDFIntvsCDF(dist)
 end
-if cto.MGFs
+if (cto.MGFs) % && (dist.DistType=='c')
     MGFs(dist);
 end
 if cto.FullIntegrals
@@ -280,7 +280,7 @@ Possible Further options:
         PctColWid = '%6s';
         ColWidDP = '%12.4f';
         ColWid = '%12s';
-        XbyInverseCheck = 'Computing X by CDF then InverseCDF.';
+        XbyInverseCheck = 'Computing X by CDF then InverseCDF';
         % XbyInverseBigErrorTolerance = 10*cto.XbyInverseErrorTolerance;
         StringOut('Table of X Values at Percentiles and Functions of X:');
         S=sprintf([PctColWid ColWid ColWid ColWid ColWid ColWid],'Pctile','X','PDF','CDF','XbyInvCDF','Hazard');
@@ -288,8 +288,16 @@ Possible Further options:
         ErrorSumSq = 0;
         SumX = 0;
         SumXX = 0;
-        for I = 1:cto.NPercentiles
-            ThisPct = cto.Percentiles(I);
+        switch dist.DistType
+            case 'c'
+                UsePercentiles = cto.Percentiles;
+            case 'd'
+                SomeXs  = dist.XsToPlot;
+                UsePercentiles = dist.CDF(SomeXs);
+        end
+        UseNPercentiles = numel(UsePercentiles);
+        for I = 1:UseNPercentiles
+            ThisPct = UsePercentiles(I);
             ThisX = InverseCDF(dist,ThisPct);
             SumX = SumX + ThisX;
             SumXX = SumXX + ThisX^2;
@@ -302,8 +310,8 @@ Possible Further options:
             StringOut(S);
             ErrorSumSq = ErrorSumSq + (ThisX - ThisXbyInverse)^2;
         end
-        MeanX = SumX / cto.NPercentiles;
-        VarOfX = (SumXX - cto.NPercentiles * MeanX^2) / cto.NPercentiles;
+        MeanX = SumX / UseNPercentiles;
+        VarOfX = (SumXX - UseNPercentiles * MeanX^2) / UseNPercentiles;
         CheckMatch(XbyInverseCheck,ErrorSumSq,0);
         % Old version does different checks depending on distribution.
         %if VarOfX == 0
@@ -458,7 +466,8 @@ Possible Further options:
             if cto.CenMom(4) > 0
                 Temp = cto.CenMom(4)^(1/3);
             elseif cto.CenMom(4) < 0
-                Temp = -(-cto.CenMom(4)^(1/3));
+                Temp = -cto.CenMom(4);
+                Temp = -(Temp^(1/3));
             else
                 Temp = 0;
             end
@@ -527,8 +536,8 @@ Possible Further options:
         if numel(find(cto.RandVals>dist.UpperBound)) > 0
             StringOut([cto.ErrorSignal ' WARNING: Random values greater than upperbound of ' num2str(dist.UpperBound)]);
         end
-        BinMax = MakeBinSet(dist,1/cto.NChiSqBins);
-        BinProb = FindBinProbs(dist,BinMax);
+        [BinMax,BinProb] = MakeBinSet(dist,1/cto.NChiSqBins);
+        % BinProb = FindBinProbs(dist,BinMax);
         [obschisqval, obschisqp] = obschisq(cto.RandVals,BinMax,BinProb);
         StringOut(['RNG check yields ObsChiSq = ' num2str(obschisqval) ' with ' num2str(cto.NChiSqBins) ' bins and p = ' num2str(obschisqp)] );
         CheckAssertion('Random numbers passed chi-square bin test.',(~isnan(obschisqp))&&(obschisqp > .01))
@@ -552,6 +561,12 @@ Possible Further options:
 
     function []=ParameterEstimates(dist)
         ThisParmCodes = dist.DefaultParmCodes;
+        
+        NumFreeParms = length(ThisParmCodes) - sum(ThisParmCodes=='f');
+        if NumFreeParms==0
+            return;
+        end
+        
         % Hold distribution parameters so that they can be restored to original values for start of each fit.
         HoldParms = ParmValues(dist);
         
@@ -567,7 +582,6 @@ Possible Further options:
             % Reinstate distribution parameters for start of each fit.
             ResetParms(dist,HoldParms);
         end
-        
         
         if cto.MomentEst
             StringOut('Example of Method-of-Moments Estimation:');
@@ -619,24 +633,24 @@ Possible Further options:
             % Choose bins based on the original distribution.
             BinMax = MakeBinSet(dist,1/cto.NChiSqBins);
             BrainDeadHistc=histc(cto.RandVals,BinMax);
-            BinProbs = BrainDeadHistc(1:numel(BinMax))/numel(cto.RandVals);
-            StartError = GofFChiSq(dist,BinMax,BinProbs);
-            EstChiSq(dist,BinMax,BinProbs,ThisParmCodes);
-            EndError = GofFChiSq(dist,BinMax,BinProbs);
+            ObsBinProbs = BrainDeadHistc(1:numel(BinMax))/numel(cto.RandVals);
+            StartError = GofFChiSq(dist,BinMax,ObsBinProbs);
+            EstChiSq(dist,BinMax,ObsBinProbs,ThisParmCodes);
+            EndError = GofFChiSq(dist,BinMax,ObsBinProbs);
             ReportEstResult(dist, StartError, EndError);
             CheckAssertion('Chi-Square bin-based Estimation Reduced Error',StartError>=EndError);
             ColWid = 14;
             StringOut(sprintf('%*s %*s %*s',2*ColWid,'BinTop',ColWid,'Observed Pr',ColWid,'Predicted Pr'));
             SumProb = 0;
-            for IBin = 1:numel(BinProbs)
-                SumProb = SumProb + BinProbs(IBin);
+            for IBin = 1:numel(ObsBinProbs)
+                SumProb = SumProb + ObsBinProbs(IBin);
                 if IBin>1
                     LowerProb = CDF(dist,BinMax(IBin-1));
                 else
                     LowerProb = 0;
                 end
                 StringOut(sprintf('%*.*f %*.*f %*.*f',2*ColWid,DP,BinMax(IBin),...
-                    ColWid,DP,BinProbs(IBin),ColWid,DP,CDF(dist,BinMax(IBin))-LowerProb) );
+                    ColWid,DP,ObsBinProbs(IBin),ColWid,DP,CDF(dist,BinMax(IBin))-LowerProb) );
             end
             StringOut(sprintf('%*s %*.*f %*.*f',2*ColWid,['Above ' num2str(BinMax(end-1))],...
                 ColWid,DP,1-SumProb,ColWid,DP,1-CDF(dist,BinMax(end-1))));
@@ -646,12 +660,6 @@ Possible Further options:
         end
         
         % Probit estimation starts here.
-        
-        % if ~(dist.DistType == 'c')
-        %     warning('Probit estimation testing only supported for continuous distributions.')
-        %     % NWJEFF: Problems with MakeBinSet now fixed?
-        %     return
-        % end
         
         GuessProb = 1 / cto.ProbitmAFC;
         NTrials = ones(1,cto.NProbitBins)*cto.NProbitTrialsPerBin;

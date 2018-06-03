@@ -35,7 +35,7 @@ classdef UniGap < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.t = newparmvalues(1);
             ReInit(obj);
         end

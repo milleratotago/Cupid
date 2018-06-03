@@ -24,7 +24,7 @@ classdef NakaRush < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.Scale = newparmvalues(1);
             ReInit(obj);
         end

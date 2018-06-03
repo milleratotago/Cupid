@@ -20,6 +20,7 @@ classdef ExGauss < dContinuous
             obj.DefaultParmCodes = 'rrr';
             obj.NDistParms = 3;
             obj.UseNormalApproxCutoff = 100;  % Used to decide whether to ignore exponential component as negligible.
+            obj.Smallrcond = 1e-10;  % Normal and exponential means trade off against one another so info matrix nearly singular
             switch nargin
                 case 0
                 case 3
@@ -32,7 +33,7 @@ classdef ExGauss < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.mu = newparmvalues(1);
             obj.sigma = newparmvalues(2);
             obj.rate = newparmvalues(3);

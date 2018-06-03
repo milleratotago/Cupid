@@ -1,4 +1,4 @@
-classdef Order < dContinuous % dEither
+classdef Order < dEither
     % Order(Order,BasisRV1,BasisRV2,BasisRV3,...): The Order'th order statistic of the independent but non-identical BasisRVs.
     
     % Notes:
@@ -13,7 +13,7 @@ classdef Order < dContinuous % dEither
     methods
         
         function obj=Order(varargin)   % Constructor
-            obj=obj@dContinuous('Order');  % dEither('Order');
+            obj=obj@dEither('Order');
             switch nargin
                 case 0
                 case {1, 2}
@@ -52,8 +52,10 @@ classdef Order < dContinuous % dEither
             end
             if OneIsContinuous && ~(OneIsDiscrete || OneIsMixed)
                 obj.DistType = 'c';
+            elseif OneIsDiscrete && ~(OneIsContinuous || OneIsMixed)
+                obj.DistType = 'd';
             else
-                assert(false,'Order can only handle continuous Basis distributions (so far)');
+                assert(false,'Order can only handle all-continuous or all-discrete Basis distributions (so far)');
             end
             
             % Assemble DefaultParmCodes & count NDistParms & CumNParms
@@ -76,7 +78,7 @@ classdef Order < dContinuous % dEither
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParms(obj);
             obj.Initialized = false;
             obj.OrderK = VerifyIntegerInRange(obj,1,obj.SampleSize,newparmvalues(1));
             obj.BigOrder = obj.OrderK >= floor( (obj.SampleSize + 1) / 2 );
@@ -121,14 +123,31 @@ classdef Order < dContinuous % dEither
             end
             Extremes = sort(Extremes);
             obj.UpperBound = Extremes(obj.OrderK);
-            % obj.NValues = obj.BasisRV.NValues;  % dEither
             obj.Initialized = true;
+            if obj.DistType == 'd'
+                obj.MakeTables;
+            end
+            % obj.NValues = obj.BasisRV.NValues;  % dEither
             if obj.NameBuilding
                 BuildMyName(obj);
             end
             
         end
         
+        function MakeTables(obj)
+            Xs = [];
+            for iDist=1:obj.SampleSize
+                Xs = [Xs obj.BasisRV{iDist}.DiscreteX];
+            end
+            obj.DiscreteX = unique(Xs);
+            obj.DistType = 'n';  % Temporarily turn off 'd' so we can use CDF
+            obj.DiscreteCDF = obj.CDF(obj.DiscreteX);
+            obj.DiscretePDF = diff([0 obj.DiscreteCDF]);
+            obj.DistType = 'd';  % return to discrete type
+            TrimTables(obj,eps(0),1);
+            SetBinEdges(obj);
+        end
+
         function parmvals = ParmValues(obj,varargin)
             parmvals = [obj.OrderK];
             for iDist=1:obj.SampleSize
@@ -174,6 +193,10 @@ classdef Order < dContinuous % dEither
         % end
         
         function thiscdf=CDF(obj,X)
+            if obj.DistType=='d'
+                thiscdf = CDF@dDiscrete(obj,X);
+                return;
+            end
             [thiscdf, InBounds, Done] = MaybeSplineCDF(obj,X);
             if Done
                 return;

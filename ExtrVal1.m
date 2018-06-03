@@ -30,7 +30,7 @@ classdef ExtrVal1 < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.alpha = newparmvalues(1);
             obj.beta = newparmvalues(2);
             ReInit(obj);

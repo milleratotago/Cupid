@@ -1,32 +1,21 @@
-classdef TruncatedP < TruncatedX
+classdef TruncatedP < TruncParent
     % TruncatedP(BasisRV,LowerCutoffP,UpperCutoffP) produces the truncated version of the BasisRV,
     % truncating between the two indicated CDF cutoffs.
     
     methods
         
-        function obj=TruncatedP(varargin)
-            obj=obj@TruncatedX;
-            obj.ThisFamilyName = 'TruncatedP';
-            switch nargin
-                case 0
-                case 3
-                    BuildMyBasis(obj,varargin{1});
-                    ResetParms(obj,[ParmValues(obj.BasisRV) varargin{end-1} varargin{end}]);
-                otherwise
-                    ME = MException('TruncatedP:Constructor', ...
-                        'TruncatedP constructor needs 0 or 3 arguments.');
-                    throw(ME);
-            end
-        end
-        
-        function BuildMyName(obj)
-            obj.StringName = [obj.ThisFamilyName '(' obj.BasisRV.StringName ',' num2str(obj.LowerCutoffP)  ',' num2str(obj.UpperCutoffP) ')'];
+        function obj=TruncatedP(BasisDist,LowerP,UpperP)
+            obj=obj@TruncParent('TruncatedP',BasisDist);
+            obj.NewCutoffs(obj.BasisRV.InverseCDF(LowerP),obj.BasisRV.InverseCDF(UpperP));
+            obj.AddParms(2,'rr');
+            obj.ReInit;
         end
         
         function []=ResetParms(obj,newparmvalues)
-            ResetParms@dTransOf1(obj,newparmvalues(1:end-2));
-            obj.LowerCutoffP = newparmvalues(end-1);
-            obj.UpperCutoffP = newparmvalues(end);
+            ClearBeforeResetParms(obj)
+            obj.BasisRV.ResetParms(newparmvalues(1:obj.BasisRV.NDistParms));
+            obj.NewCutoffs(obj.BasisRV.InverseCDF(newparmvalues(end-1)),obj.BasisRV.InverseCDF(newparmvalues(end)));
+            obj.Initialized = true;
             ReInit(obj);
         end
         
@@ -37,20 +26,8 @@ classdef TruncatedP < TruncatedX
             obj.ResetParms([obj.BasisRV.ParmValues NewLowerP NewUpperP]);
         end
         
-        function []=ReInit(obj)
-            obj.Initialized = true;
-            obj.UnconditionalP = obj.UpperCutoffP - obj.LowerCutoffP;
-            assert(obj.UnconditionalP>0,'TruncatedP distribution must include probability > 0.');
-            assert(obj.BasisRV.Initialized,'TruncatedP BasisRV must already be initialized.');
-            obj.LowerCutoffX = obj.BasisRV.InverseCDF(obj.LowerCutoffP);
-            obj.UpperCutoffX = obj.BasisRV.InverseCDF(obj.UpperCutoffP);
-            ReInit@TruncatedX(obj);
-            % if (obj.NameBuilding)
-            %     BuildMyName(obj);
-        end
-        
-        function parmvals = ParmValues(obj)
-            parmvals = [obj.BasisRV.ParmValues obj.LowerCutoffP obj.UpperCutoffP];
+        function parmvals = TransParmValues(obj)
+            parmvals = [obj.LowerCutoffP obj.UpperCutoffP];
         end
         
         function TransReals = TransParmsToReals(obj,Parms,~)

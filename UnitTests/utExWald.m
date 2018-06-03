@@ -30,7 +30,7 @@ classdef utExWald < utContinuous;
             testCase.Dist = ExWald(waldmu,waldsigma,waldbarrier,exrate);
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 
-            testCase.Dist.DefaultParmCodes = 'rffr';
+            testCase.EstParmCodes = 'rffr';
             testCase.Dist.UseSplinePDFOn(200);
             testCase.SkipMomentEst = true;  % Moments do not provide enough info to constrain parameters
             

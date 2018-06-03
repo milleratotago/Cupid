@@ -23,7 +23,7 @@ classdef utWeibull < utContinuous;
         function ClassSetup(testCase,parmScale,parmPower,parmOrigin)
             % Computations specific to the Weibull distribution.
             testCase.Dist = Weibull(parmScale,parmPower,parmOrigin);
-            testCase.Dist.DefaultParmCodes = 'rrf';
+            testCase.EstParmCodes = 'rrf';
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 
             SetupXs(testCase,1000,10000);

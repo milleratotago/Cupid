@@ -1,4 +1,4 @@
-classdef Mixture < dContinuous % dEither % Probably fastest to handle Mixtures of discrete RVs via ListRV mechanism.
+classdef Mixture < dEither
     % Mixture(p1,BasisRV1,p2,BasisRV2,...,pk,BasisRVk) creates a random variable that is
     %  a mixture of the indicated basis RVs with the indicated probabilities.
     % The final pk is ignored can be omitted.
@@ -22,7 +22,7 @@ classdef Mixture < dContinuous % dEither % Probably fastest to handle Mixtures o
     methods
         
         function obj=Mixture(varargin)
-            obj=obj@dContinuous('Mixture');
+            obj=obj@dEither('Mixture');
             obj.AdjustMixturePs = false;
             switch nargin
                 case 0
@@ -101,8 +101,10 @@ classdef Mixture < dContinuous % dEither % Probably fastest to handle Mixtures o
             end
             if OneIsContinuous && ~(OneIsDiscrete || OneIsMixed)
                 obj.DistType = 'c';
+            elseif OneIsDiscrete && ~(OneIsContinuous || OneIsMixed)
+                obj.DistType = 'd';
             else
-                assert(false,'Mixture can only handle continuous Basis distributions (so far)');
+                assert(false,'Mixture can only handle all-continuous or all-discrete Basis distributions (so far)');
             end
             
         end
@@ -116,7 +118,7 @@ classdef Mixture < dContinuous % dEither % Probably fastest to handle Mixtures o
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues)
+            ClearBeforeResetParms(obj)
             obj.Initialized = true;
             ParmsUsed = 0;
             for iDist = 1:obj.NDists
@@ -145,6 +147,37 @@ classdef Mixture < dContinuous % dEither % Probably fastest to handle Mixtures o
             obj.ReInit;
         end
         
+        function MakeTables(obj)
+            Xs = [];
+            Probs = [];
+            for iDist = 1:obj.NDists
+                Xs = [Xs obj.BasisRV{iDist}.DiscreteX];
+                Probs = [Probs obj.BasisRV{iDist}.DiscretePDF*obj.MixtureP(iDist)];
+            end
+            [obj.DiscreteX, obj.DiscretePDF] = CollapseVals(Xs,Probs);
+            obj.DiscreteCDF = cumsum(obj.DiscretePDF);
+            obj.DiscreteCDF(end) = 1;
+            obj.NValues = numel(obj.DiscreteX);
+            obj.SetBinEdges;
+            obj.LowerBound = obj.DiscreteXmin(1);
+            obj.UpperBound = obj.DiscreteXmax(end);
+        end
+
+        function [] = SetBoundsContin(obj)
+            obj.LowerBound = inf;
+            obj.UpperBound = -inf;
+            for iDist=1:obj.NDists
+                if obj.MixtureP(iDist) > 0
+                    if obj.LowerBound > obj.BasisRV{iDist}.LowerBound
+                        obj.LowerBound = obj.BasisRV{iDist}.LowerBound;
+                    end
+                    if obj.UpperBound < obj.BasisRV{iDist}.UpperBound
+                        obj.UpperBound = obj.BasisRV{iDist}.UpperBound;
+                    end
+                end
+            end
+        end
+        
         function ReInit(obj)
             % Assume all distributions have been initialized
             
@@ -158,26 +191,25 @@ classdef Mixture < dContinuous % dEither % Probably fastest to handle Mixtures o
             assert(MixPSum<=1,'Sum of first n-1 mixture probabilities cannot exceed 1.');
             obj.MixtureP(obj.NDists) = 1 - MixPSum;
             obj.CumulativeP(obj.NDists) = 1;
-            
-            obj.LowerBound = inf;
-            obj.UpperBound = -inf;
-            for iDist=1:obj.NDists
-                if obj.MixtureP(iDist) > 0
-                    if obj.LowerBound > obj.BasisRV{iDist}.LowerBound
-                        obj.LowerBound = obj.BasisRV{iDist}.LowerBound;
-                    end
-                    if obj.UpperBound < obj.BasisRV{iDist}.UpperBound
-                        obj.UpperBound = obj.BasisRV{iDist}.UpperBound;
-                    end
-                end
-            end
+
             obj.Initialized = true;
+            switch obj.DistType
+                case 'd'
+                    obj.MakeTables;
+                case 'c'
+                    obj.SetBoundsContin;
+            end
+            
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
         end
         
         function thispdf=PDF(obj,X)
+            if obj.DistType=='d'
+                thispdf = PDF@dDiscrete(obj,X);
+                return;
+            end
             [thispdf, InBounds, Done] = MaybeSplinePDF(obj,X);
             if Done
                 return;
@@ -188,6 +220,10 @@ classdef Mixture < dContinuous % dEither % Probably fastest to handle Mixtures o
         end
         
         function thiscdf=CDF(obj,X)
+            if obj.DistType=='d'
+                thiscdf = CDF@dDiscrete(obj,X);
+                return;
+            end
             [thiscdf, InBounds, Done] = MaybeSplineCDF(obj,X);
             if Done
                 return;
@@ -259,27 +295,27 @@ classdef Mixture < dContinuous % dEither % Probably fastest to handle Mixtures o
         end
         
         function thisval=RawMoment(obj,N)
-            if obj.DistType == 'c'
+%            if obj.DistType == 'c'  % NWJEFF--also Integral
                 thisval = 0;
                 for iDist = 1:obj.NDists
                     This = obj.BasisRV{iDist}.RawMoment(N);
                     thisval = This * obj.MixtureP(iDist) + thisval;
                 end
-            else
-                assert(false,'Unable to compute Mixture distribution RawMoment.');
-            end
+%            else
+%                assert(false,'Unable to compute Mixture distribution RawMoment.');
+%            end
         end
         
         function thisval=IntegralXToNxPDF(obj,FromX,ToX,N)
-            if obj.DistType == 'c'
+%            if obj.DistType == 'c'
                 thisval = 0;
                 for iDist = 1:obj.NDists
                     This = obj.BasisRV{iDist}.IntegralXToNxPDF(FromX,ToX,N);
                     thisval = This * obj.MixtureP(iDist) + thisval;
                 end
-            else
-                assert(false,'Unable to compute Mixture distribution IntegralXToNxPDF.');
-            end
+%            else
+%                assert(false,'Unable to compute Mixture distribution IntegralXToNxPDF.');
+%            end
         end
         
         function thisval=Random(obj,varargin)

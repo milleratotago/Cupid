@@ -27,7 +27,7 @@ classdef Exponential < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             assert(newparmvalues(1)>0,'Exponential rate must be positive.');
             obj.rate = newparmvalues(1);
             ReInit(obj);

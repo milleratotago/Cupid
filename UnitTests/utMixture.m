@@ -26,16 +26,16 @@ classdef utMixture < utContinuous;
             switch parmCase
                 case 1
                     testCase.Dist = Mixture(0.2,Triangular(1,2),Uniform(0.5,1.5));
-                    testCase.Dist.DefaultParmCodes = 'ffffr';
+                    testCase.EstParmCodes = 'ffffr';
                 case 2
                     testCase.Dist = Mixture(0.5,Beta(18,5),Beta(21,2));
-                    testCase.Dist.DefaultParmCodes = 'ffffr';
+                    testCase.EstParmCodes = 'ffffr';
                 case 3
                     testCase.Dist = Mixture(0.8,RNGamma(10,.1),Triangular(50,150));
-                    testCase.Dist.DefaultParmCodes = 'frrff';
+                    testCase.EstParmCodes = 'frrff';
                 case 4
                     testCase.Dist = Mixture(0.5,Normal(0,1),Normal(0,1));  % Constructed to give a known result.
-                    testCase.Dist.DefaultParmCodes = 'frrff';
+                    testCase.EstParmCodes = 'frrff';
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

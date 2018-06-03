@@ -9,7 +9,7 @@ classdef TriangularGCWP < TriangularG
         
         function obj=TriangularGCWP(varargin)
             obj=obj@TriangularG;
-            obj.ThisFamilyName = 'TriangularGCWP';
+            obj.FamilyName = 'TriangularGCWP';
             obj.ParmNames{1} = 'center';
             obj.ParmNames{2} = 'width';
             obj.ParmNames{3} = 'peakprop';
@@ -28,7 +28,7 @@ classdef TriangularGCWP < TriangularG
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.center = newparmvalues(1);
             obj.width = newparmvalues(2);
             obj.peakprop = newparmvalues(3);

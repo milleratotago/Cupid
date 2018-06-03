@@ -26,22 +26,22 @@ classdef utInfMix < utContinuous;
             switch parmCase
                 case 1
                     testCase.Dist = InfMix(Normal(0,1),Uniform(0.9999,1.0001),2);  % Constructed to give a known result.
-                    testCase.Dist.DefaultParmCodes = 'rfff';
+                    testCase.EstParmCodes = 'rfff';
                     testCase.SkipAllEst = true;  % Skip in interests of speed
                 case 2
                     testCase.Dist = InfMix(Normal(.09091,1),Beta(5,50),1);
-                    testCase.Dist.DefaultParmCodes = 'frff';
+                    testCase.EstParmCodes = 'frff';
                     testCase.SkipAllEst = true;  % Skip in interests of speed
                 case 3
                     testCase.Dist = InfMix(Exponential(1),Triangular(0.5,1.5),1);
-                    testCase.Dist.DefaultParmCodes = 'frf';
+                    testCase.EstParmCodes = 'frf';
                     testCase.SkipAllEst = true;  % Skip in interests of speed
                 case 4
                     testCase.Dist = InfMix(RNGamma(5,.1),Cosine(5,3),1);
-                    testCase.Dist.DefaultParmCodes = 'frff';  % DO THIS ESTIMATION JUST AS ONE EXAMPLE.
+                    testCase.EstParmCodes = 'frff';  % DO THIS ESTIMATION JUST AS ONE EXAMPLE.
                 case 5
                     testCase.Dist = InfMix(RNGamma(5,.1),Cosine(5,2),1);
-                    testCase.Dist.DefaultParmCodes = 'ffrf';  % Note adjusting parameter of ParmDist rather than ParentDist
+                    testCase.EstParmCodes = 'ffrf';  % Note adjusting parameter of ParmDist rather than ParentDist
                     testCase.SkipAllEst = true;  % Skip in interests of speed
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)

@@ -29,7 +29,7 @@ classdef Cauchy < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.location = newparmvalues(1);
             obj.scale = newparmvalues(2);
             ReInit(obj);

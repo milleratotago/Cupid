@@ -1,12 +1,18 @@
-classdef LogisticTrans < dMonoTrans0
+classdef LogisticTrans < dTransMono
 % Logistic transformation of any real random variable.
 
 methods
 
         function obj=LogisticTrans(BasisDist)
-            obj@dMonoTrans0('LogisticTrans',BasisDist);
+            obj@dTransMono('LogisticTrans',BasisDist);
             obj.TransReverses = false;
+            obj.PDFScaleFactorKnown = false;
             obj.ReInit;
+        end
+
+        function []=ResetParms(obj,newparmvalues)
+            ResetParms@dTransMono(obj,newparmvalues);
+            ReInit(obj);
         end
 
         function Trans = PreTransToTrans(obj,PreTrans)

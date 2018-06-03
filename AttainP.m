@@ -1,4 +1,4 @@
-classdef AttainP < dContinuous % dEither  % Discrete not implemented yet. Maybe handle it by descending from dTransOf1 or dTransOf2 (MinBound)
+classdef AttainP < dContinuous % dEither  % Discrete not implemented yet. Maybe handle it by descending from dTransMono or dTransOf2 (MinBound)
     % AttainP(TrueDist,NullDist[,TailsArg]): Distribution of "p" values with true distribution tested against Null
     % TailsArg = -1 for lower tail p, 1 for upper tail p, or 2 for 2-tailed (default=2).');
     
@@ -76,7 +76,7 @@ classdef AttainP < dContinuous % dEither  % Discrete not implemented yet. Maybe 
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.Initialized = false;
             obj.True.ResetParms(newparmvalues(1:obj.True.NDistParms));
             obj.Null.ResetParms(newparmvalues(obj.True.NDistParms+1:end));

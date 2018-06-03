@@ -30,7 +30,7 @@ classdef JohnsonSU < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.Location = newparmvalues(1);
             obj.Scale = newparmvalues(2);
             obj.Alpha1 = newparmvalues(3);

@@ -2,7 +2,7 @@ classdef utProduct < utContinuous;
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.
-        parmCase = {1};
+        parmCase = {1 2 3};
     end
     
     properties
@@ -27,13 +27,13 @@ classdef utProduct < utContinuous;
             switch parmCase
                 case 1
                     testCase.Dist = Product(RNGamma(10,.1),RNGamma(10,10)); % Lognormal(1,.1),Uniform(1,2));
-                    % testCase.Dist.DefaultParmCodes = 'rfff';
+                    % testCase.EstParmCodes = 'rfff';
                 case 2
                     testCase.Dist = Product(Beta(5,18),Wald2(.25,20));
-                    % testCase.Dist.DefaultParmCodes = 'ffrf';
+                    % testCase.EstParmCodes = 'ffrf';
                 case 3
                     testCase.Dist = Product(RNGamma(10,.1),Uniform(1,2));
-                    % testCase.Dist.DefaultParmCodes = 'rfff';
+                    % testCase.EstParmCodes = 'rfff';
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

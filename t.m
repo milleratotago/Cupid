@@ -29,7 +29,7 @@ classdef t < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.df = VerifyIntegerGE(obj,1,newparmvalues(1));
             ReInit(obj);
         end

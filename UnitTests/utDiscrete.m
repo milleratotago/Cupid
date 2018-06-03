@@ -29,7 +29,7 @@ classdef utDiscrete < utGeneric;
             testCase.xvalues = testCase.Dist.XsToPlot;
 
             % Set up some X values for which MLE should return (very close to) the true parameters:
-            testCase.xMLE = testCase.xvalues;
+            testCase.xMLE = testCase.Dist.Random(100000,1);
 
         end
             
@@ -40,8 +40,8 @@ classdef utDiscrete < utGeneric;
         function PDFIntegralPieces(testCase)
             
             % Check for consistency of CDF with sum of PDF:
-            IntegralPieces = testCase.Dist.PDF(testCase.xvalues);
-            testCase.Computed.CDF = testCase.Dist.CDF(testCase.xvalues);
+            IntegralPieces = testCase.Dist.PDF(testCase.Dist.DiscreteX);
+            testCase.Computed.CDF = testCase.Dist.CDF(testCase.Dist.DiscreteX);
             IntegralPieces = cumsum(IntegralPieces);
             testCase.verifyEqual(testCase.Computed.CDF,IntegralPieces,'AbsTol',testCase.CDFAbsTol,'RelTol',testCase.CDFRelTol,'CDF values are not consistent with summed PDF');
             

@@ -1,10 +1,11 @@
 classdef Poisson < dDiscrete   % NWJEFF: Not vectorized
     % Poisson(mu):  mean equals parameter mu.
     
-    % NWJEFF: As written, does this _always_ use a stored table?
+    % NWJEFF: Use a normal approximation for mu>100; this version gives numerical errors.
     
     properties(SetAccess = protected)
         mu, expmu
+        Warned  % Warning given about numerical problems with large mu
     end
     
     methods
@@ -14,6 +15,7 @@ classdef Poisson < dDiscrete   % NWJEFF: Not vectorized
             obj.ParmTypes = 'r';
             obj.DefaultParmCodes = 'r';
             obj.NDistParms = 1;
+            obj.Warned = false;
             switch nargin
                 case 0
                 case 1
@@ -26,8 +28,7 @@ classdef Poisson < dDiscrete   % NWJEFF: Not vectorized
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
-            obj.StoredTablesInitialized = false;
+            ClearBeforeResetParmsD(obj);
             obj.mu = newparmvalues;
             ReInit(obj);
         end
@@ -40,12 +41,13 @@ classdef Poisson < dDiscrete   % NWJEFF: Not vectorized
         
         function []=ReInit(obj)
             assert(obj.mu>0,'Poisson mu must be > 0.');
+            if (obj.mu>100)&&(~obj.Warned)
+                obj.Warned = true;
+                warning('Expect numerical problems with Poisson mu>100; use Normal approximation.');
+            end
             obj.expmu = exp(-obj.mu);
             obj.Initialized = true;
-            obj.UseStoredTables = true;
-            if obj.UseStoredTables
-                MakeTables(obj);  % also sets lower and upper bounds
-            end
+            MakeTables(obj);  % also sets lower and upper bounds
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
@@ -69,27 +71,10 @@ classdef Poisson < dDiscrete   % NWJEFF: Not vectorized
         end
         
         function thisval=NearestLegal(obj,X)
-%             thisval = zeros(size(X));
-%             for i=1:numel(X)
-%                 if X(i) < -0.5
-%                     thisval(i) = -1;
-%                 elseif X(i) < 0.5
-%                     thisval(i) = 0;
-%                 else
-%                     thisval(i) = round(X);
-%                 end
-                thisval = round(X);
-%            end
-        end
-        
-        function thisval=nIthValue(obj,I)
-            assert(obj.Initialized,UninitializedError(obj));
-            assert(min(I)>0&&max(I)<=obj.NValues,'Requested value at nonexistent position')
-            thisval = obj.LowerBound+I-1;
+            thisval = round(X);
         end
         
         function []=MakeTables(obj)
-            obj.LowerBound = 0;
             chunksize = 100;  % grow the arrays in chunks.
             tempX = zeros(1,chunksize);
             tempPDF = zeros(1,chunksize);
@@ -114,40 +99,18 @@ classdef Poisson < dDiscrete   % NWJEFF: Not vectorized
                 I = I+1;
                 XFac = XFac * I;
             end
-            obj.UpperBound = I;
+            obj.DiscreteX = tempX(1:I);
+            obj.DiscretePDF = tempPDF(1:I);
+            obj.DiscreteCDF = tempCDF(1:I);
+            obj.DiscreteCDF(end) = 1;
             obj.NValues = I;
-            obj.StoredX = [ -0.01 tempX(1:obj.NValues)];
-            obj.StoredPDF = [0 tempPDF(1:obj.NValues)];
-            obj.StoredCDF = [0 tempCDF(1:obj.NValues)];
+% NWJEFF: Trim zeros & set NValues?
+            obj.LowerBound = obj.DiscreteX(1);
+            obj.UpperBound = obj.DiscreteX(end);
+            SetBinEdges(obj);
             obj.StoredTablesInitialized = true;
         end
 
-        function thisval=NextValue(obj,X)
-            thisval = X + 1;
-        end
-        
-        function thispdf=nPDF(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
-            thispdf = zeros(size(X));
-            for i=1:numel(X)
-                if LegalValue(obj,X(i))
-                    thispdf(i) = obj.expmu*obj.mu^X(i)/factorial(X(i));
-                end
-            end
-        end
-        
-        function thiscdf=nCDF(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
-            thiscdf = zeros(size(X));
-            for i=1:numel(X)
-                PSum = 0;
-                for I = 0:floor(X(i))
-                    PSum = PSum + PDF(obj,I);
-                end
-                thiscdf(i) = PSum;
-            end
-        end
-        
         function thisval=Mean(obj)
             assert(obj.Initialized,UninitializedError(obj));
             thisval = obj.mu;

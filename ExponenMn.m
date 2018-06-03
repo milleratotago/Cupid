@@ -9,7 +9,7 @@ classdef ExponenMn < Exponential
         
         function obj=ExponenMn(varargin)
             obj=obj@Exponential;
-            obj.ThisFamilyName = 'ExponenMn';
+            obj.FamilyName = 'ExponenMn';
             obj.ParmNames{1} = 'expmean';
             if nargin==1
                 ResetParms(obj,varargin{1});
@@ -21,7 +21,7 @@ classdef ExponenMn < Exponential
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.expmean = newparmvalues(1);
             obj.rate = 1/obj.expmean;
             assert(obj.expmean>0,'ExponenMn mean must be > 0.');

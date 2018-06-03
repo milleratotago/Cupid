@@ -7,7 +7,7 @@ classdef Rosin < Weibull
         
         function obj=Rosin(varargin)
             obj=obj@Weibull;
-            obj.ThisFamilyName = 'Rosin';
+            obj.FamilyName = 'Rosin';
             obj.ParmTypes = 'rrf';
             obj.DefaultParmCodes = 'rrf';
             obj.origin = 0;
@@ -23,11 +23,11 @@ classdef Rosin < Weibull
         end
         
         function BuildMyName(obj)
-            obj.StringName = [obj.ThisFamilyName '(' num2str(obj.scale) ',' num2str(obj.power) ')'];
+            obj.StringName = [obj.FamilyName '(' num2str(obj.scale) ',' num2str(obj.power) ')'];
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,[newparmvalues 0]);
+            ClearBeforeResetParmsC(obj);  % NWJEFF: Was ,[newparmvalues 0]
             obj.scale = newparmvalues(1);
             obj.power = newparmvalues(2);
             ReInit(obj);

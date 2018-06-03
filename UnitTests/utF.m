@@ -1,7 +1,7 @@
 classdef utF < utContinuous;
     
     properties (ClassSetupParameter)
-        parm1DfNum   = struct( 'p1a',1 , 'p1b',1  , 'p1c',1    , 'p2',2      , 'p4',4       ,  'p8', 8   );
+        parm1DfNum   = struct( 'p2a',2 , 'p1a',1  , 'p1b',1    , 'p2b',2     , 'p4',4       ,  'p8', 8   );
         parm2DfDenom = struct( 'p6',6  , 'p12',12 , 'p240',240 , 'p48', 48   ,  'p96', 96   ,  'p320', 320  );
     end
     

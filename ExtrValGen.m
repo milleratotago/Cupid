@@ -38,7 +38,7 @@ classdef ExtrValGen < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.Initialized = false;
             obj.Mu = newparmvalues(1);
             obj.Sigma = newparmvalues(2);

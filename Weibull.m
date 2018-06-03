@@ -38,7 +38,7 @@ classdef Weibull < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.scale = newparmvalues(1);
             obj.power = newparmvalues(2);
             obj.origin = newparmvalues(3);

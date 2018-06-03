@@ -45,7 +45,7 @@ classdef utContinuous < utGeneric;
             LowerLimit = testCase.Dist.LowerBound;
             for iSegment=1:NSegments
                 UpperLimit = testCase.xvalues(iSegment);
-                IntegralPieces(iSegment) = testCase.Dist.IntegralXToNxPDF(LowerLimit,UpperLimit,0);
+                IntegralPieces(iSegment) = testCase.Dist.IntegralXToNxPDF(LowerLimit+eps(LowerLimit),UpperLimit,0);
                 LowerLimit = UpperLimit;
             end
             IntegralPieces = cumsum(IntegralPieces);

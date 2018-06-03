@@ -27,7 +27,7 @@ classdef TriangularG < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.min = newparmvalues(1);
             obj.peak = newparmvalues(2);
             obj.max = newparmvalues(3);

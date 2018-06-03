@@ -66,7 +66,7 @@ classdef rNoncentral < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.SampleSize = VerifyIntegerGE(obj,3,newparmvalues(1));
             obj.TrueRho = newparmvalues(2);
             ReInit(obj);

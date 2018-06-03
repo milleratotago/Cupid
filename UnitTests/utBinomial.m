@@ -1,9 +1,10 @@
 classdef utBinomial < utDiscrete;
     
     properties (ClassSetupParameter)
-        parmN = struct('p2',2,    'p4',4     , 'p20',20, 'p100',100 , 'p500',500 );
-        parmp = struct('p_1',0.1, 'p_83',.83 , 'p_8',.8, 'p_55',.55 , 'p_73',.73 );
+        parmN = struct('p2',2  , 'p4',4     , 'p20',20, 'p100',100 , 'p120',120, 'p130',130, 'p500',500 );
+        parmp = struct('p_1',.1, 'p_83',.83 , 'p_8',.8, 'p_55',.55 , 'p_03',.03, 'p_99',.99, 'p_73',.73 );
     end
+    % Note relaxed moment tolerances when using Poisson approximations
     
     properties
        Dummy1, Dummy2  % Provide the dummy variables that were used to make parent classes abstract.
@@ -36,7 +37,11 @@ classdef utBinomial < utDiscrete;
             
             % Adjust tolerances as appropriate for this distribution & parameters:
             SetTolerances(testCase,0.005);
-            testCase.KurtRelTol = 0.01;  % Kurtosis not so accurate
+            if testCase.Dist.Approx>=2  % Poisson approximation moments are not very accurate
+                testCase.RawMomentRelTol(3) = 0.04;
+                testCase.CenMomentRelTol(3) = 0.04;
+                testCase.KurtRelTol = 0.04;
+            end
 
             utGenericMethodSetup(testCase);   % Initialize many standard computations
 

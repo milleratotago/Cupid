@@ -12,7 +12,7 @@ classdef RNGammaMS < RNGamma
         
         function obj=RNGammaMS(varargin)
             obj=obj@RNGamma;
-            obj.ThisFamilyName = 'RNGammaMS';
+            obj.FamilyName = 'RNGammaMS';
             obj.ParmNames{1} = 'mu';
             obj.ParmNames{2} = 'sigma';
             switch nargin
@@ -27,7 +27,7 @@ classdef RNGammaMS < RNGamma
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.mu = newparmvalues(1);
             obj.sigma = newparmvalues(2);
             assert(obj.mu>0,'RNGammaMS mu must be > 0.');

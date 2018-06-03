@@ -9,7 +9,7 @@ classdef ExWaldMn < ExWald
         
         function obj=ExWaldMn(varargin)
             obj=obj@ExWald;
-            obj.ThisFamilyName = 'ExWaldMn';
+            obj.FamilyName = 'ExWaldMn';
             obj.ParmNames{4} = 'expmean';
             switch nargin
                 case 0
@@ -23,7 +23,7 @@ classdef ExWaldMn < ExWald
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.mu = newparmvalues(1);
             obj.sigma = newparmvalues(2);
             obj.barrierA = newparmvalues(3);

@@ -70,6 +70,14 @@ classdef dContinuous < dGeneric   % Calls by reference
             obj.IntegralCDFXNRelTol = 1e-6  * ones(1,MaxN);
         end
         
+        function []=ClearBeforeResetParmsC(obj)
+            obj.Initialized = false;
+            obj.HaveSplinePDFs = false;
+            obj.HaveSplineCDFs = false;
+            obj.HaveSplineInvCDFs = false;
+            obj.HaveStoredCDFs = false;
+        end
+
         function thispdf=PDF(obj,X)
             % Compute the PDF as the numerical derivative of the CDF.
             % This is used to supply PDF for distributions where only the CDF is known analytically.
@@ -260,7 +268,7 @@ classdef dContinuous < dGeneric   % Calls by reference
             x = lowx:stepsize:highx;
         end
         
-        function BinMax=MakeBinSet(obj,MinPr)
+        function [BinMax,BinProb]=MakeBinSetC(obj,MinPr)
             % This function creates an output vector of length NBins defining NBins bins covering the RV's range.
             % The bottom of the first bin is implicitly obj.LowerBound, and the top of bin I is BinMax(I).
             % BinMax(NBins) always equals obj.UpperBound.
@@ -282,6 +290,8 @@ classdef dContinuous < dGeneric   % Calls by reference
                     BinMax(iBin) = InverseCDF(obj,PropPerBin*iBin);
                 end
             end
+            BinProb = obj.CDF(BinMax);
+            BinProb = diff([0 BinProb]);
         end
         
     end  % methods

@@ -26,13 +26,13 @@ classdef utDifference < utContinuous;
             switch parmCase
                 case 1
                     testCase.Dist = Difference(Triangular(1,2),Uniform(0.5,1.5));
-                    testCase.Dist.DefaultParmCodes = 'fffr';
+                    testCase.EstParmCodes = 'fffr';
                 case 2
                     testCase.Dist = Difference(Beta(18,5),Triangular(-1,0));
-                    testCase.Dist.DefaultParmCodes = 'fffr';
+                    testCase.EstParmCodes = 'fffr';
                 case 3
                     testCase.Dist = Difference(RNGamma(10,2.1),Uniform(1,2));
-                    testCase.Dist.DefaultParmCodes = 'frrf';
+                    testCase.EstParmCodes = 'frrf';
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 
@@ -77,7 +77,7 @@ testCase.ParmEstAbsTol(:)=.1;
             end
         end
         
-    end
+    end % methods (Test)
     
 end  % utDifference
 

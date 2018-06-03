@@ -1,7 +1,7 @@
 classdef utNakaRush < utContinuous;
     
     properties (ClassSetupParameter)
-        parmScale  = struct( 'p_1',.1 , 'p1',1 , 'p2',2 , 'p4',4 , 'p10',10 );
+        parmScale  = struct( 'p_5',.5 , 'p1',1 , 'p2',2 , 'p4',4 , 'p10',10 );
     end
     
     properties

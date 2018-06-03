@@ -11,7 +11,7 @@ classdef ExWaldMSM < ExWald
         
         function obj=ExWaldMSM(varargin)
             obj=obj@ExWald;
-            obj.ThisFamilyName = 'ExWaldMSM';
+            obj.FamilyName = 'ExWaldMSM';
             obj.NDistParms = 3;
             obj.ParmNames{1} = 'WaldMean';
             obj.ParmNames{2} = 'WaldSD';
@@ -33,7 +33,7 @@ classdef ExWaldMSM < ExWald
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.WaldMean = newparmvalues(1);
             obj.WaldSD = newparmvalues(2);
             obj.ExpMean = newparmvalues(3);

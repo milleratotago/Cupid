@@ -26,7 +26,7 @@ classdef Rayleigh < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.Sigma = newparmvalues(1);
             ReInit(obj);
         end

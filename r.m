@@ -1,4 +1,4 @@
-classdef r < dContinuous
+classdef r < dContinuous  % NWJEFF: For large DF, approximate with Normal(0,1/sqrt(DF))
     
     properties(SetAccess = protected)
         SampleSize, DF, GamHalf,  Gam1, Gam2, Parentt
@@ -25,7 +25,7 @@ classdef r < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.SampleSize = VerifyIntegerGE(obj,3,newparmvalues(1));
             ReInit(obj);
         end

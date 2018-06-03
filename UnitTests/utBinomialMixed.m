@@ -30,7 +30,7 @@ classdef utBinomialMixed < utDiscrete;
                 case 3
                     ThesePs = (1:10)/20;
                 case 4
-                    ThesePs = (1:100)/100;
+                    ThesePs = (2.5:5:97.5)/100;
             end
 
             testCase.Dist = BinomialMixed(ThesePs);

@@ -26,14 +26,14 @@ classdef utPowerTrans < utContinuous;
             switch parmCase
                 case 1
                     testCase.Dist = PowerTrans(Uniform(1,2),1.5);
-                    testCase.Dist.DefaultParmCodes = 'rrr';
+                    testCase.EstParmCodes = 'rrr';
                     % testCase.SkipAllEst = true;
                 case 2
                     testCase.Dist = PowerTrans(Normal(100,1),2);
-                    testCase.Dist.DefaultParmCodes = 'rrf';
+                    testCase.EstParmCodes = 'rrf';
                 case 3
                     testCase.Dist = PowerTrans(Exponential(0.1),0.55);
-                    testCase.Dist.DefaultParmCodes = 'rr';
+                    testCase.EstParmCodes = 'rr';
                     testCase.SkipMLEst = true;  % The exponential produces a better ML at a different rate.
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
@@ -45,7 +45,7 @@ classdef utPowerTrans < utContinuous;
             
             % Adjust tolerances as appropriate for this distribution & parameters:
             SetTolerances(testCase,0.002);
-            testCase.ParmEstRelTol = .03;
+            testCase.ParmEstRelTol = .05;
 %             if testCase.ThisCase==1
 %             end
 %             if testCase.ThisCase==2

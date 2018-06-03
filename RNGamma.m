@@ -30,7 +30,7 @@ classdef RNGamma < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.N = newparmvalues(1);
             obj.Rate = newparmvalues(2);
             ReInit(obj);

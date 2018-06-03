@@ -28,7 +28,6 @@ classdef tPowerEst < dContinuous
         
         function obj=tPowerEst(varargin)
             obj=obj@dContinuous('tPowerEst');
-            obj.sSqrDist = MultTrans;
             obj.MinPwr = .00001;
             obj.MaxPwr = .99999;
             switch nargin
@@ -53,7 +52,7 @@ classdef tPowerEst < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.TrueDelta = newparmvalues(1);
             obj.sigma = newparmvalues(2);
             obj.alpha = newparmvalues(3);

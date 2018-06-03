@@ -46,7 +46,7 @@ classdef GenNor1 < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.Mu = newparmvalues(1);
             obj.Alpha = newparmvalues(2);
             obj.Beta = newparmvalues(3);
@@ -109,7 +109,7 @@ classdef GenNor1 < dContinuous
 % seem to be faster: if anything, slightly slower.  I did not check accuracy.
 %         function thisval=InverseCDF(obj,P)
 %             assert(obj.Initialized,UninitializedError(obj));
-%             GammaBasis = RNGamma(1/obj.Beta,obj.Beta);  % NEWJEFF: Make as part of object?
+%             GammaBasis = RNGamma(1/obj.Beta,obj.Beta);  % JEFF: Make as part of object?
 %             TwoAlphaBeta = 2*obj.Alpha*obj.Beta;
 %             thisval=zeros(size(P));
 %             for i=1:numel(P)

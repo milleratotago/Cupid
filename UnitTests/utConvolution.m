@@ -29,25 +29,26 @@ classdef utConvolution < utContinuous;
             switch parmCase
                 case 1
                     testCase.Dist = Convolution(Normal(0.5,1),Normal(0,1));
-                    testCase.Dist.DefaultParmCodes = 'rfff';
+                    testCase.EstParmCodes = 'rfff';
                     SetTolerances(testCase,0.01);
                 case 2
+                    % The distribution of the sum of 2 Uniform(0,1) is Triangular(0,2)
                     testCase.Dist = Convolution(Uniform(0,1),Uniform(0,1));
-                    testCase.Dist.DefaultParmCodes = 'rrff';
+                    testCase.EstParmCodes = 'rrff';
                     SetTolerances(testCase,0.01);
                     testCase.RawMomentAbsTol(4)=.1;
                     testCase.ParmEstRelTol = 0.02;
                 case 3
                     CommonRate = .01;
                     testCase.Dist = Convolution(RNGamma(4,CommonRate),Exponential(CommonRate));
-                    testCase.Dist.DefaultParmCodes = 'rff';
+                    testCase.EstParmCodes = 'rff';
                     SetTolerances(testCase,0.01);
                     testCase.RawMomentRelTol(1) = 0.01;
                     testCase.CenMomentRelTol(1) = 0.01;
                     testCase.ParmEstRelTol = 0.02;
                 case 4
                     testCase.Dist = Convolution(Normal(200,20),Exponential(.01));
-                    testCase.Dist.DefaultParmCodes = 'frf';
+                    testCase.EstParmCodes = 'frf';
                     SetTolerances(testCase,0.01);
                     testCase.ParmEstRelTol = 0.02;
             end

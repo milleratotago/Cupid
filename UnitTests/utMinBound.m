@@ -26,13 +26,13 @@ classdef utMinBound < utContinuous;
             switch parmCase
                 case 1
                     testCase.Dist = MinBound(Uniform(10,20),Uniform(10,20));
-                    testCase.Dist.DefaultParmCodes = 'ffrr';
+                    testCase.EstParmCodes = 'ffrr';
                 case 2
                     testCase.Dist = MinBound(Beta(18,5),Beta(21,2));
-                    testCase.Dist.DefaultParmCodes = 'fffr';
+                    testCase.EstParmCodes = 'fffr';
                 case 3
                     testCase.Dist = MinBound(RNGamma(10,10),Uniform(1,2));
-                    testCase.Dist.DefaultParmCodes = 'rrff';
+                    testCase.EstParmCodes = 'rrff';
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

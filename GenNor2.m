@@ -33,7 +33,7 @@ classdef GenNor2 < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.Xi = newparmvalues(1);
             obj.Alpha = newparmvalues(2);
             obj.Kappa = newparmvalues(3);

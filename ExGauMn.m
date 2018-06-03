@@ -9,7 +9,7 @@ classdef ExGauMn < ExGauss
         
         function obj=ExGauMn(varargin)
             obj=obj@ExGauss;
-            obj.ThisFamilyName = 'ExGauMn';
+            obj.FamilyName = 'ExGauMn';
             obj.ParmNames{3} = 'exmean';
             switch nargin
                 case 0
@@ -23,7 +23,7 @@ classdef ExGauMn < ExGauss
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.mu = newparmvalues(1);
             obj.sigma = newparmvalues(2);
             obj.exmean = newparmvalues(3);

@@ -24,7 +24,7 @@ classdef uttNoncentral < utContinuous;
             testCase.Dist = tNoncentral(parmdf,parmnoncen);
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
             
-            testCase.Dist.DefaultParmCodes = 'fr';
+            testCase.EstParmCodes = 'fr';
             
             SetupXs(testCase,40,1000);
             

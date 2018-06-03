@@ -17,7 +17,7 @@ classdef MinBound < dContinuous % dEither
                 case 2
                     obj.BasisRV1 = varargin{1};
                     obj.BasisRV2 = varargin{2};
-                    assert(obj.BasisRV1.Initialized&&obj.BasisRV2.Initialized,['Error initializing ' obj.ThisFamilyName ' BasisRV1/RV2.']);
+                    assert(obj.BasisRV1.Initialized&&obj.BasisRV2.Initialized,['Error initializing ' obj.FamilyName ' BasisRV1/RV2.']);
                     if obj.BasisRV1.DistType == obj.BasisRV2.DistType
                         obj.DistType = obj.BasisRV1.DistType;
                     else
@@ -40,11 +40,11 @@ classdef MinBound < dContinuous % dEither
         end
         
         function BuildMyName(obj)
-            obj.StringName = [obj.ThisFamilyName '(' obj.BasisRV1.StringName ',' obj.BasisRV2.StringName ')'];
+            obj.StringName = [obj.FamilyName '(' obj.BasisRV1.StringName ',' obj.BasisRV2.StringName ')'];
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues)
+            ClearBeforeResetParms(obj)
             obj.Initialized = false;
             obj.BasisRV1.ResetParms(newparmvalues(1:obj.BasisRV1.NDistParms));
             obj.BasisRV2.ResetParms(newparmvalues(obj.BasisRV1.NDistParms+1:end));

@@ -26,11 +26,11 @@ classdef utAddTrans < utContinuous;
             switch parmCase
                 case 1
                     testCase.Dist = AddTrans(Uniform(0,1),10);
-                    testCase.Dist.DefaultParmCodes = 'rrf';  % Don't adjust both constant and bounds since they can trade off.
+                    testCase.EstParmCodes = 'rrf';  % Don't adjust both constant and bounds since they can trade off.
                     testCase.Expected.Mean = (testCase.Dist.LowerBound + testCase.Dist.UpperBound)/2;
                 case 2
-                    testCase.Dist = AddTrans(Normal(100,10),100);
-                    testCase.Dist.DefaultParmCodes = 'rrf';  % Don't adjust both constant and mean since they can trade off.
+                    testCase.Dist = AddTrans(Normal(1.5,1.5),1.5);
+                    testCase.EstParmCodes = 'rrf';  % Don't adjust both constant and mean since they can trade off.
                 case 3
                     testCase.Dist = AddTrans(Exponential(0.1),55);
                     testCase.SkipMLEst = true;  % The exponential produces a better ML at a different rate.
@@ -47,9 +47,7 @@ classdef utAddTrans < utContinuous;
             if testCase.ThisCase==1
                 testCase.ParmEstAbsTol = .01;
             end
-            if testCase.ThisCase==2
-                testCase.RawMomentAbsTol(4)=.005;
-            end
+            testCase.RawMomentAbsTol(4)=.005; % Skewness computations slightly problematic
             
             utGenericMethodSetup(testCase);   % Initialize many standard computations
             

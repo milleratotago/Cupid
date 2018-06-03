@@ -1,4 +1,4 @@
-classdef OrderIID < dContinuous % dEither
+classdef OrderIID < dEither
     % OrderIID(Order,SampleSize,BasisRV): The Order'th order statistic of SampleSize=N IID RVs from the BasisRV.
     
     % Notes:
@@ -13,12 +13,12 @@ classdef OrderIID < dContinuous % dEither
     methods
         
         function obj=OrderIID(varargin)   % Constructor
-            obj=obj@dContinuous('OrderIID'); % dEither('OrderIID');
+            obj=obj@dEither('OrderIID');
             switch nargin
                 case 0
                 case 3
                     obj.BasisRV = varargin{3};
-                    assert(obj.BasisRV.Initialized,['Error initializing ' obj.ThisFamilyName ' as BasisRV for OrderIID.']);
+                    assert(obj.BasisRV.Initialized,['Error initializing ' obj.FamilyName ' as BasisRV for OrderIID.']);
                     obj.DistType = obj.BasisRV.DistType;
                     obj.NDistParms = 2 + obj.BasisRV.NDistParms;
                     obj.DefaultParmCodes = ['ff' obj.BasisRV.DefaultParmCodes];
@@ -36,7 +36,7 @@ classdef OrderIID < dContinuous % dEither
         
         function []=ResetParms(obj,newparmvalues)
             obj.Initialized = false;
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParms(obj);
             obj.Order = VerifyIntegerGE(obj,1,newparmvalues(1));
             obj.SampleSize = VerifyIntegerGE(obj,obj.Order,newparmvalues(2));
             obj.BigOrder = obj.Order >= floor( (obj.SampleSize + 1) / 2 );
@@ -50,6 +50,11 @@ classdef OrderIID < dContinuous % dEither
             
             obj.BasisRV.ResetParms(newparmvalues(3:end));
             obj.NValues = obj.BasisRV.NValues;
+            obj.Initialized = true;
+            switch obj.DistType
+                case 'd'
+                    obj.MakeTables;
+                case 'c'
             % Finding bounds is difficult when the basis distribution is unbounded
             % (e.g., OrderIID(1,10,Normal(0,1)) ).  Some cluges used in Pascal version.
             %      Adjust = BasisRV.SD / 2;
@@ -57,9 +62,9 @@ classdef OrderIID < dContinuous % dEither
             %      obj.UpperBound = BasisRV.obj.UpperBound;
             %      While CDF(obj.LowerBound) > obj.CDFNearlyZero Do obj.LowerBound = obj.LowerBound - Adjust;
             %      While CDF(obj.UpperBound) < obj.CDFNearlyOne Do obj.UpperBound = obj.UpperBound + Adjust;
-            obj.LowerBound = obj.BasisRV.LowerBound;
-            obj.UpperBound = obj.BasisRV.UpperBound;
-            obj.Initialized = true;
+                    obj.LowerBound = obj.BasisRV.LowerBound;
+                    obj.UpperBound = obj.BasisRV.UpperBound;
+            end
             if obj.NameBuilding
                 BuildMyName(obj);
             end
@@ -83,19 +88,23 @@ classdef OrderIID < dContinuous % dEither
             Parms = [NumTrans.Real2GT(1,Reals(1)) NumTrans.Real2GT(1,Reals(2)) obj.BasisRV.RealsToParms(Reals(3:end))];
         end
         
-        function thisval=LegalValue(obj,X)
-            thisval = LegalValue(obj.BasisRV,X);
+        function MakeTables(obj)
+            obj.DiscreteX = obj.BasisRV.DiscreteX;
+            obj.DistType = 'n';  % Temporarily turn off 'd' so we can use CDF
+            obj.LowerBound = obj.BasisRV.LowerBound;  % Used by CDF
+            obj.UpperBound = obj.BasisRV.UpperBound;
+            obj.DiscreteCDF = obj.CDF(obj.DiscreteX);
+            obj.DiscretePDF = diff([0 obj.DiscreteCDF]);
+            obj.DistType = 'd';  % return to discrete type
+            TrimTables(obj,eps(0),1-eps(1));
+            SetBinEdges(obj);
         end
-        
-        function thisval=NearestLegal(obj,X)
-            thisval = NearestLegal(obj.BasisRV,X);
-        end
-        
-        function thisval=nIthValue(obj,I)
-            thisval = nIthValue(obj.BasisRV,I);
-        end
-        
+
         function thiscdf=CDF(obj,X)
+            if obj.DistType=='d'
+                thiscdf = CDF@dDiscrete(obj,X);
+                return;
+            end
             [thiscdf, InBounds, Done] = MaybeSplineCDF(obj,X);
             if Done
                 return;
@@ -115,7 +124,7 @@ classdef OrderIID < dContinuous % dEither
                         for Idx = obj.CDFLoop1:obj.CDFLoop2
                             One_FxTerm = Ln1_Fx * (obj.SampleSize - Idx);
                             FxTerm = LnFx * Idx;
-                           FxSum = exp(FxTerm + One_FxTerm) * N + FxSum;
+                            FxSum = exp(FxTerm + One_FxTerm) * N + FxSum;
                             N = N * (obj.SampleSize - Idx) / (Idx + 1);
                         end
                         if obj.BigOrder

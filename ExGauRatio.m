@@ -9,7 +9,7 @@ classdef ExGauRatio < ExGauss
         
         function obj=ExGauRatio(varargin)   % Constructor
             obj=obj@ExGauss;
-            obj.ThisFamilyName = 'ExGauRatio';
+            obj.FamilyName = 'ExGauRatio';
             obj.ParmNames{3} = 'ratio';
             switch nargin
                 case 0
@@ -23,7 +23,7 @@ classdef ExGauRatio < ExGauss
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.mu = newparmvalues(1);
             obj.sigma = newparmvalues(2);
             obj.ratio = newparmvalues(3);

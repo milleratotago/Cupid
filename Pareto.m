@@ -26,7 +26,7 @@ classdef Pareto < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.K = newparmvalues(1);
             obj.A = newparmvalues(2);
             ReInit(obj);

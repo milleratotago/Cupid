@@ -1,4 +1,4 @@
-classdef ArcsinTrans < dMonoTrans0
+classdef ArcsinTrans < dTransMono
     % ArcsinTrans(BasisRV): Arcsin(sqrt( Standard_Normal.CDF(BasisRV/2) ))
     % This transformation is used with frequency data (e.g. binomial proportions)
     % in order to obtain more normally distributed values.  For example,
@@ -13,10 +13,16 @@ classdef ArcsinTrans < dMonoTrans0
     methods
         
         function obj=ArcsinTrans(BasisDist)
-            obj=obj@dMonoTrans0('ArcsinTrans',BasisDist);
+            obj=obj@dTransMono('ArcsinTrans',BasisDist);
             obj.Standard_Normal = Normal(0,1);
             obj.TransReverses = false;
+            obj.PDFScaleFactorKnown = false;
             obj.ReInit;
+        end
+        
+        function []=ResetParms(obj,newparmvalues)
+            ResetParms@dTransMono(obj,newparmvalues);
+            ReInit(obj);
         end
         
         function Trans = PreTransToTrans(obj,PreTrans)

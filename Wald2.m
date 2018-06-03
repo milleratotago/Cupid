@@ -5,7 +5,7 @@ classdef Wald2 < Wald
         
         function obj=Wald2(varargin)
             obj=obj@Wald;
-            obj.ThisFamilyName = 'Wald2';
+            obj.FamilyName = 'Wald2';
             obj.ParmNames{2} = 'barrierA';
             obj.ParmTypes = 'rr';
             obj.DefaultParmCodes = 'rr';
@@ -22,7 +22,7 @@ classdef Wald2 < Wald
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             passMu = newparmvalues(1);
             passbarrierA = newparmvalues(2);
             assert(passMu>0,'Wald2 mu must be > 0.');
@@ -43,7 +43,7 @@ classdef Wald2 < Wald
         end
         
         function []=BuildMyName(obj)
-            obj.StringName = [obj.ThisFamilyName '(' num2str(obj.mu) ',' num2str(obj.barrierA) ')'];
+            obj.StringName = [obj.FamilyName '(' num2str(obj.mu) ',' num2str(obj.barrierA) ')'];
         end
         
         function Reals = ParmsToReals(obj,Parms,~)

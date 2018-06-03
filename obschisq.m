@@ -7,7 +7,8 @@ function [obschisqval, obschisqp]=obschisq(obsvals,BinMax,PredictedBinProbs)
 % of the first bin is implicitly -\inf.
 NObs = numel(obsvals);
 NBins = numel(BinMax);
-ObsBinCounts = histcounts(obsvals,[-realmax BinMax])';  % Add eps to avoid numerical problems with integers
+% The value X(i) is in the kth bin if edges(k) <= X(i) < edges(k+1).
+ObsBinCounts = histcounts(obsvals,[-realmax BinMax])';
 ObsBinCounts = ObsBinCounts';
 PredBinCounts = PredictedBinProbs * NObs;
 BinError = (PredBinCounts - ObsBinCounts(1:end)).^2 ./ PredBinCounts;  % WAS end-1 with continuous

@@ -26,16 +26,16 @@ classdef utAttainP < utContinuous;
             switch parmCase
                 case 1
                     testCase.Dist = AttainP(Normal(0.5,1),Normal(0,1),1);
-                    testCase.Dist.DefaultParmCodes = 'rrff';
+                    testCase.EstParmCodes = 'rrff';
                 case 2
                     testCase.Dist = AttainP(tNoncentral(20,.3),t(20),1);
-                    testCase.Dist.DefaultParmCodes = 'frf';
+                    testCase.EstParmCodes = 'frf';
                 case 3
                     testCase.Dist = AttainP(FNoncentral(3,20,.1),F(3,20));
-                    testCase.Dist.DefaultParmCodes = 'ffrff';
+                    testCase.EstParmCodes = 'ffrff';
                 case 4
                     testCase.Dist = AttainP(rNoncentral(120,-.1),r(120),-1);
-                    testCase.Dist.DefaultParmCodes = 'frf';
+                    testCase.EstParmCodes = 'frf';
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

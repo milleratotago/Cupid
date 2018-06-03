@@ -10,7 +10,7 @@ classdef TriangularCW < Triangular
         
         function obj=TriangularCW(varargin)
             obj=obj@Triangular;
-            obj.ThisFamilyName = 'TriangularCW';
+            obj.FamilyName = 'TriangularCW';
             obj.ParmNames{1} = 'center';
             obj.ParmNames{2} = 'width';
             obj.minwidth = sqrt(eps);
@@ -26,7 +26,7 @@ classdef TriangularCW < Triangular
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.center = newparmvalues(1);
             obj.width = newparmvalues(2);
             ReInit(obj);

@@ -34,7 +34,7 @@ classdef Quick < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.Scale = newparmvalues(1);
             obj.Shape = newparmvalues(2);
             ReInit(obj);

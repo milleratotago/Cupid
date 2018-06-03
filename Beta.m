@@ -33,7 +33,7 @@ classdef Beta < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.A = newparmvalues(1);
             obj.B = newparmvalues(2);
             ReInit(obj);

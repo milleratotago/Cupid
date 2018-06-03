@@ -28,14 +28,14 @@ classdef utOrder < utContinuous;
                 case 1
 %                     testCase.Dist = Order(3,Uniform(0,2),Normal(0,2),Uniform(1,3));  % Very slow
                     testCase.Dist = Order(3,Uniform(0,2),Triangular(0,2),TriangularG(0,.5,2));
-                    testCase.Dist.DefaultParmCodes = 'ffffffrf';
+                    testCase.EstParmCodes = 'ffffffrf';
                 case 2
                     testCase.Dist = Order(2,Normal(100,10),Gamma(10,.1));
-                    testCase.Dist.DefaultParmCodes = 'frfff';
+                    testCase.EstParmCodes = 'frfff';
                     testCase.Dist.UseSplinePDF = true;   % Speeds things up enormously
                 case 3
                     testCase.Dist = Order(1,Exponential(0.1),Exponential(0.1),Exponential(0.1));
-                    testCase.Dist.DefaultParmCodes = 'frff';
+                    testCase.EstParmCodes = 'frff';
 %                     testCase.Dist.UseSplinePDF = true;   % Speeds things up enormously
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)

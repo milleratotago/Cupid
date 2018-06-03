@@ -70,7 +70,7 @@ by the Uniform distribution.
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParms(obj);
             obj.ParentDist.ResetParms(newparmvalues(1:obj.ParentDist.NDistParms));
             obj.ParmDist.ResetParms(newparmvalues(obj.ParentDist.NDistParms+1:end));
             ReInit(obj);

@@ -170,7 +170,7 @@ POSSIBILITY OF SUCH DAMAGE.
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.df = newparmvalues(1);
             obj.r = newparmvalues(2);
             ReInit(obj);

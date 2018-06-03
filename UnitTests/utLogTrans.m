@@ -28,9 +28,9 @@ classdef utLogTrans < utContinuous;
                     testCase.Dist = LogTrans(Uniform(1,2));
                     % testCase.SkipAllEst = true;
                 case 2
-                    testCase.Dist = LogTrans(Normal(100,10));
+                    testCase.Dist = LogTrans(RNGamma(10,.10));
                 case 3
-                    testCase.Dist = LogTrans(Exponential(0.1));
+                    testCase.Dist = LogTrans(Beta(10,10));
                     % testCase.SkipMLEst = true;
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)

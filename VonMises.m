@@ -29,7 +29,7 @@ classdef VonMises < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.Loc = newparmvalues(1);
             obj.Concentration = newparmvalues(2);
             ReInit(obj);

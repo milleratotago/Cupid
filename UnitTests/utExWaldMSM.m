@@ -29,7 +29,7 @@ classdef utExWaldMSM < utContinuous;
             testCase.Dist = ExWaldMSM(p1WaldMean,p2WaldSD,p3ExMean);
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 
-            testCase.Dist.DefaultParmCodes = 'rfr';
+            testCase.EstParmCodes = 'rfr';
             testCase.Dist.UseSplinePDFOn(200);
             testCase.SkipMomentEst = true;  % Moments do not provide enough info to constrain parameters
             

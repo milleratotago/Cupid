@@ -1,4 +1,4 @@
-classdef AddTrans < dTransOf1
+classdef AddTrans < dTransMono
     % AddTrans(BasisRV,Addend): Shifts the BasisRV by the specified additive constant.
     
     properties(SetAccess = protected)
@@ -7,28 +7,17 @@ classdef AddTrans < dTransOf1
     
     methods
         
-        function obj=AddTrans(varargin)
-            obj@dTransOf1('AddTrans');
-            obj.NTransParms = 1;
-            obj.TransParmCodes = 'r';
-            switch nargin
-                case 0
-                case 2
-                    BuildMyBasis(obj,varargin{1});
-                    obj.DistType = obj.BasisRV.DistType;
-                    obj.NDistParms = obj.BasisRV.NDistParms + 1;
-                    obj.DefaultParmCodes = [obj.BasisRV.DefaultParmCodes 'r'];
-                    ResetParms(obj,[obj.BasisRV.ParmValues varargin{2}]);
-                otherwise
-                    ME = MException('AddTrans:Constructor', ...
-                        'AddTrans constructor needs 0 or 2 arguments.');
-                    throw(ME);
-            end
+        function obj=AddTrans(BasisDist,Addend)
+            obj=obj@dTransMono('AddTrans',BasisDist);
+            obj.Addend = Addend;
+            obj.AddParms(1,'r');
+            obj.PDFScaleFactorKnown = true;
+            obj.ReInit;
         end
         
         function []=ResetParms(obj,newparmvalues)
-            ResetParms@dTransOf1(obj,newparmvalues);
             obj.Addend = newparmvalues(end);
+            ResetParms@dTransMono(obj,newparmvalues(1:end-1));
             ReInit(obj);
         end
         
@@ -38,17 +27,8 @@ classdef AddTrans < dTransOf1
             obj.ResetParms([obj.BasisRV.ParmValues NewAddend]);
         end
         
-        function []=ReInit(obj)
-            obj.Initialized = true;
-            obj.LowerBound = obj.BasisRV.LowerBound + obj.Addend;
-            obj.UpperBound = obj.BasisRV.UpperBound + obj.Addend;
-            if (obj.NameBuilding)
-                BuildMyName(obj);
-            end
-        end
-        
         function parmvals = TransParmValues(obj)
-            parmvals = [obj.Addend];
+            parmvals = obj.Addend;
         end
         
         function TransX = PreTransToTrans(obj,PreTransX)
@@ -71,10 +51,6 @@ classdef AddTrans < dTransOf1
             thisval = 1;
         end
         
-        function thisval = nIthValue(obj,Ith)
-            thisval = TransX(obj.BasisRV.nIthValue(Ith));
-        end
-        
         function thisval=Mean(obj)
             assert(obj.Initialized,UninitializedError(obj));
             thisval = Mean(obj.BasisRV) + obj.Addend;
@@ -84,7 +60,22 @@ classdef AddTrans < dTransOf1
             assert(obj.Initialized,UninitializedError(obj));
             thisval = Variance(obj.BasisRV);
         end
-        
+
+        function thisval=Skewness(obj)
+            assert(obj.Initialized,UninitializedError(obj));
+            thisval = Skewness(obj.BasisRV);
+        end
+
+        function thisval=Kurtosis(obj)
+            assert(obj.Initialized,UninitializedError(obj));
+            thisval = Kurtosis(obj.BasisRV);
+        end
+
+        function thisval=CenMoment(obj,I)
+            assert(obj.Initialized,UninitializedError(obj));
+            thisval = CenMoment(obj.BasisRV,I);
+        end
+
     end  % methods
     
 end  % class AddTrans

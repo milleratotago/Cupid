@@ -30,6 +30,7 @@ classdef utTruncatedP < utContinuous;
                 testCase.Expected.Mean = (testCase.Dist.LowerBound + testCase.Dist.UpperBound)/2;
               case 2
                 testCase.Dist = TruncatedP(Normal(0,1),0.11,0.93);
+                testCase.EstParmCodes = 'rrff';
               case 3
                 testCase.Dist = TruncatedP(Exponential(0.1),.1,0.99999);
                 testCase.SkipMLEst = true;  % The exponential produces a better ML at a different rate.
@@ -39,7 +40,7 @@ classdef utTruncatedP < utContinuous;
             testCase.Dist.SearchOptions.MaxFunEvals = 30000;
             testCase.Dist.SearchOptions.MaxIter = 20000;
 
-            SetupXs(testCase,40,200);
+            SetupXs(testCase,40,5000);
             
             % Adjust tolerances as appropriate for this distribution & parameters:
             SetTolerances(testCase,0.002);

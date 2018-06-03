@@ -30,7 +30,7 @@ classdef utSqrTrans < utContinuous;
                 case 2
                     testCase.Dist = SqrTrans(RNGamma(5,1/10));
                 case 3
-                    testCase.Dist = SqrTrans(Exponential(0.1));
+                    testCase.Dist = SqrTrans(Exponential(0.51));
                     % testCase.SkipMLEst = true;
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)

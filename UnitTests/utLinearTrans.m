@@ -26,15 +26,15 @@ classdef utLinearTrans < utContinuous;
             switch parmCase
                 case 1
                     testCase.Dist = LinearTrans(Uniform(0,1),2,10);
-                    testCase.Dist.DefaultParmCodes = 'rrff';  % Don't adjust both constants and bounds since they can trade off.
+                    testCase.EstParmCodes = 'rrff';  % Don't adjust both constants and bounds since they can trade off.
                     %               testCase.SkipAllEst = true;
                     testCase.Expected.Mean = (testCase.Dist.LowerBound + testCase.Dist.UpperBound)/2;
                 case 2
-                    testCase.Dist = LinearTrans(Normal(0,1),100,10);
-                    testCase.Dist.DefaultParmCodes = 'rrff';  % Don't adjust both constants and mean/sd since they can trade off.
+                    testCase.Dist = LinearTrans(Normal(0,1),10,3.5);
+                    testCase.EstParmCodes = 'rrff';  % Don't adjust both constants and mean/sd since they can trade off.
                 case 3
                     testCase.Dist = LinearTrans(Exponential(0.1),2,5);
-                    testCase.Dist.DefaultParmCodes = 'rff';  % Don't adjust both constants and rate since they can trade off.
+                    testCase.EstParmCodes = 'rff';  % Don't adjust both constants and rate since they can trade off.
                     testCase.SkipMLEst = true;  % The exponential produces a better ML at a different rate.
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
@@ -48,6 +48,7 @@ classdef utLinearTrans < utContinuous;
             SetTolerances(testCase,0.002);
             if testCase.ThisCase==1
                 testCase.ParmEstAbsTol = .01;
+                testCase.RawMomentAbsTol(4)=.005;
             end
             if testCase.ThisCase==2
                 testCase.RawMomentAbsTol(4)=.005;

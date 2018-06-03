@@ -29,7 +29,7 @@ classdef SkewNor < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.Loc = newparmvalues(1);
             obj.Scale = newparmvalues(2);
             obj.Shape = newparmvalues(3);

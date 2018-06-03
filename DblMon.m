@@ -29,7 +29,7 @@ classdef DblMon < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.tzero = newparmvalues(1);
             obj.delta = newparmvalues(2);
             obj.epsilon = newparmvalues(3);

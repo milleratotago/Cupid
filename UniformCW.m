@@ -10,7 +10,7 @@ classdef UniformCW < Uniform
         
         function obj=UniformCW(varargin)
             obj=obj@Uniform;
-            obj.ThisFamilyName = 'UniformCW';
+            obj.FamilyName = 'UniformCW';
             obj.ParmNames{1} = 'center';
             obj.ParmNames{2} = 'width';
             obj.minwidth = sqrt(eps);
@@ -26,7 +26,7 @@ classdef UniformCW < Uniform
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.center = newparmvalues(1);
             obj.width = newparmvalues(2);
             ReInit(obj);

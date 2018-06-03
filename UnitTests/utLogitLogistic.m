@@ -61,23 +61,13 @@ classdef utLogitLogistic < utContinuous;
         
         function ComparePDFs(testCase)
             % Check matches to known PDFs
-            if testCase.ThisCase == 1
-%                tempU = Uniform(testCase.Dist.LowerBound,testCase.Dist.UpperBound);
-%                tempPDF = tempU.PDF(testCase.xvalues);
-%                testCase.verifyEqual(testCase.Computed.PDF,tempPDF,'AbsTol',1e-6,'Does not match expected PDF values.');
-            elseif testCase.ThisCase == 2
-%                tempU = Normal(testCase.Dist.Mean,testCase.Dist.SD);
-%                tempPDF = tempU.PDF(testCase.xvalues);
-%                testCase.verifyEqual(testCase.Computed.PDF,tempPDF,'AbsTol',1e-6,'Does not match expected PDF values.');
-            elseif testCase.ThisCase == 3
-%                tempU = testCase.Dist.BasisRV;
-%                tempPDF = tempU.PDF(testCase.xvalues-testCase.Dist.LowerBound);
-%                testCase.verifyEqual(testCase.Computed.PDF,tempPDF,'AbsTol',1e-6,'Does not match expected PDF values.');
-            end
+            tempDist = testCase.BasisRVs{testCase.ThisCase};
+            tempPDF = tempDist.PDF(testCase.xvalues);
+            testCase.verifyEqual(testCase.Computed.PDF,tempPDF,'AbsTol',1e-6,'Does not match expected PDF values.');
         end
         
     end
     
-end  % utLogisticLogit
+end  % utLogitLogistic
 
 

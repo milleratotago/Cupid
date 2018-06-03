@@ -9,7 +9,7 @@ classdef LognormalMS < Lognormal
         
         function obj=LognormalMS(varargin)   % Constructor
             obj=obj@Lognormal;
-            obj.ThisFamilyName = 'LognormalMS';
+            obj.FamilyName = 'LognormalMS';
             obj.ParmNames{1} = 'postmu';
             obj.ParmNames{2} = 'postsigma';
             switch nargin
@@ -24,7 +24,7 @@ classdef LognormalMS < Lognormal
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.postmu = newparmvalues(1);
             obj.postsigma = newparmvalues(2);
             ReInit(obj);

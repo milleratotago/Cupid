@@ -10,9 +10,9 @@ classdef Binomial < dDiscrete   % NWJEFF: Not vectorized
         Q, NP, NQ, NPQ,
         % The next variable stores the type of approximation (if any) in use.
         Approx,     % 0 = Compute directly / Do not approximate
-        % 1 = Normal approx
-        % 2 = Poisson approx for x
-        % 3 = Poisson approx for N-x
+                    % 1 = Normal approx
+                    % 2 = Poisson approx for x
+                    % 3 = Poisson approx for N-x
         Standard_Normal, PoissonBasis
     end
     
@@ -20,6 +20,7 @@ classdef Binomial < dDiscrete   % NWJEFF: Not vectorized
         BinomialExact,  % If true, always use exact computation--do not approximate
         % If BinomialExact is false, the next three cutoffs are used to decide when and how to approximate.
         LargeNCutoff, LargeCellCutoff
+        ZExtreme  % Extreme Z value used in normal approximation
     end
     
     methods
@@ -29,10 +30,17 @@ classdef Binomial < dDiscrete   % NWJEFF: Not vectorized
             obj.ParmTypes = 'ir';
             obj.DefaultParmCodes = 'fr';
             obj.NDistParms = 2;
-            obj.UseStoredTables = false;
             obj.BinomialExact = false;  % false allows approximations in some cases.
-            obj.LargeNCutoff = 50;      % approximate if N larger than this
-            obj.LargeCellCutoff = 10;   % Use normal approximation if at least this many per cell.
+            obj.ZExtreme = 10;
+            
+            % Problems can arise if LowerBound and UpperBound are adjusted to exclude
+            % some values with nonzero PDFs. In that case, transformations that reverse
+            % the order of Xs (e.g., multiply by -1) may have incorrect CDFs due to
+            % ignoring Xs outside the bounds.
+            obj.PDFNearlyZero = 2*eps(0);
+            
+            obj.LargeNCutoff = 100;      % approximate if N larger than this
+            obj.LargeCellCutoff = 20;   % Use normal approximation if at least this many per cell.
             obj.Standard_Normal = Normal(0,1);
             SetZExtreme(obj.Standard_Normal,10);  % Limit binomial to within this many SDs of mean.
             obj.PoissonBasis = Poisson();  % Create the Poisson basis.
@@ -48,15 +56,15 @@ classdef Binomial < dDiscrete   % NWJEFF: Not vectorized
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsD(obj);
             obj.N = VerifyIntegerGE(obj,1,newparmvalues(1));
             obj.P = newparmvalues(2);
             ReInit(obj);
         end
         
         function []=PerturbParms(obj,ParmCodes)
-            obj.N = ifelse(ParmCodes(1)=='f',obj.N,obj.N+2);
-            obj.P = ifelse(ParmCodes(2)=='f',obj.P,0.95*obj.P);
+            obj.N = ifelse(ParmCodes(1)=='f',obj.N,obj.N+1);
+            obj.P = ifelse(ParmCodes(2)=='f',obj.P,0.985*obj.P);  % Very sensitive to local minimum problems
             ReInit(obj);
         end
         
@@ -69,35 +77,20 @@ classdef Binomial < dDiscrete   % NWJEFF: Not vectorized
             obj.Q = 1 - obj.P;
             obj.NQ = obj.N*obj.Q;
             obj.NPQ = obj.NP*obj.Q;
-            obj.Approx = 0;
-            obj.LowerBound = 0;
-            obj.UpperBound = obj.N;
-            if (~obj.BinomialExact) && (obj.N > obj.LargeNCutoff)
-                if (obj.NP > obj.LargeCellCutoff) && (obj.NQ > obj.LargeCellCutoff)
-                    obj.Approx = 1;   % NORMAL
-                    HalfWidth = obj.Standard_Normal.ZExtreme * sqrt(obj.NPQ);
-                    obj.LowerBound = max(0,floor(obj.NP-HalfWidth));
-                    obj.UpperBound = min(obj.N,floor(obj.NP+HalfWidth)+1);
-                elseif obj.P <= obj.Q
-                    % NWJEFF: Check Poisson basis next 2 cases.
-                    obj.Approx = 2;   % POISSON on X
-                    obj.PoissonBasis.ResetParms(obj.N*obj.P);
-                    obj.LowerBound = 0;
-                    obj.UpperBound = obj.PoissonBasis.UpperBound;
-                else
-                    obj.Approx = 3;   % POISSON ON obj.N-X
-                    obj.PoissonBasis.ResetParms(obj.N*obj.Q);
-                    obj.LowerBound = obj.N - obj.PoissonBasis.UpperBound;
-                    obj.UpperBound = obj.N;
-                end
+            if obj.BinomialExact || (obj.N<=obj.LargeNCutoff)
+                obj.Approx = 0;  % Exact
+            elseif (obj.NP > obj.LargeCellCutoff) && (obj.NQ > obj.LargeCellCutoff)
+                obj.Approx = 1;  % Normal
+            elseif obj.P <= obj.Q
+                obj.Approx = 2;   % POISSON on X
+            else
+                obj.Approx = 3;   % POISSON on N-X
             end
-            while obj.PDF(obj.LowerBound)<=eps(obj.PDFNearlyZero)
-                obj.LowerBound = obj.LowerBound + 1;
-            end
-            while obj.PDF(obj.UpperBound)<=eps(obj.PDFNearlyZero)
-                obj.UpperBound = obj.UpperBound - 1;
-            end
-            obj.NValues = round(obj.UpperBound - obj.LowerBound) + 1;
+            MakeTables(obj);
+            TrimTables(obj,eps(0),1);
+            SetBinEdges(obj);
+            obj.LowerBound = obj.DiscreteX(1);
+            obj.UpperBound = obj.DiscreteX(end);
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
@@ -135,130 +128,72 @@ classdef Binomial < dDiscrete   % NWJEFF: Not vectorized
             end
         end
         
-        function thisval=nIthValue(obj,I)
-            assert(obj.Initialized,UninitializedError(obj));
-            assert(min(I)>0&&max(I)<=obj.NValues,'Requested value at nonexistent position')
-            thisval = obj.LowerBound+I-1;
-        end
+%        function thisval=nIthValue(obj,I)
+%            assert(obj.Initialized,UninitializedError(obj));
+%            assert(min(I)>0&&max(I)<=obj.NValues,'Requested value at nonexistent position')
+%            thisval = obj.LowerBound+I-1;
+%        end
         
         function []=MakeTables(obj)
-            obj.StoredX = zeros(obj.NValues,1);
-            obj.StoredPDF = obj.StoredX;
-            obj.StoredCDF = obj.StoredX;
-            for i=1:obj.NValues
-                obj.StoredX(i) = obj.LowerBound - 1 + i;
-            end
             switch obj.Approx
                 case 0
-                    SumPr = 0;
-                    T1 = 1;
-                    T2 = 1;
-                    T3 = (1-obj.P)^(obj.N);
-                    for i=1:obj.NValues
-                        K = obj.StoredX(i);
-                        %                       T1 = nchoosek(obj.N,K);
-                        %                       T2 = obj.P^K;
-                        %                       T3 = (1-obj.P)^(obj.N-K);
-                        
-                        obj.StoredPDF(i) = T1 * T2 * T3;
-                        
-                        % Prepare updated T's for the next iteration:
-                        T1 = T1 * (obj.N - K) / (K + 1);
-                        T2 = T2 * obj.P;
-                        T3 = T3 / (1-obj.P);
-                        
-                        % Version from Carl Nettelblad.
-                        % Converted from C++ retrieved from http://www.nettelblad.se/binomcalc.cpp
-                        % on 2013-10-30 (and elaborated slightly after emails):
-                        SumPr = SumPr + obj.StoredPDF(i);
-                        obj.StoredCDF(i) = SumPr;
-                    end
+                    [obj.DiscreteX, obj.DiscretePDF, obj.DiscreteCDF] = obj.MakeTableExact;
                 case 1
-                    PrevSum = 0;
-                    for i=1:obj.NValues
-                        obj.StoredCDF(i) = CDF(obj.Standard_Normal, (obj.StoredX(i)+0.5-obj.NP)/sqrt(obj.NPQ) );
-                        obj.StoredPDF(i) = obj.StoredCDF(i) - PrevSum;
-                        PrevSum = obj.StoredCDF(i);
-                    end
-                case 2
-                    PrevSum = 0;
-                    for i=1:obj.NValues
-                        obj.StoredCDF(i) = CDF(obj.PoissonBasis,obj.StoredX(i));
-                        obj.StoredPDF(i) = obj.StoredCDF(i) - PrevSum;
-                        PrevSum = obj.StoredCDF(i);
-                    end
-                case 3
-                    PrevSum = 0;
-                    for i=1:obj.NValues
-                        obj.StoredCDF(i) = CDF(obj.PoissonBasis,obj.N-1-obj.StoredX(i));
-                        obj.StoredPDF(i) = obj.StoredCDF(i) - PrevSum;
-                        PrevSum = obj.StoredCDF(i);
-                    end
+                    [obj.DiscreteX, obj.DiscretePDF, obj.DiscreteCDF] = obj.MakeTableNormal;
+                case {2, 3}
+                    [obj.DiscreteX, obj.DiscretePDF, obj.DiscreteCDF] = obj.MakeTablePoisson;
+            end
+            obj.DiscreteCDF(end) = 1;
+        end
+
+        function [Xs, PDFs, CDFs] = MakeTableExact(obj)
+            % Make tables of Xs, PDFs, & CDFs for 0-N successes
+            SumPr = 0;
+            T1 = 1;
+            T2 = 1;
+            T3 = (1-obj.P)^(obj.N);
+            Xs = (0:obj.N);
+            PDFs = zeros(1,obj.N+1);
+            CDFs = zeros(1,obj.N+1);
+            for i=1:numel(Xs)
+                K = Xs(i);
+                PDFs(i) = T1 * T2 * T3;
+                % Prepare updated T's for the next iteration:
+                T1 = T1 * (obj.N - K) / (K + 1);
+                T2 = T2 * obj.P;
+                T3 = T3 / (1-obj.P);
+                % Version from Carl Nettelblad.
+                % Converted from C++ retrieved from http://www.nettelblad.se/binomcalc.cpp
+                % on 2013-10-30 (and elaborated slightly after emails):
+                SumPr = SumPr + PDFs(i);
+                CDFs(i) = SumPr;
             end
         end
         
-        function thisval=NextValue(obj,X)
-            thisval = X + 1;
+        function [Xs, PDFs, CDFs] = MakeTableNormal(obj)
+            HalfWidth = obj.ZExtreme * sqrt(obj.NPQ);
+            minX = max(0,floor(obj.NP-HalfWidth));
+            maxX = min(obj.N,floor(obj.NP+HalfWidth)+1);
+            Xs = (minX:maxX);
+            CDFs = obj.Standard_Normal.CDF( (Xs+0.5-obj.NP)/sqrt(obj.NPQ) );
+            PDFs = diff([0 CDFs]);
         end
         
-        function thispdf=nPDF(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
+        function [Xs, PDFs, CDFs] = MakeTablePoisson(obj)
             switch obj.Approx
-                case 0
-                    thispdf = zeros(size(X));
-                    for i=1:numel(X)
-                        if LegalValue(obj,X(i))
-                            if obj.P == 0
-                                if X(i) == 0
-                                    thispdf(i) = 1;
-                                else
-                                    thispdf(i) = 0;
-                                end
-                            elseif obj.P == 1
-                                if X == obj.N
-                                    thispdf(i) = 1;
-                                else
-                                    thispdf(i) = 0;
-                                end
-                            else
-                                % T1 = nchoosek(obj.N,round(X(i)));
-                                % T2 = exp(X(i)*log(obj.P));
-                                % T3 = exp((obj.N-X(i))*log(1-obj.P));
-                                % thispdf(i) = T1 * T2 * T3;
-                                thispdf(i) = binopdf(X(i),obj.N,obj.P);  %  Statistics Toolbox
-                            end
-                        end
-                    end
-                case   {1, 2, 3}
-                    T1 = nCDF(obj,X);
-                    T2 = nCDF(obj,X-1);
-                    thispdf = T1 - T2;
-            end
-        end
-        
-        function thiscdf=nCDF(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
-            X = floor(X);
-            switch obj.Approx
-                case 0
-                    thiscdf = zeros(size(X));
-                    for i=1:numel(X)
-                        % PSum = 0;
-                        % for IVal=0:X(i)
-                        %     PSum=PSum+PDF(obj,IVal);
-                        % end
-                        % thiscdf(i) = PSum;
-                        thiscdf(i) = binocdf(X(i),obj.N,obj.P);  %  Statistics Toolbox
-                    end
-                case 1
-                    thiscdf = CDF(obj.Standard_Normal, (X+0.5-obj.NP)/sqrt(obj.NPQ) );
                 case 2
-                    thiscdf = CDF(obj.PoissonBasis,X);
+                    obj.PoissonBasis.ResetParms(obj.N*obj.P);
+                    Xs   = obj.PoissonBasis.DiscreteX;
+                    PDFs = obj.PoissonBasis.DiscretePDF;
+                    CDFs = obj.PoissonBasis.DiscreteCDF;
                 case 3
-                    thiscdf = 1 - CDF(obj.PoissonBasis,obj.N-1-X);
+                    obj.PoissonBasis.ResetParms(obj.N*obj.Q);
+                    Xs   = flip( obj.N - obj.PoissonBasis.DiscreteX ) ;
+                    PDFs = flip( obj.PoissonBasis.DiscretePDF );
+                    CDFs = 1 - flip( obj.PoissonBasis.DiscreteCDF ) + PDFs;
             end
         end
-        
+
         function thisval=Mean(obj)
             assert(obj.Initialized,UninitializedError(obj));
             thisval = obj.NP;

@@ -24,7 +24,7 @@ classdef Logistic < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.mu = newparmvalues(1);
             obj.beta = newparmvalues(2);
             ReInit(obj);

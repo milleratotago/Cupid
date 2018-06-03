@@ -30,7 +30,7 @@ classdef Gamma < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.N = VerifyIntegerGE(obj,1,newparmvalues(1));
             obj.Rate = newparmvalues(2);
             ReInit(obj);

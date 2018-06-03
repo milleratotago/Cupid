@@ -29,7 +29,7 @@ classdef ExtrVal2 < dContinuous
         end
         
         function []=ResetParms(obj,newparmvalues)
-            CheckBeforeResetParms(obj,newparmvalues);
+            ClearBeforeResetParmsC(obj);
             obj.mu = newparmvalues(1);
             obj.scale = newparmvalues(2);
             obj.shapek = newparmvalues(3);

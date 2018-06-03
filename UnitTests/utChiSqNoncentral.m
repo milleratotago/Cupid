@@ -26,7 +26,7 @@ classdef utChiSqNoncentral < utContinuous;
 
             % Adjust tolerances as appropriate for this distribution & parameters:
 
-            testCase.Dist.DefaultParmCodes = 'fr';
+            testCase.EstParmCodes = 'fr';
 
             % testCase.Dist.UseSplineCDFOn(200);  % Approximation is quite poor due to fast rise from zero (case 1 at least)
             % testCase.Dist.UseSplinePDFOn(200);  % Approximation is quite poor due to high spike & long tail (case 1 at least)

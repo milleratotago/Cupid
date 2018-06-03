@@ -26,7 +26,7 @@ classdef utSkewNor < utContinuous;
             testCase.Dist = SkewNor(parmloc,parmscale,parmshape);
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
             
-            testCase.Dist.DefaultParmCodes = 'frr';
+            testCase.EstParmCodes = 'frr';
             SetupXs(testCase,40,500);
             SetTolerances(testCase,0.005);
             
