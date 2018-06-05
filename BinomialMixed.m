@@ -86,36 +86,6 @@ classdef BinomialMixed < dDiscrete
             Parms = Reals; % [NumTrans.Real2Bounded(0,1,Reals(1))];
         end
         
-%         function thisval=LegalValue(obj,X)
-%             assert(obj.Initialized,UninitializedError(obj));
-%             thisval = zeros(size(X));
-%             for i=1:numel(X)
-%                 if (abs(round(X(i))-X(i))<eps) && (X(i)>=obj.LowerBound) && (X(i)<=obj.UpperBound)
-%                     thisval(i) = true;
-%                 end
-%             end
-%         end
-%         
-%         function thisval=NearestLegal(obj,X)
-%             assert(obj.Initialized,UninitializedError(obj));
-%             thisval = zeros(size(X));
-%             for iel=1:numel(X)
-%                 if X(iel) <= obj.LowerBound
-%                     thisval(iel) = obj.LowerBound;
-%                 elseif X(iel) < obj.UpperBound
-%                     thisval(iel) = round(X);
-%                 else
-%                     X(iel) = obj.UpperBound;
-%                 end
-%             end
-%         end
-%         
-%         function thisval=nIthValue(obj,I)
-%             assert(obj.Initialized,UninitializedError(obj));
-%             assert(min(I)>0&&max(I)<=obj.NValues,'Requested value at nonexistent position')
-%             thisval = obj.LowerBound+I-1;
-%         end
-        
         function []=MakeTables(obj)
             obj.N = numel(obj.P);
             obj.LowerBound = 0;

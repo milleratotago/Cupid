@@ -116,7 +116,7 @@ function Run(CaseNs)
             SingleTest('BinomialMixed');
             SingleTest('Geometric');
             SingleTest('Poisson');
-% NWJEFF SingleTest('RankDist');
+            SingleTest('RankDist');
             SingleTest('UniformInt');
             WriteMarker([MarkerRoot 'DisFas']);
         end
