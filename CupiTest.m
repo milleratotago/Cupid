@@ -538,9 +538,15 @@ Possible Further options:
         end
         [BinMax,BinProb] = MakeBinSet(dist,1/cto.NChiSqBins);
         % BinProb = FindBinProbs(dist,BinMax);
-        [obschisqval, obschisqp] = obschisq(cto.RandVals,BinMax,BinProb);
+        [obschisqval, obschisqp, ObsBinCounts, PredBinCounts] = obschisq(cto.RandVals,BinMax,BinProb);
         StringOut(['RNG check yields ObsChiSq = ' num2str(obschisqval) ' with ' num2str(cto.NChiSqBins) ' bins and p = ' num2str(obschisqp)] );
-        CheckAssertion('Random numbers passed chi-square bin test.',(~isnan(obschisqp))&&(obschisqp > .01))
+        RandsOK = (~isnan(obschisqp))&&(obschisqp > .01);
+        CheckAssertion('Random numbers passed chi-square bin test.',RandsOK)
+        if ~RandsOK
+            for i=1:numel(BinMax)
+                fprintf('%10.3f %10.3f %10.3f\n',BinMax(i),PredBinCounts(i),ObsBinCounts(i));
+            end
+        end
         %if (isnan(obschisqp)) || (obschisqp < .01)
         %    StringOut([cto.ErrorSignal ' WARNING: RNG test resulted in very low p value.']);
         %else

@@ -3,7 +3,10 @@ classdef ExWaldMSM < ExWald
     % plus an exponential, specified in terms of its mean.  The Wald's sigma is 1.
     
     properties(SetAccess = protected)
-        WaldMean, WaldSD, ExpMean,
+        WaldMean, WaldSD, ExpMean
+    end
+
+    properties(SetAccess = public)
         MinWaldMean, MinWaldSD, MinExpMean
     end
     
@@ -37,9 +40,9 @@ classdef ExWaldMSM < ExWald
             obj.WaldMean = newparmvalues(1);
             obj.WaldSD = newparmvalues(2);
             obj.ExpMean = newparmvalues(3);
-            assert(obj.WaldMean>0,'ExWaldMSM WaldMean must be > 0.');
-            assert(obj.WaldSD>0,'ExWaldMSM WaldSD must be > 0.');
-            assert(obj.ExpMean>0,'ExWaldMSM ExpMean must be > 0.');
+            assert(obj.WaldMean>obj.MinWaldMean,['ExWaldMSM WaldMean must be > ' num2str(obj.MinWaldMean) '.']);
+            assert(obj.WaldSD>obj.MinWaldSD,['ExWaldMSM WaldSD must be > ' num2str(obj.MinWaldSD) '.']);
+            assert(obj.ExpMean>obj.MinExpMean,['ExWaldMSM ExpMean must be > ' num2str(obj.MinExpMean) '.']);
             PassA = sqrt(obj.WaldMean)*obj.WaldMean/obj.WaldSD;
             PassMu = PassA / obj.WaldMean;
             PassRate = 1/obj.ExpMean;

@@ -24,6 +24,9 @@ c1 = strrep(c1,'Warning: Minimum step size reached near','');
 % because the same value is at both percentiles defining the boundaries.
 c1 = strrep(c1,'Warning: Cannot perform PctBoundsEstTest for this distribution because LowerX >= UpperX','');
 
+% Often arises with Rician in dMATLABc
+c1 = strrep(c1,'[Warning: NCX2INV did not converge.]','');
+
 tf = contains(c1,'warning','IgnoreCase',true) || contains(c1,'error','IgnoreCase',true) || contains(c1,'exiting','IgnoreCase',true);
 
 end

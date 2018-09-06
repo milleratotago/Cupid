@@ -128,12 +128,6 @@ classdef Binomial < dDiscrete   % NWJEFF: Not vectorized
             end
         end
         
-%        function thisval=nIthValue(obj,I)
-%            assert(obj.Initialized,UninitializedError(obj));
-%            assert(min(I)>0&&max(I)<=obj.NValues,'Requested value at nonexistent position')
-%            thisval = obj.LowerBound+I-1;
-%        end
-        
         function []=MakeTables(obj)
             switch obj.Approx
                 case 0
@@ -224,9 +218,11 @@ classdef Binomial < dDiscrete   % NWJEFF: Not vectorized
                 varargin{1} = 1;
             end
             unirands = rand(varargin{:},obj.N);
-            thisvar01 = unirands<obj.P;
-            thissize = size(thisvar01);
-            thisval = squeeze(sum(thisvar01,numel(thissize)));
+            thisval = unirands<obj.P;
+            if obj.N>1
+                thissize = size(thisval);
+                thisval = squeeze(sum(thisval,numel(thissize)));
+            end
         end
         
         function s=EstML(obj,Observations,varargin)

@@ -434,7 +434,7 @@ classdef dGeneric < handle  % Calls by reference
         end
         
         function thisval=LnLikelihood(obj, Observations)
-            % Computes LnLikelihood of a set of observations, mostly for parameter search.
+            % Computes LnLikelihood of a set of observations, e.g. for parameter search.
             % The case of an observation with PDF=0 is handled by setting the PDF to
             % a small value that decreases with Distance outside the Upperbound or Lowerbound.
             % This imposes a penalty for observations outside the range based on how far outside
@@ -442,6 +442,9 @@ classdef dGeneric < handle  % Calls by reference
             assert(obj.Initialized,UninitializedError(obj));
             Like = PDF(obj,Observations);
             ZeroPos = find(Like==0);
+            if numel(ZeroPos) > 0
+                warning([obj.FamilyName ' checking likelihood of impossible data values.']);
+            end
             for I = 1:length(ZeroPos)
                 J = ZeroPos(I);
                 X = Observations(J);
@@ -651,7 +654,7 @@ classdef dGeneric < handle  % Calls by reference
             end
         end
         
-        function s=EstML(obj,Observations,varargin)
+        function [s,EndingVals,fval,exitflag,output]=EstML(obj,Observations,varargin)
             assert(obj.Initialized,UninitializedError(obj));
             if numel(varargin)<1
                 ParmCodes = obj.DefaultParmCodes;
@@ -663,8 +666,7 @@ classdef dGeneric < handle  % Calls by reference
             ErrFn = @MyErrFunc;
             StartingVals = ParmValues(obj);
             obj.PushAndStopNameBuilding;
-            %           pc = ParmCodes
-            EndingVals = fminsearcharb(ErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
+            [EndingVals,fval,exitflag,output] = fminsearcharb(ErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
             obj.ResetParms(EndingVals);
             obj.PopNameBuilding;
             BuildMyName(obj);
@@ -763,7 +765,7 @@ classdef dGeneric < handle  % Calls by reference
             end
         end
         
-        function s=EstMom(obj,TargetVals,varargin)
+        function [s,EndingVals,fval,exitflag,output]=EstMom(obj,TargetVals,varargin)
             assert(obj.Initialized,UninitializedError(obj));
             if numel(varargin)<1
                 ParmCodes = obj.DefaultParmCodes;
@@ -775,7 +777,7 @@ classdef dGeneric < handle  % Calls by reference
             ErrFn = @MyErrFunc;
             StartingVals = ParmValues(obj);
             obj.PushAndStopNameBuilding;
-            EndingVals = fminsearcharb(ErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
+            [EndingVals,fval,exitflag,output] = fminsearcharb(ErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
             obj.ResetParms(EndingVals);
             obj.PopNameBuilding;
             BuildMyName(obj);
@@ -799,7 +801,7 @@ classdef dGeneric < handle  % Calls by reference
             end
         end
         
-        function s=EstChiSq(obj,BinUpperBounds,BinProbs,varargin)
+        function [s,EndingVals,fval,exitflag,output]=EstChiSq(obj,BinUpperBounds,BinProbs,varargin)
             assert(obj.Initialized,UninitializedError(obj));
             if numel(varargin)<1
                 ParmCodes = obj.DefaultParmCodes;
@@ -811,7 +813,7 @@ classdef dGeneric < handle  % Calls by reference
             ErrFn = @MyErrFunc;
             StartingVals = ParmValues(obj);
             obj.PushAndStopNameBuilding;
-            EndingVals = fminsearcharb(ErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
+            [EndingVals,fval,exitflag,output] = fminsearcharb(ErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
             obj.ResetParms(EndingVals);
             obj.PopNameBuilding;
             BuildMyName(obj);
@@ -847,7 +849,7 @@ classdef dGeneric < handle  % Calls by reference
             end
         end
         
-        function s=EstPctile(obj,XValues,TargetCDFs,varargin)
+        function [s,EndingVals,fval,exitflag,output]=EstPctile(obj,XValues,TargetCDFs,varargin)
             assert(obj.Initialized,UninitializedError(obj));
             if numel(varargin)<1
                 ParmCodes = obj.DefaultParmCodes;
@@ -859,7 +861,7 @@ classdef dGeneric < handle  % Calls by reference
             ErrFn = @MyErrFunc;
             StartingVals = ParmValues(obj);
             obj.PushAndStopNameBuilding;
-            EndingVals = fminsearcharb(ErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
+            [EndingVals,fval,exitflag,output] = fminsearcharb(ErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
             obj.ResetParms(EndingVals);
             obj.PopNameBuilding;
             BuildMyName(obj);
@@ -895,7 +897,7 @@ classdef dGeneric < handle  % Calls by reference
             end
         end
 
-        function s=EstPctBounds(obj,LowerBound,UpperBound,TargetProb,varargin)
+        function [s,EndingVals,fval,exitflag,output]=EstPctBounds(obj,LowerBound,UpperBound,TargetProb,varargin)
             % Adjust parameter(s) so that the desired TargetProb % of the distribution
             % falls between the specified bounds.
             assert(LowerBound<UpperBound,GenericError(obj,['Called EstPctBounds with LowerBound = ' num2str(LowerBound) ' and UpperBound = ' num2str(UpperBound)]))
@@ -911,7 +913,7 @@ classdef dGeneric < handle  % Calls by reference
             ErrFn = @MyErrFunc;
             StartingVals = ParmValues(obj);
             obj.PushAndStopNameBuilding;
-            EndingVals = fminsearcharb(ErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
+            [EndingVals,fval,exitflag,output] = fminsearcharb(ErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
             obj.ResetParms(EndingVals);
             obj.PopNameBuilding;
             BuildMyName(obj);
@@ -922,7 +924,7 @@ classdef dGeneric < handle  % Calls by reference
             end
         end
         
-        function s=EstProbitYNML(obj,Constants,NTrials,NGreater,varargin)
+        function [s,EndingVals,fval,exitflag,output]=EstProbitYNML(obj,Constants,NTrials,NGreater,varargin)
             assert(obj.Initialized,UninitializedError(obj));
             if numel(varargin)<1
                 ParmCodes = obj.DefaultParmCodes;
@@ -934,7 +936,7 @@ classdef dGeneric < handle  % Calls by reference
             ErrFn = @MyErrFunc;
             StartingVals = ParmValues(obj);
             obj.PushAndStopNameBuilding;
-            EndingVals = fminsearcharb(ErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
+            [EndingVals,fval,exitflag,output] = fminsearcharb(ErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
             obj.ResetParms(EndingVals);
             obj.PopNameBuilding;
             BuildMyName(obj);
@@ -945,7 +947,7 @@ classdef dGeneric < handle  % Calls by reference
             end
         end
         
-        function s=EstProbitYNChiSq(obj,Constants,NTrials,NGreater,varargin)
+        function [s,EndingVals,fval,exitflag,output]=EstProbitYNChiSq(obj,Constants,NTrials,NGreater,varargin)
             assert(obj.Initialized,UninitializedError(obj));
             if numel(varargin)<1
                 ParmCodes = obj.DefaultParmCodes;
@@ -957,7 +959,7 @@ classdef dGeneric < handle  % Calls by reference
             ErrFn = @MyErrFunc;
             StartingVals = ParmValues(obj);
             obj.PushAndStopNameBuilding;
-            EndingVals = fminsearcharb(ErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
+            [EndingVals,fval,exitflag,output] = fminsearcharb(ErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
             obj.ResetParms(EndingVals);
             obj.PopNameBuilding;
             BuildMyName(obj);
@@ -968,7 +970,7 @@ classdef dGeneric < handle  % Calls by reference
             end
         end
         
-        function s=EstProbitmAFCML(obj,M,Constants,NTrials,NGreater,varargin)
+        function [s,EndingVals,fval,exitflag,output]=EstProbitmAFCML(obj,M,Constants,NTrials,NGreater,varargin)
             assert(obj.Initialized,UninitializedError(obj));
             if numel(varargin)<1
                 ParmCodes = obj.DefaultParmCodes;
@@ -980,7 +982,7 @@ classdef dGeneric < handle  % Calls by reference
             ErrFn = @MyErrFunc;
             StartingVals = ParmValues(obj);
             obj.PushAndStopNameBuilding;
-            EndingVals = fminsearcharb(ErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
+            [EndingVals,fval,exitflag,output] = fminsearcharb(ErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
             obj.ResetParms(EndingVals);
             obj.PopNameBuilding;
             BuildMyName(obj);
@@ -991,7 +993,7 @@ classdef dGeneric < handle  % Calls by reference
             end
         end
         
-        function s=EstProbitmAFCChiSq(obj,M,Constants,NTrials,NGreater,varargin)
+        function [s,EndingVals,fval,exitflag,output]=EstProbitmAFCChiSq(obj,M,Constants,NTrials,NGreater,varargin)
             assert(obj.Initialized,UninitializedError(obj));
             if numel(varargin)<1
                 ParmCodes = obj.DefaultParmCodes;
@@ -1003,7 +1005,7 @@ classdef dGeneric < handle  % Calls by reference
             ErrFn = @MyErrFunc;
             StartingVals = ParmValues(obj);
             obj.PushAndStopNameBuilding;
-            EndingVals = fminsearcharb(ErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
+            [EndingVals,fval,exitflag,output] = fminsearcharb(ErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
             obj.ResetParms(EndingVals);
             obj.PopNameBuilding;
             BuildMyName(obj);
@@ -1093,7 +1095,7 @@ classdef dGeneric < handle  % Calls by reference
             end
             obj.UseSplineCDF = false;
             obj.SplineCDFs = CDF(obj,obj.SplineCDFsXs);
-            obj.CDFSplineInfo = spline(obj.SplineCDFsXs,[obj.SplineCDFs]);  % The 0/1 at the ends guarantee flatness at ends
+            obj.CDFSplineInfo = spline([obj.LowerBound obj.SplineCDFsXs obj.UpperBound],[0 obj.SplineCDFs 1]);  % The 0/1 at the ends guarantee flatness at ends
             obj.UseSplineCDF = true;
             obj.HaveSplineCDFs = true;
         end

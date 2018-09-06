@@ -25,7 +25,7 @@ classdef utLinearTrans < utContinuous;
             testCase.ThisCase  = parmCase;
             switch parmCase
                 case 1
-                    testCase.Dist = LinearTrans(Uniform(0,1),2,10);
+                    testCase.Dist = LinearTrans(Uniform(0,1),-2,10);
                     testCase.EstParmCodes = 'rrff';  % Don't adjust both constants and bounds since they can trade off.
                     %               testCase.SkipAllEst = true;
                     testCase.Expected.Mean = (testCase.Dist.LowerBound + testCase.Dist.UpperBound)/2;

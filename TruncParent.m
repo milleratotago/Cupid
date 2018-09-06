@@ -17,8 +17,10 @@ classdef TruncParent < dTransMono
         end
 
         function []=NewCutoffs(obj,LowerX,UpperX)
-            obj.LowerCutoffX = max(LowerX,obj.BasisRV.LowerBound);
-            obj.UpperCutoffX = min(UpperX,obj.BasisRV.UpperBound);
+%             obj.LowerCutoffX = max(LowerX,obj.BasisRV.LowerBound);  % NWJEFF: This can lead to fixed cutoffs seeming to be adjusted
+%             obj.UpperCutoffX = min(UpperX,obj.BasisRV.UpperBound);  % if the BasisRV does not extend to the lower/upper bounds.
+            obj.LowerCutoffX = LowerX;
+            obj.UpperCutoffX = UpperX;
             obj.LowerCutoffP = obj.BasisRV.CDF(LowerX);
             obj.UpperCutoffP = obj.BasisRV.CDF(UpperX);
             obj.UnconditionalP = obj.UpperCutoffP - obj.LowerCutoffP;

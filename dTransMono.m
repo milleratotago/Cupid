@@ -37,11 +37,22 @@ classdef (Abstract) dTransMono < dEither
     
     methods
         
-        function obj=dTransMono(FamName,BasisDist)
+        function obj=dTransMono(FamName,varargin)
             obj@dEither(FamName);
+            obj.NTransParms = 0;
+            switch nargin
+                case 1
+                case 2
+                    obj.Setup(varargin{1});
+                otherwise
+                    ME = MException('dTransMono:Constructor','dTransMono constructor needs 1 or 2 arguments.');
+                    throw(ME);
+            end
+        end
+
+        function Setup(obj,BasisDist)
             obj.BasisRV = BasisDist;
             obj.DistType = obj.BasisRV.DistType;
-            obj.NTransParms = 0;
             obj.NDistParms = obj.BasisRV.NDistParms;
             obj.DefaultParmCodes = obj.BasisRV.DefaultParmCodes;
         end

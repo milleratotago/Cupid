@@ -34,6 +34,7 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
         XGrain     % A "graininess" factor for X that multiplies times eps(X) in checking Y values against DiscreteX values.
                    % Y is accepted as equal to DiscreteX(i) if it is within XGrain*eps(DiscreteX(i))
         CDFGrain   % A "graininess" factor for CDF.  P is accepted as equal to DiscreteCDF(i) if it is within CDFGrain*eps(DiscreteCDF(i))
+        ExhaustiveBins  % Set to true if all X values should be considered as falling within a bin.
     end
 
     methods
@@ -44,6 +45,7 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
             obj.StoredTablesInitialized = false;
             obj.XGrain = 2;
             obj.CDFGrain = 2;  % InverseCDF returns a too-small value where CDF is increasing slowly
+            obj.ExhaustiveBins = false;
         end
 
         function []=ClearBeforeResetParmsD(obj)
@@ -74,9 +76,18 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
         function SetBinEdges(obj)
             % After the DiscreteX values have been determined, set the edges of the bins.
             % MakeTables should always call this at the end.
-            thistol = obj.XGrain * eps(obj.DiscreteX);
-            obj.DiscreteXmin = obj.DiscreteX - thistol;
-            obj.DiscreteXmax = obj.DiscreteX + thistol;
+            if obj.ExhaustiveBins
+                obj.DiscreteXmin = nan(size(obj.DiscreteX));
+                obj.DiscreteXmax = nan(size(obj.DiscreteX));
+                obj.DiscreteXmin(1) = -inf;
+                obj.DiscreteXmax(end) = inf;
+                obj.DiscreteXmin(2:end) = (obj.DiscreteX(1:end-1) + obj.DiscreteX(2:end)) / 2;
+                obj.DiscreteXmax(1:end-1) = obj.DiscreteXmin(2:end);
+            else
+                thistol = obj.XGrain * eps(obj.DiscreteX);
+                obj.DiscreteXmin = obj.DiscreteX - thistol;
+                obj.DiscreteXmax = obj.DiscreteX + thistol;
+            end
             obj.DiscreteCDFmax = min(1,obj.DiscreteCDF + obj.CDFGrain * eps(obj.DiscreteCDF));
             obj.StoredTablesInitialized = true;
         end

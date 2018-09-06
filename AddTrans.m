@@ -7,8 +7,20 @@ classdef AddTrans < dTransMono
     
     methods
         
-        function obj=AddTrans(BasisDist,Addend)
-            obj=obj@dTransMono('AddTrans',BasisDist);
+        function obj=AddTrans(varargin) % BasisDist,Addend
+            obj=obj@dTransMono('AddTrans');
+            switch nargin
+                case 0
+                case 2
+                    obj.Setup(varargin{:});
+                otherwise
+                    ME = MException('AddTrans:Constructor','AddTrans constructor needs 0 or 2 arguments.');
+                    throw(ME);
+            end
+        end
+
+        function Setup(obj,BasisDist,Addend)
+            obj.Setup@dTransMono(BasisDist);
             obj.Addend = Addend;
             obj.AddParms(1,'r');
             obj.PDFScaleFactorKnown = true;

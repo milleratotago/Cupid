@@ -1,13 +1,18 @@
 classdef ExGauss < dContinuous
     % ExGaussian distribution (sum of normal and exponential) with parameters mu, sigma, rate
+    % Note that there is a minimum sigma to avoid numerical problems in parameter estimation when sigma is allowed to approach 0.
     
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
         mu, sigma, rate,
         Standard_Normal, Standard_Exponential, EExtreme, SqrtTwo
-        UseNormalApproxCutoff  % Ignore exponential component if sigma*rate^2 > UseNormalApproxCutoff
-        UseNormalApprox
     end
     
+    properties(SetAccess = public)
+        UseNormalApproxCutoff  % Ignore exponential component if sigma*rate^2 > UseNormalApproxCutoff
+        UseNormalApprox
+        MinSigma
+    end
+
     methods
         
         function obj=ExGauss(varargin)
@@ -21,6 +26,7 @@ classdef ExGauss < dContinuous
             obj.NDistParms = 3;
             obj.UseNormalApproxCutoff = 100;  % Used to decide whether to ignore exponential component as negligible.
             obj.Smallrcond = 1e-10;  % Normal and exponential means trade off against one another so info matrix nearly singular
+            obj.MinSigma = 1.0;
             switch nargin
                 case 0
                 case 3
@@ -40,6 +46,10 @@ classdef ExGauss < dContinuous
             ReInit(obj);
         end
         
+        function CheckSigma(obj)
+            assert(obj.sigma>=obj.MinSigma,[obj.FamilyName ' sigma is ' num2str(obj.sigma) ' but must be > obj.MinSigma = ' num2str(obj.MinSigma) '.']);
+        end
+        
         function PerturbParms(obj,ParmCodes)
             % Perturb parameter values a little bit, e.g., prior to estimation attempts for testing.
             % Here, just make mu a little larger and the variances a little bit more equal.
@@ -57,7 +67,7 @@ classdef ExGauss < dContinuous
         end
         
         function []=ReInit(obj)
-            assert(obj.sigma>0,'ExGauss sigma must be > 0.');
+            CheckSigma(obj);
             assert(obj.rate>0,'ExGauss rate must be > 0.');
             obj.UseNormalApprox = obj.sigma*obj.rate^2 > obj.UseNormalApproxCutoff;
             obj.LowerBound = obj.mu - obj.Standard_Normal.ZExtreme * obj.sigma;
@@ -73,11 +83,11 @@ classdef ExGauss < dContinuous
         end
         
         function Reals = ParmsToReals(obj,Parms,~)
-            Reals = [Parms(1) NumTrans.GT2Real(0,Parms(2)) NumTrans.GT2Real(0,Parms(3))];
+            Reals = [Parms(1) NumTrans.GT2Real(obj.MinSigma,Parms(2)) NumTrans.GT2Real(eps,Parms(3))];
         end
         
         function Parms = RealsToParms(obj,Reals,~)
-            Parms = [Reals(1) NumTrans.Real2GT(0,Reals(2)) NumTrans.Real2GT(0,Reals(3))];
+            Parms = [Reals(1) NumTrans.Real2GT(obj.MinSigma,Reals(2)) NumTrans.Real2GT(eps,Reals(3))];
         end
         
         function thispdf=PDF(obj,X)
@@ -87,7 +97,8 @@ classdef ExGauss < dContinuous
             end
             t1 = -X(InBounds)*obj.rate + obj.mu*obj.rate + 0.5*(obj.sigma*obj.rate)^2;
             t2 = (X(InBounds) - obj.mu - obj.sigma^2*obj.rate) / obj.sigma;
-            thispdf(InBounds) = obj.rate*exp(t1).*obj.Standard_Normal.CDF(t2);
+            thispdf(InBounds) = obj.rate*exp( t1 + log(normcdf(t2)) );  % Better numerical properties.
+%           thispdf(InBounds) = obj.rate*exp(t1).*normcdf(t2);
             %            return
             %            % Old pre-vectorized version below with possibly more checking for numerical problems when Sigma*Rate is large.
             %            % Luce (1986, p. 36) has a version of the PDF, but not quite this one.

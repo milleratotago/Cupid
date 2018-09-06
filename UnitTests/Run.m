@@ -63,6 +63,7 @@ function Run(CaseNs)
             SingleTest('ExWaldMSM');
             SingleTest('F');
             SingleTest('Gamma');
+            SingleTest('Geary');
             SingleTest('GenNor1');
             SingleTest('GenNor2');
             SingleTest('HyperbolicTan');
@@ -113,11 +114,14 @@ function Run(CaseNs)
         
         if Discrete && Fast
             SingleTest('Binomial');
+            SingleTest('BinomialP');
+            SingleTest('BinomialZ');
             SingleTest('BinomialMixed');
             SingleTest('Geometric');
             SingleTest('Poisson');
             SingleTest('RankDist');
             SingleTest('UniformInt');
+            SingleTest('YNdPrime');
             WriteMarker([MarkerRoot 'DisFas']);
         end
         

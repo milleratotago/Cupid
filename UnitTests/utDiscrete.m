@@ -44,7 +44,6 @@ classdef utDiscrete < utGeneric;
             testCase.Computed.CDF = testCase.Dist.CDF(testCase.Dist.DiscreteX);
             IntegralPieces = cumsum(IntegralPieces);
             testCase.verifyEqual(testCase.Computed.CDF,IntegralPieces,'AbsTol',testCase.CDFAbsTol,'RelTol',testCase.CDFRelTol,'CDF values are not consistent with summed PDF');
-            
         end  % PDFIntegralPieces
         
         

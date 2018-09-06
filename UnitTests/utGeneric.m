@@ -397,7 +397,7 @@ classdef utGeneric < matlab.unittest.TestCase
             testCase.verifyEqual(CenInt,testCase.Computed.CenMoment,'AbsTol',testCase.CenIntAbsTol,'RelTol',testCase.CenIntRelTol,'Central integrals do not match moments within CenIntAbsTol/CenIntRelTol.');
         end  % CheckIntegrals
         
-        function MLEEstTest(testCase)
+        function MLEstTest(testCase)
             % The data to be fit are the original testCase.xMLE values.
 
             global GlobalSkipAllEst;

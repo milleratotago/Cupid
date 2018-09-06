@@ -1,4 +1,4 @@
-function SingleTest(sThisClass)
+function failedTests = SingleTest(sThisClass)
     
     global WantPlots
     global GlobalSkipAllEst
@@ -52,9 +52,18 @@ function SingleTest(sThisClass)
     if ErrFound(DiaryName)
         CleanHTML(DiaryName);
         disp(['Errors in ' DiaryName ', so save it.']);
+        
+        % Rerun failed tests with StopOnFailures
+        % Save & return these failed tests.
+%         import matlab.unittest.plugins.StopOnFailuresPlugin
+%         runner.addPlugin(StopOnFailuresPlugin);
+        failedTests = tests([results.Failed]);
+%         result2 = runner.run(failedTests);
+
     else
         disp(['No errors in ' DiaryName ', so remove it.']);
         delete(DiaryName);
+        failedTests = [];
     end
     
 end % SingleTest

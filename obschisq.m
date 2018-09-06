@@ -1,4 +1,4 @@
-function [obschisqval, obschisqp]=obschisq(obsvals,BinMax,PredictedBinProbs)
+function [obschisqval, obschisqp, ObsBinCounts, PredBinCounts]=obschisq(obsvals,BinMax,PredictedBinProbs)
 % Used with CONTINUOUS random variables.
 % This function uses the chi-square test to evaluate the fit of
 % the observed distribution to a set of predicted bin probabilities,

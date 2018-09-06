@@ -28,8 +28,11 @@ classdef ExGauMn < ExGauss
             obj.sigma = newparmvalues(2);
             obj.exmean = newparmvalues(3);
             obj.rate = 1/obj.exmean;
-            assert(obj.sigma>0,'ExGauMn sigma must be > 0.');
-            assert(obj.exmean>0,'ExGauMn exmean must be > 0.');
+            if ~(obj.sigma>0)
+                disp('error');
+            end
+            CheckSigma(obj);
+            assert(obj.exmean>=eps,['ExGauMn exmean is ' num2str(obj.exmean) ' but must be > 0.']);
             ReInit(obj);
         end
         
