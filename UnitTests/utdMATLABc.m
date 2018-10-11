@@ -4,9 +4,9 @@ classdef utdMATLABc < utContinuous;
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.
-        % parmCase = {1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23};
-        parmCase = {3};  % Still a problem with Burr
-       % Special handling for some distributions:
+        parmCase = {1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23};
+        % parmCase = {11};  % Check a single distribution
+        % Special handling for some distributions:
         %  8: GeneralizedPareto: Do not adjust constant to avoid impossible data values.
         %  9: HalfNormal: Do not adjust mu to avoid impossible data values.
         % 18: Rician; Modified ErrFound to ignore many complaints that NCX2INV did not converge
@@ -53,11 +53,11 @@ classdef utdMATLABc < utContinuous;
                 case 4
                     pd = makedist('Exponential','mu',100);
                     testCase.Dist = dMATLABc(pd,'r',0,+inf);
-                    SetTolerances(testCase,0.002);
+                    SetTolerances(testCase,0.005);
                 case 5
                     pd = makedist('ExtremeValue');
                     testCase.Dist = dMATLABc(pd,'rr',[-inf 0],[+inf +inf]);
-                    SetTolerances(testCase,0.002);
+                    SetTolerances(testCase,0.005);
                 case 6
                     pd = makedist('Gamma');
                     testCase.Dist = dMATLABc(pd,'rr',[0 0],[+inf +inf]);
@@ -82,7 +82,7 @@ classdef utdMATLABc < utContinuous;
                     testCase.Dist = dMATLABc(pd,'rr',[0 0],[+inf +inf]);
                     SetTolerances(testCase,0.008);
                 case 11
-                    pd = makedist('Logistic');
+                    pd = makedist('Logistic','mu',10,'sigma',1);
                     testCase.Dist = dMATLABc(pd,'rr',[-inf 0],[+inf +inf]);
                     SetTolerances(testCase,0.005);
                 case 12
@@ -115,7 +115,7 @@ classdef utdMATLABc < utContinuous;
                 case 18
                     pd = makedist('Rician','s',8,'sigma',1);
                     testCase.Dist = dMATLABc(pd,'rr',[0 0],[inf inf]);
-                    SetTolerances(testCase,0.005);
+                    SetTolerances(testCase,0.010);
                 case 19
                     pd = makedist('Stable','alpha',2,'beta',0.25,'gam',1,'delta',0);    % Moments only exist when alpha=2
                     testCase.Dist = dMATLABc(pd,'ffrr',[0 -1 0 -inf],[2 1 +inf +inf]);  % Fix some parameters to speed searches & avoid estimation problems.

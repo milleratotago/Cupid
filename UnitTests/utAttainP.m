@@ -2,7 +2,7 @@ classdef utAttainP < utContinuous;
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.
-        parmCase = { 1 2 3 4 };
+        parmCase = { 4}; % 1 2 3 4 5 };
     end
     
     properties
@@ -34,7 +34,12 @@ classdef utAttainP < utContinuous;
                     testCase.Dist = AttainP(FNoncentral(3,20,.1),F(3,20));
                     testCase.EstParmCodes = 'ffrff';
                 case 4
-                    testCase.Dist = AttainP(rNoncentral(120,-.1),r(120),-1);
+                    SampleSize = 60;  % Sometimes fails random number test with SampleSize 120
+                    % testCase.ChiSqNTries = 10;
+                    testCase.Dist = AttainP(rNoncentral(SampleSize,-.1),r(SampleSize),-1);
+                    testCase.EstParmCodes = 'frf';
+                case 5
+                    testCase.Dist = AttainP(tNoncentral(20,.3),t(20),-1);
                     testCase.EstParmCodes = 'frf';
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)

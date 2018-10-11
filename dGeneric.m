@@ -76,6 +76,7 @@ classdef dGeneric < handle  % Calls by reference
         DefaultParmCodes  % One character for each parameter indicating whether it is 'f'=fixed or not during parameter estimation.
         MLSEh             % A small delta used in computing the Fisher information (FI).
         Smallrcond        % The minimum rcond of the Fisher information matrix; below this value, print a warning.
+        SkipImpossibleWarn % Flag to skip warning about computing likelihood of impossible data value.
     end
     
     methods(Abstract)
@@ -121,6 +122,7 @@ classdef dGeneric < handle  % Calls by reference
             obj.Smallrcond = 1e-6;
             obj.NBNStored = 0;
             obj.NBStored = zeros(10,1);
+            obj.SkipImpossibleWarn = false;
         end
         
         % **************** Some house-keeping functions:
@@ -442,7 +444,7 @@ classdef dGeneric < handle  % Calls by reference
             assert(obj.Initialized,UninitializedError(obj));
             Like = PDF(obj,Observations);
             ZeroPos = find(Like==0);
-            if numel(ZeroPos) > 0
+            if numel(ZeroPos) && ~(obj.SkipImpossibleWarn > 0)
                 warning([obj.FamilyName ' checking likelihood of impossible data values.']);
             end
             for I = 1:length(ZeroPos)
@@ -666,7 +668,10 @@ classdef dGeneric < handle  % Calls by reference
             ErrFn = @MyErrFunc;
             StartingVals = ParmValues(obj);
             obj.PushAndStopNameBuilding;
+            HoldWarn = obj.SkipImpossibleWarn;
+            obj.SkipImpossibleWarn = true;  % Do not warn about impossible values when parameter searching.
             [EndingVals,fval,exitflag,output] = fminsearcharb(ErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
+            obj.SkipImpossibleWarn = HoldWarn;
             obj.ResetParms(EndingVals);
             obj.PopNameBuilding;
             BuildMyName(obj);
@@ -691,6 +696,8 @@ classdef dGeneric < handle  % Calls by reference
             RealParmAddrs = find(RealParms>0);
             NRealParms = sum(RealParms);
             FI = zeros(NRealParms);  % Allocate space for the k*k Fisher information matrix.
+            HoldWarn = obj.SkipImpossibleWarn;
+            obj.SkipImpossibleWarn = true;  % Turn off warnings about impossible data values
             for iParm=1:NRealParms
                 UpParms = OrigParms;
                 iParmAddr = RealParmAddrs(iParm);
@@ -711,6 +718,7 @@ classdef dGeneric < handle  % Calls by reference
                     FI(iParm,jParm) = -(Fup2 + Fdown2 - Fupdown - Fdownup ) / (4*obj.MLSEh^2);
                 end
             end
+            obj.SkipImpossibleWarn = HoldWarn;
             FI = FI + triu(FI,1)';  % Copy upper triangular into lower triangular.
             % Set up output matrices in case try block fails
             Cov = nan(NParms);
@@ -825,6 +833,12 @@ classdef dGeneric < handle  % Calls by reference
         end
         
         function totalerr=PercentileError(obj, XValues, TargetCDFs)
+            % Compute sum of squared difference between given CDF values
+            % and those CDF values associated with the distribution.
+            % NWJEFF: Provide additional options:
+            %   to measure CDF differences on log(odds) scale
+            %   to consider CDFs as fixed and minimize differences on the X scale, as suggested at
+            %   https://au.mathworks.com/help/stats/examples/fitting-a-univariate-distribution-using-cumulative-probabilities.html
             assert(obj.Initialized,UninitializedError(obj));
             totalerr = 0;
             NToFit = numel(XValues);

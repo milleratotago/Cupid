@@ -142,6 +142,12 @@ Here are most of the values that can be computed for any distribution, standard 
 * Parameter estimates to produce a desired probability within a certain range
 * Parameter estimates for probit models with yes/no and m-AFC tasks
 
+[5]  Additional requirements
+------------------------------------------------------------
+
+The special-purpose multivariate random number generator class RandGen also requires the
+ExtractNameVal package from https://github.com/milleratotago/ExtractNameVal.
+
 Copyright (C) 2018 Jeffrey Owen Miller
   
       This program is free software: you can redistribute it and/or modify

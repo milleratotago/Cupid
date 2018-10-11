@@ -72,7 +72,14 @@ classdef AttainP < dContinuous % dEither  % Discrete not implemented yet. Maybe 
         end
         
         function BuildMyName(obj)
-            obj.StringName = ['AttainP(' obj.True.StringName ',' obj.Null.StringName ')'];
+            if obj.TwoTailed
+                sType = 'two-tailed';
+            elseif obj.UpperTail
+                sType = 'upper tail';
+            else
+                sType = 'lower tail';
+            end
+            obj.StringName = ['AttainP(' obj.True.StringName ',' obj.Null.StringName ',' sType ')'];
         end
         
         function []=ResetParms(obj,newparmvalues)
@@ -144,23 +151,36 @@ classdef AttainP < dContinuous % dEither  % Discrete not implemented yet. Maybe 
                 return;
             end
             % From Ulrich Miller (2016) p-curve paper
-            for iel=1:numel(X)
-                if InBounds(iel)
-                    if obj.TwoTailed
-                        ThisXLo = obj.Null.InverseCDF(X(iel)/2);
-                        ThisXHi = obj.Null.InverseCDF(1-X(iel)/2);
-                        RatioLo = obj.True.PDF(ThisXLo) / obj.Null.PDF(ThisXLo);
-                        RatioHi = obj.True.PDF(ThisXHi) / obj.Null.PDF(ThisXHi);
-                        thispdf(iel) = 0.5*(RatioLo + RatioHi);
-                    elseif obj.UpperTail
-                        ThisX = obj.Null.InverseCDF(1-X(iel));
-                        thispdf(iel) = obj.True.PDF(ThisX) / obj.Null.PDF(ThisX);
-                    else
-                        ThisX = obj.Null.InverseCDF(X(iel));
-                        thispdf(iel) = obj.True.PDF(ThisX) / obj.Null.PDF(ThisX);
-                    end
-                end
+            if obj.TwoTailed
+                ThisXLo = obj.Null.InverseCDF(X(InBounds)/2);
+                ThisXHi = obj.Null.InverseCDF(1-X(InBounds)/2);
+                RatioLo = obj.True.PDF(ThisXLo) ./ obj.Null.PDF(ThisXLo);
+                RatioHi = obj.True.PDF(ThisXHi) ./ obj.Null.PDF(ThisXHi);
+                thispdf(InBounds) = 0.5*(RatioLo + RatioHi);
+            elseif obj.UpperTail
+                ThisX = obj.Null.InverseCDF(1-X(InBounds));
+                thispdf(InBounds) = obj.True.PDF(ThisX) ./ obj.Null.PDF(ThisX);
+            else
+                ThisX = obj.Null.InverseCDF(X(InBounds));
+                thispdf(InBounds) = obj.True.PDF(ThisX) ./ obj.Null.PDF(ThisX);
             end
+%           for iel=1:numel(X)
+%               if InBounds(iel)
+%                   if obj.TwoTailed
+%                       ThisXLo = obj.Null.InverseCDF(X(iel)/2);
+%                       ThisXHi = obj.Null.InverseCDF(1-X(iel)/2);
+%                       RatioLo = obj.True.PDF(ThisXLo) / obj.Null.PDF(ThisXLo);
+%                       RatioHi = obj.True.PDF(ThisXHi) / obj.Null.PDF(ThisXHi);
+%                       thispdf(iel) = 0.5*(RatioLo + RatioHi);
+%                   elseif obj.UpperTail
+%                       ThisX = obj.Null.InverseCDF(1-X(iel));
+%                       thispdf(iel) = obj.True.PDF(ThisX) / obj.Null.PDF(ThisX);
+%                   else
+%                       ThisX = obj.Null.InverseCDF(X(iel));
+%                       thispdf(iel) = obj.True.PDF(ThisX) / obj.Null.PDF(ThisX);
+%                   end
+%               end
+%           end
         end
         
         function thiscdf=CDF(obj,X)
@@ -168,17 +188,24 @@ classdef AttainP < dContinuous % dEither  % Discrete not implemented yet. Maybe 
             if Done
                 return;
             end
-            for iel=1:numel(X)
-                if InBounds(iel)
-                    if obj.TwoTailed
-                        thiscdf(iel) = obj.True.CDF(obj.Null.InverseCDF(X(iel)/2)) + 1 - obj.True.CDF(obj.Null.InverseCDF(1-X(iel)/2));
-                    elseif obj.UpperTail
-                        thiscdf(iel) = 1 - obj.True.CDF(obj.Null.InverseCDF(1-X(iel)));
-                    else
-                        thiscdf(iel) = obj.True.CDF(obj.Null.InverseCDF(X(iel)));
-                    end
-                end
+            if obj.TwoTailed
+                thiscdf(InBounds) = obj.True.CDF(obj.Null.InverseCDF(X(InBounds)/2)) + 1 - obj.True.CDF(obj.Null.InverseCDF(1-X(InBounds)/2));
+            elseif obj.UpperTail
+                thiscdf(InBounds) = 1 - obj.True.CDF(obj.Null.InverseCDF(1-X(InBounds)));
+            else
+                thiscdf(InBounds) = obj.True.CDF(obj.Null.InverseCDF(X(InBounds)));
             end
+%           for iel=1:numel(X)
+%               if InBounds(iel)
+%                   if obj.TwoTailed
+%                       thiscdf(iel) = obj.True.CDF(obj.Null.InverseCDF(X(iel)/2)) + 1 - obj.True.CDF(obj.Null.InverseCDF(1-X(iel)/2));
+%                   elseif obj.UpperTail
+%                       thiscdf(iel) = 1 - obj.True.CDF(obj.Null.InverseCDF(1-X(iel)));
+%                   else
+%                       thiscdf(iel) = obj.True.CDF(obj.Null.InverseCDF(X(iel)));
+%                   end
+%               end
+%           end
         end
         
         function Reals = ParmsToReals(obj,Parms,~)
@@ -205,40 +232,28 @@ classdef AttainP < dContinuous % dEither  % Discrete not implemented yet. Maybe 
         %     thisval = false;  % Dummy
         % end
         
-        function x = XsToPlot(obj)
-            x = XsToPlot(obj.True);
-            for i=1:numel(x)
-                if obj.TwoTailed
-                    if x(i) < 0
-                        x(i) = CDF(obj.Null,x(i)) + 1 - CDF(obj.Null,-x(i));
-                    else
-                        x(i) = CDF(obj.Null,-x(i)) + 1 - CDF(obj.Null,x(i));
-                    end
-                elseif obj.UpperTail
-                    x(i) = 1 - CDF(obj.Null,x(i));
-                else
-                    x(i) = CDF(obj.Null,x(i));
-                end
+        function p = XtoP(obj,x)
+            % Convert x values from the true distribution into p values
+            % relative to the null distribution.
+            p=zeros(size(x));
+            if obj.TwoTailed
+                p(x<0) = obj.Null.CDF(x(x<0)) + 1 - obj.Null.CDF(-x(x<0));
+                p(x>=0) = obj.Null.CDF(-x(x>=0)) + 1 - obj.Null.CDF(x(x>=0));
+            elseif obj.UpperTail
+                p = 1 - obj.Null.CDF(x);
+            else
+                p = obj.Null.CDF(x);
             end
+        end
+        
+        function p = XsToPlot(obj)
+            p = obj.XtoP(obj.True.XsToPlot);
         end
         
         function thisval=Random(obj,varargin)
             assert(obj.Initialized,UninitializedError(obj));
-            r = Random(obj.True,varargin{:});
-            thisval=zeros(varargin{:});
-            for i=1:numel(thisval)
-                if obj.TwoTailed
-                    if r(i) < 0
-                        thisval(i) = CDF(obj.Null,r(i)) + 1 - CDF(obj.Null,-r(i));
-                    else
-                        thisval(i) = CDF(obj.Null,-r(i)) + 1 - CDF(obj.Null,r(i));
-                    end
-                elseif obj.UpperTail
-                    thisval(i) = 1 - CDF(obj.Null,r(i));
-                else
-                    thisval(i) = CDF(obj.Null,r(i));
-                end
-            end
+            r = obj.True.Random(varargin{:});
+            thisval = obj.XtoP(r);
         end
         
     end  % methods

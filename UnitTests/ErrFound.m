@@ -27,6 +27,6 @@ c1 = strrep(c1,'Warning: Cannot perform PctBoundsEstTest for this distribution b
 % Often arises with Rician in dMATLABc
 c1 = strrep(c1,'[Warning: NCX2INV did not converge.]','');
 
-tf = contains(c1,'warning','IgnoreCase',true) || contains(c1,'error','IgnoreCase',true) || contains(c1,'exiting','IgnoreCase',true);
+tf = contains(c1,'warning','IgnoreCase',true) || contains(c1,'error','IgnoreCase',true) || contains(c1,'Failed by','IgnoreCase',true) || contains(c1,'exiting','IgnoreCase',true);
 
 end

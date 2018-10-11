@@ -62,7 +62,13 @@ classdef RandGen < handle
             obj.RVs = RVs;
             obj.NRVs = numel(RVs);
             obj.RhoControllers = RhoControllers;
-            [obj.WantHistograms, varargin] = ExtractNamei({'Histogram','Histograms'},varargin);
+            try
+                [obj.WantHistograms, varargin] = ExtractNamei({'Histogram','Histograms'},varargin);
+            catch ME
+                disp('Error handling varargin with ExtractName');
+                disp('For RandGen, you also need ExtractNameVal from https://github.com/milleratotago/ExtractNameVal ');
+                rethrow(ME);
+            end
             [obj.WantScattergrams, varargin] = ExtractNamei({'Scattergram','Scattergrams'},varargin);
             [WantAdjust, varargin] = ExtractNamei('Adjust',varargin);
             if WantAdjust

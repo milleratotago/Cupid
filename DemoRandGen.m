@@ -1,7 +1,7 @@
 % Random number generation demos.
 
-
-% NwJeff: Spline examples.  Add 'SplineAll' option?
+% IMPORTANT: RandGen uses some routines from ExtractNameVal at https://github.com/milleratotago/ExtractNameVal
+% so you need to have that in addition to Cupid.
 
 %% A simple example:
 
@@ -74,7 +74,7 @@ TargetCorrs = ...
 
 mymultivar = RandGen(RVs,TargetCorrs,'Adjust','NSteps',500,'Histograms','Scattergrams');
 
-disp('Here are the values of RhoControllers, in case you want to save them for later re-used:');
+disp('Here are the values of RhoControllers, in case you want to save them for later re-use:');
 temp1 = mymultivar.RhoControllers
 disp('FYI, here are the maximum & minimal attainable correlations with these RVs:');
 tempMax = mymultivar.RhoMax
@@ -92,9 +92,57 @@ for iSample = 1:NSamples
     ThisSample = mymultivar.Rands(NCases)
 end
 
+%% Example with discrete RVs:
+
+NRVs = 3;
+RVs = cell(NRVs,1);
+RVs{1} = Poisson(4);   % Each RV can be any legal Cupid distribution.
+RVs{2} = UniformInt(1,10);
+RVs{3} = Binomial(20,.5);
+
+TargetCorrs = ...
+    [ 1 -0.2  0.8; ...
+    0   1  -0.4; ...
+    0   0    1   ]
+
+mymultivar = RandGen(RVs,TargetCorrs,'Adjust','NSteps',500,'Histograms','Scattergrams');
+
+disp('Here are the values of RhoControllers, in case you want to save them for later re-use:');
+temp1 = mymultivar.RhoControllers
+disp('FYI, here are the maximum & minimal attainable correlations with these RVs:');
+tempMax = mymultivar.RhoMax
+tempMin = mymultivar.RhoMin
+
+r=mymultivar.Rands(10000);
+
+mymultivar.WantHistograms = false;
+mymultivar.WantScattergrams = false;
+
+% % Now verify that these random numbers have the desired correlations.
+NCases = 250000;
+ThisSample = mymultivar.Rands(NCases);
+corr(ThisSample)
+for iRV = 1:NRVs
+    figure;
+    histogram(ThisSample(:,iRV));
+end
+
+
+%% An example with discrete random variables:
+
+NRVs = 2;
+RVs = cell(NRVs,1);
+RVs{1}=Poisson(23);   % The Poisson parameter is the mean
+RVs{2}=Poisson(12);
+TargetCorrs = [1  0.3; 0.3 1];  % Replace 0.3 with whatever correlation you want.
+mymultivar = RandGen(RVs,TargetCorrs,'Adjust','NSteps',500);
+r=mymultivar.Rands(10000);  % r is the array of random numbers with desired marginals & correlation
+corr(r)
+histogram(r(:,1));
 
 %% %%%%%%%%%%%%%%%%% Old Versions from here:
 
+% NwJeff: Spline examples.  Add 'SplineAll' option?
 
 
 % %% This section shows how to adjust the values in RhoControllers to get

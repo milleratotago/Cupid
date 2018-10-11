@@ -42,177 +42,202 @@ function Run(CaseNs)
         
         time0 = tic;
         
-        if Continuous && Fast
-            SingleTest('Beta');
-            SingleTest('Cauchy');
-            SingleTest('Chi');
-            SingleTest('ChiSq');
-            SingleTest('Cosine');
-            SingleTest('DblMon');
-            SingleTest('ExGauss');
-            SingleTest('ExGauMn');
-            SingleTest('ExGauRatio');
-            SingleTest('Exponential');
-            SingleTest('ExponenMn');
-            SingleTest('ExpSum');
-            SingleTest('ExtrVal1');
-            SingleTest('ExtrVal2');
-            SingleTest('ExtrValGen');
-            SingleTest('ExWald');
-            SingleTest('ExWaldMn');
-            SingleTest('ExWaldMSM');
-            SingleTest('F');
-            SingleTest('Gamma');
-            SingleTest('Geary');
-            SingleTest('GenNor1');
-            SingleTest('GenNor2');
-            SingleTest('HyperbolicTan');
-            SingleTest('JohnsonSB');
-            SingleTest('JohnsonSU');
-            SingleTest('Laplace');
-            SingleTest('Logistic');
-            SingleTest('Lognormal');
-            SingleTest('LognormalMS');
-            SingleTest('NakaRush');
-            SingleTest('Normal');
-            SingleTest('Pareto');
-            SingleTest('Quantal');
-            SingleTest('Quick');
-            SingleTest('Rayleigh');
-            SingleTest('Triangular');
-            SingleTest('RNGamma');
-            SingleTest('RNGammaMn');
-            SingleTest('RNGammaMS');
-            SingleTest('Rosin');
-            SingleTest('t');
-            SingleTest('TriangularCW');
-            SingleTest('Uniform');
-            SingleTest('UniformCW');
-            SingleTest('UniGap');
-            SingleTest('Wald2');
-            SingleTest('Weibull');
-            WriteMarker([MarkerRoot 'CntFas']);
+        if Continuous && Fast   % iCase 1
+            rpt = cell(0,0);
+            sectiontime = tic;
+            rpt{end+1} = SingleTest('Beta');
+            rpt{end+1} = SingleTest('Cauchy');
+            rpt{end+1} = SingleTest('Chi');
+            rpt{end+1} = SingleTest('ChiSq');
+            rpt{end+1} = SingleTest('Cosine');
+            rpt{end+1} = SingleTest('DblMon');
+            rpt{end+1} = SingleTest('ExGauss');
+            rpt{end+1} = SingleTest('ExGauMn');
+            rpt{end+1} = SingleTest('ExGauRatio');
+            rpt{end+1} = SingleTest('Exponential');
+            rpt{end+1} = SingleTest('ExponenMn');
+            rpt{end+1} = SingleTest('ExpSum');
+            rpt{end+1} = SingleTest('ExtrVal1');
+            rpt{end+1} = SingleTest('ExtrVal2');
+            rpt{end+1} = SingleTest('ExtrValGen');
+            rpt{end+1} = SingleTest('ExWald');
+            rpt{end+1} = SingleTest('ExWaldMn');
+            rpt{end+1} = SingleTest('ExWaldMSM');
+            rpt{end+1} = SingleTest('F');
+            rpt{end+1} = SingleTest('Gamma');
+            rpt{end+1} = SingleTest('Geary');
+            rpt{end+1} = SingleTest('GenNor1');
+            rpt{end+1} = SingleTest('GenNor2');
+            rpt{end+1} = SingleTest('HyperbolicTan');
+            rpt{end+1} = SingleTest('JohnsonSB');
+            rpt{end+1} = SingleTest('JohnsonSU');
+            rpt{end+1} = SingleTest('Laplace');
+            rpt{end+1} = SingleTest('Logistic');
+            rpt{end+1} = SingleTest('Lognormal');
+            rpt{end+1} = SingleTest('LognormalMS');
+            rpt{end+1} = SingleTest('NakaRush');
+            rpt{end+1} = SingleTest('Normal');
+            rpt{end+1} = SingleTest('Pareto');
+            rpt{end+1} = SingleTest('Quantal');
+            rpt{end+1} = SingleTest('Quick');
+            rpt{end+1} = SingleTest('Rayleigh');
+            rpt{end+1} = SingleTest('Triangular');
+            rpt{end+1} = SingleTest('RNGamma');
+            rpt{end+1} = SingleTest('RNGammaMn');
+            rpt{end+1} = SingleTest('RNGammaMS');
+            rpt{end+1} = SingleTest('Rosin');
+            rpt{end+1} = SingleTest('t');
+            rpt{end+1} = SingleTest('TriangularCW');
+            rpt{end+1} = SingleTest('Uniform');
+            rpt{end+1} = SingleTest('UniformCW');
+            rpt{end+1} = SingleTest('UniGap');
+            rpt{end+1} = SingleTest('Wald2');
+            rpt{end+1} = SingleTest('Weibull');
+            sectiontime = toc(sectiontime) / 60;
+            WriteMarker([MarkerRoot '1CntFas'],rpt,sectiontime);
         end
         
-        if Continuous && Slow
-            SingleTest('ChiSqNoncentral');
-            SingleTest('ExpSumT');
-            SingleTest('FNoncentral');
-            SingleTest('r');
-            SingleTest('rNoncentral');
-            SingleTest('Recinormal');
-            SingleTest('SkewNor');
-            SingleTest('StudRng');
-            SingleTest('tNoncentral');
-            SingleTest('tPowerEst');
-            SingleTest('TriangularG');
-            SingleTest('TriangularGCWP');
-            SingleTest('VonMises');
-            SingleTest('Wald');
-            WriteMarker([MarkerRoot 'CntSlo']);
+        if Discrete && Fast   % iCase 2
+            rpt = cell(0,0);
+            sectiontime = tic;
+            rpt{end+1} = SingleTest('Binomial');
+            rpt{end+1} = SingleTest('BinomialP');
+            rpt{end+1} = SingleTest('BinomialZ');
+            rpt{end+1} = SingleTest('BinomialMixed');
+            rpt{end+1} = SingleTest('Geometric');
+            rpt{end+1} = SingleTest('Poisson');
+            rpt{end+1} = SingleTest('RankDist');
+            rpt{end+1} = SingleTest('UniformInt');
+%            rpt{end+1} = SingleTest('YNdPrime');
+            sectiontime = toc(sectiontime) / 60;
+            WriteMarker([MarkerRoot '2DisFas'],rpt,sectiontime);
         end
         
-        if Discrete && Fast
-            SingleTest('Binomial');
-            SingleTest('BinomialP');
-            SingleTest('BinomialZ');
-            SingleTest('BinomialMixed');
-            SingleTest('Geometric');
-            SingleTest('Poisson');
-            SingleTest('RankDist');
-            SingleTest('UniformInt');
-            SingleTest('YNdPrime');
-            WriteMarker([MarkerRoot 'DisFas']);
-        end
-        
-        if Discrete && Slow
-            %    SingleTest('');
-            WriteMarker([MarkerRoot 'DisSlo']);
-        end
-        
-        if DerivedCont && Fast
-            % This section takes ~14 min non-parallel
-            SingleTest('AddTrans');
-            SingleTest('ArcsinTrans');
-            SingleTest('ExpTrans');
-            SingleTest('InverseTrans');
-            SingleTest('LinearTrans');
-            SingleTest('LogisticTrans');
-            SingleTest('LogitTrans');
-            SingleTest('LogTrans');
-            SingleTest('Mixture');
-            SingleTest('MonotoneTrans');
-            SingleTest('MultTrans');
-            SingleTest('PhiTrans');
-            SingleTest('PhiInvTrans');
-            SingleTest('PowerTrans');
-            SingleTest('Product');
-            SingleTest('Ratio');
-            SingleTest('SqrTrans');
-            SingleTest('SqrtTrans');
-            SingleTest('TruncatedP');
-            SingleTest('TruncatedX');
-            SingleTest('TruncatedXlow');
-            SingleTest('TruncatedXhi');
+        if DerivedCont && Fast   % iCase 3
+            rpt = cell(0,0);
+            sectiontime = tic;
+            rpt{end+1} = SingleTest('AddTrans');
+            rpt{end+1} = SingleTest('ArcsinTrans');
+            rpt{end+1} = SingleTest('ExpTrans');
+            rpt{end+1} = SingleTest('InverseTrans');
+            rpt{end+1} = SingleTest('LinearTrans');
+            rpt{end+1} = SingleTest('LogisticTrans');
+            rpt{end+1} = SingleTest('LogitTrans');
+            rpt{end+1} = SingleTest('LogTrans');
+            rpt{end+1} = SingleTest('Mixture');
+            rpt{end+1} = SingleTest('MonotoneTrans');
+            rpt{end+1} = SingleTest('MultTrans');
+            rpt{end+1} = SingleTest('PhiTrans');
+            rpt{end+1} = SingleTest('PhiInvTrans');
+            rpt{end+1} = SingleTest('PowerTrans');
+            rpt{end+1} = SingleTest('Product');
+            rpt{end+1} = SingleTest('Ratio');
+            rpt{end+1} = SingleTest('SqrTrans');
+            rpt{end+1} = SingleTest('SqrtTrans');
+            rpt{end+1} = SingleTest('TruncatedP');
+            rpt{end+1} = SingleTest('TruncatedX');
+            rpt{end+1} = SingleTest('TruncatedXlow');
+            rpt{end+1} = SingleTest('TruncatedXhi');
 
             % Forward and reverse transformation combinations;  NWJEFF: Many more are possible.
-            SingleTest('ExpLog');
-            SingleTest('LogitLogistic');
-            WriteMarker([MarkerRoot 'DerivContFas']);
+            rpt{end+1} = SingleTest('ExpLog');
+            rpt{end+1} = SingleTest('LogitLogistic');
+            sectiontime = toc(sectiontime) / 60;
+            WriteMarker([MarkerRoot '3DerivContFas'],rpt,sectiontime);
         end
         
-        if DerivedCont && Slow
-            % This section takes 330 min non-parallel
-            SingleTest('AttainP');
-            SingleTest('Convolution');
-            SingleTest('Difference');
-            SingleTest('InfMix');
-            SingleTest('MinBound');
-            SingleTest('Order');
-            SingleTest('OrderIID');
-            WriteMarker([MarkerRoot 'DerivContSlo']);
-        end
-        
-        if DerivedDisc && Fast
-            % This section takes ~14 min non-parallel
-            SingleTest('AddTransDisc');
-            SingleTest('ArcsinTransDisc');
-            SingleTest('ExpTransDisc');
-            SingleTest('InverseTransDisc');
-            SingleTest('LinearTransDisc');
-            SingleTest('LogisticTransDisc');
-            SingleTest('LogitTransDisc');
-            SingleTest('LogTransDisc');
-            SingleTest('MixtureDisc');
-            SingleTest('MonotoneTransDisc');
-            SingleTest('MultTransDisc');
-            SingleTest('PhiInvTransDisc');
-            SingleTest('PhiTransDisc');
-            SingleTest('PowerTransDisc');
-            SingleTest('ProductDisc');
-            SingleTest('RatioDisc');
-            SingleTest('SqrTransDisc');
-            SingleTest('SqrtTransDisc');
-            SingleTest('TruncatedPDisc');
-            SingleTest('TruncatedXDisc');
-            SingleTest('TruncatedXlowDisc');
-            SingleTest('TruncatedXhiDisc');
+        if DerivedDisc && Fast   % iCase 4
+            rpt = cell(0,0);
+            sectiontime = tic;
+            rpt{end+1} = SingleTest('AddTransDisc');
+            rpt{end+1} = SingleTest('ArcsinTransDisc');
+            rpt{end+1} = SingleTest('ExpTransDisc');
+            rpt{end+1} = SingleTest('InverseTransDisc');
+            rpt{end+1} = SingleTest('LinearTransDisc');
+            rpt{end+1} = SingleTest('LogisticTransDisc');
+            rpt{end+1} = SingleTest('LogitTransDisc');
+            rpt{end+1} = SingleTest('LogTransDisc');
+            rpt{end+1} = SingleTest('MixtureDisc');
+            rpt{end+1} = SingleTest('MonotoneTransDisc');
+            rpt{end+1} = SingleTest('MultTransDisc');
+            rpt{end+1} = SingleTest('PhiInvTransDisc');
+            rpt{end+1} = SingleTest('PhiTransDisc');
+            rpt{end+1} = SingleTest('PowerTransDisc');
+            rpt{end+1} = SingleTest('ProductDisc');
+            rpt{end+1} = SingleTest('RatioDisc');
+            rpt{end+1} = SingleTest('SqrTransDisc');
+            rpt{end+1} = SingleTest('SqrtTransDisc');
+            rpt{end+1} = SingleTest('TruncatedPDisc');
+            rpt{end+1} = SingleTest('TruncatedXDisc');
+            rpt{end+1} = SingleTest('TruncatedXlowDisc');
+            rpt{end+1} = SingleTest('TruncatedXhiDisc');
 
             % Forward and reverse transformation combinations;  NWJEFF: Many more possible.
-            SingleTest('ExpLogDisc');
-            SingleTest('LogitLogisticDisc');
-            WriteMarker([MarkerRoot 'DerivDiscFas']);
+            rpt{end+1} = SingleTest('ExpLogDisc');
+            rpt{end+1} = SingleTest('LogitLogisticDisc');
+            sectiontime = toc(sectiontime) / 60;
+            WriteMarker([MarkerRoot '4DerivDiscFas'],rpt,sectiontime);
         end
         
-        if DerivedDisc && Slow
-%            SingleTest('AttainPDisc');
-            SingleTest('ConvolutionDisc');
-            SingleTest('DifferenceDisc');
-%            SingleTest('InfMixDisc');
-%            SingleTest('MinBoundDisc');
-            SingleTest('OrderDisc');
-            SingleTest('OrderIIDDisc');
-            WriteMarker([MarkerRoot 'DerivDiscSlo']);
+        if Continuous && Slow   % iCase 5
+            rpt = cell(0,0);
+            sectiontime = tic;
+            rpt{end+1} = SingleTest('ChiSqNoncentral');
+            rpt{end+1} = SingleTest('dMATLABc');
+            rpt{end+1} = SingleTest('ExpSumT');
+            rpt{end+1} = SingleTest('FNoncentral');
+            rpt{end+1} = SingleTest('r');
+            rpt{end+1} = SingleTest('rNoncentral');
+            rpt{end+1} = SingleTest('Recinormal');
+            rpt{end+1} = SingleTest('SkewNor');
+            rpt{end+1} = SingleTest('StudRng');
+            rpt{end+1} = SingleTest('tNoncentral');
+            rpt{end+1} = SingleTest('tPowerEst');
+            rpt{end+1} = SingleTest('TriangularG');
+            rpt{end+1} = SingleTest('TriangularGCWP');
+            rpt{end+1} = SingleTest('VonMises');
+            rpt{end+1} = SingleTest('Wald');
+            sectiontime = toc(sectiontime) / 60;
+            WriteMarker([MarkerRoot '5CntSlo'],rpt,sectiontime);
+        end
+        
+
+        if Discrete && Slow   % iCase 6
+            rpt = cell(0,0);
+            sectiontime = tic;
+            %    rpt{end+1} = SingleTest('');
+            sectiontime = toc(sectiontime) / 60;
+            WriteMarker([MarkerRoot '6DisSlo'],rpt,sectiontime);
+        end
+        
+
+        if DerivedCont && Slow   % iCase 7
+            rpt = cell(0,0);
+            sectiontime = tic;
+            rpt{end+1} = SingleTest('AttainP');
+            rpt{end+1} = SingleTest('Convolution');
+            rpt{end+1} = SingleTest('Difference');
+            rpt{end+1} = SingleTest('InfMix');
+            rpt{end+1} = SingleTest('MinBound');
+            rpt{end+1} = SingleTest('Order');
+            rpt{end+1} = SingleTest('OrderIID');
+            sectiontime = toc(sectiontime) / 60;
+            WriteMarker([MarkerRoot '7DerivContSlo'],rpt,sectiontime);
+        end
+        
+
+        if DerivedDisc && Slow   % iCase 8
+            rpt = cell(0,0);
+            sectiontime = tic;
+%            rpt{end+1} = SingleTest('AttainPDisc');
+            rpt{end+1} = SingleTest('ConvolutionDisc');
+            rpt{end+1} = SingleTest('DifferenceDisc');
+%            rpt{end+1} = SingleTest('InfMixDisc');
+%            rpt{end+1} = SingleTest('MinBoundDisc');
+            rpt{end+1} = SingleTest('OrderDisc');
+            rpt{end+1} = SingleTest('OrderIIDDisc');
+            sectiontime = toc(sectiontime) / 60;
+            WriteMarker([MarkerRoot '8DerivDiscSlo'],rpt,sectiontime);
         end
         
         % Note: When running parallel, MATLAB reports xxx seconds testing time, but it appears to sum the
@@ -228,8 +253,10 @@ function Run(CaseNs)
     
 end  % function Run
 
-function WriteMarker(fName)
+function WriteMarker(fName,rpt,min)
 f = fopen([fName '.chk'],'wt');
+fprintf(f,'%s\n',rpt{:});
+fprintf(f,'%10.3f total minutes for this section.\n',min);
 fclose(f);
 end
 

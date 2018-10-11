@@ -405,6 +405,9 @@ classdef utGeneric < matlab.unittest.TestCase
                 return
             end
             
+            HoldWarn = testCase.Dist.SkipImpossibleWarn;
+            testCase.Dist.SkipImpossibleWarn = true;  % Turn off warnings about impossible data values
+            
             % Save current parameters & then perturb them slightly, to see whether estimation process recovers the original parms:
             %             t = size(testCase.xMLE)
             %             s=testCase.Dist.StringName
@@ -436,6 +439,7 @@ classdef utGeneric < matlab.unittest.TestCase
             
             % Reinstate the original parameter values:
             testCase.Dist.ResetParms(HoldParms);
+            testCase.Dist.SkipImpossibleWarn = HoldWarn;
         end
         
         function MomEstTest(testCase)

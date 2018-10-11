@@ -1,4 +1,4 @@
-function failedTests = SingleTest(sThisClass)
+function [rpt, failedTests] = SingleTest(sThisClass)  % NewJeff: Auto save failed tests?
     
     global WantPlots
     global GlobalSkipAllEst
@@ -46,6 +46,8 @@ function failedTests = SingleTest(sThisClass)
     s=evalc('disp(results)');
     wantloc=strfind(s,'Totals:');
     fprintf(['Summary of test result totals:\n' s(wantloc+8:end)]);
+    
+    rpt = sprintf('%10.3f for %s.',totalmins_elapsed,sThisClass);
     
     diary('off');
     
