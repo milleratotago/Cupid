@@ -1,5 +1,5 @@
-classdef InfMix < dContinuous  % Either
-    % InfMix(ParentDist,ParmDist,MixParmNum)
+classdef InfMix < dContinuous  % dEither
+    % InfMix(ParentDist,ParmDist,MixParmNum)  % Optional MixParmNum if ParentDist only has one parm?
     
     %{
 This random variable implements a mixture distribution in which a parameter of one

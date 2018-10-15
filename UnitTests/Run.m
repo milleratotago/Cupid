@@ -105,6 +105,7 @@ function Run(CaseNs)
             rpt{end+1} = SingleTest('BinomialZ');
             rpt{end+1} = SingleTest('BinomialMixed');
             rpt{end+1} = SingleTest('Geometric');
+            rpt{end+1} = SingleTest('NegativeBinomial');
             rpt{end+1} = SingleTest('Poisson');
             rpt{end+1} = SingleTest('RankDist');
             rpt{end+1} = SingleTest('UniformInt');
