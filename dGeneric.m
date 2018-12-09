@@ -682,7 +682,7 @@ classdef dGeneric < handle  % Calls by reference
             end
         end
         
-        function [SE, Cov] = MLSE(obj,X,ParmCodes)  % NWJEFF: I AM NOT CONFIDENT ABOUT THIS: Need testing, examples, and demos
+        function [SE, Cov] = MLSE(obj,X,ParmCodes)  % See DemoMLSE for examples.
             % Use Fisher Information to estimate the standard errors & covariance matrix
             % of the current parameter estimates with respect to the values in X.
             % This only returns values for the parameters with ParmCodes=='r';
