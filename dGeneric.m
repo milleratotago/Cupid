@@ -682,13 +682,23 @@ classdef dGeneric < handle  % Calls by reference
             end
         end
         
-        function [SE, Cov] = MLSE(obj,X,ParmCodes)  % See DemoMLSE for examples.
+        function [SE, Cov] = MLSE(obj,X,varargin)  % See DemoMLSE for examples.
             % Use Fisher Information to estimate the standard errors & covariance matrix
-            % of the current parameter estimates with respect to the values in X.
-            % This only returns values for the parameters with ParmCodes=='r';
+            %  of the current parameter estimates with respect to the values in X.
+            % This function should only be called after EstML(X) has been used to get ML
+            %  estimates for the parameters based on the data in X.
+            % This function only returns values for the parameters with ParmCodes=='r';
             %  nan's are returned for the parameters with other ParmCodes (e.g., 'f','i').
-            % Note: SEs may have twice as many terms as expected if some solutions have imaginary components.
+            % Notes:
+            %   MLSE changes parm values directly, so it may violate parameter constraints (e.g., produce normal sigma below zero).
+            %   SEs may have twice as many terms as expected if some solutions have imaginary components.
             
+            if numel(varargin)<1
+                ParmCodes = obj.DefaultParmCodes;
+            else
+                ParmCodes = varargin{1};
+            end
+
             NParms = obj.NDistParms;
             OrigParms = obj.ParmValues;
             F0 = LnLikelihood(obj,X);   % Ln likelihood at the current parameters

@@ -2,23 +2,23 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
     % dDiscrete is an abstract class for discrete distributions.
     % Every distribution is stored as a list of values with associated PDF and CDF.
     
-% Copyright (C) 2018 Jeffrey Owen Miller
-% 
-%     This program is free software: you can redistribute it and/or modify
-%     it under the terms of the GNU General Public License as published by
-%     the Free Software Foundation, either version 3 of the License, or
-%     any later version.
-% 
-%     This program is distributed in the hope that it will be useful,
-%     but WITHOUT ANY WARRANTY; without even the implied warranty of
-%     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-%     GNU General Public License for more details.
-% 
-%     You should have received a copy of the GNU General Public License
-%     along with this program (00License.txt). If not, see 
-%     <http://www.gnu.org/licenses/>.
-%
-
+    % Copyright (C) 2018 Jeffrey Owen Miller
+    %
+    %     This program is free software: you can redistribute it and/or modify
+    %     it under the terms of the GNU General Public License as published by
+    %     the Free Software Foundation, either version 3 of the License, or
+    %     any later version.
+    %
+    %     This program is distributed in the hope that it will be useful,
+    %     but WITHOUT ANY WARRANTY; without even the implied warranty of
+    %     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    %     GNU General Public License for more details.
+    %
+    %     You should have received a copy of the GNU General Public License
+    %     along with this program (00License.txt). If not, see
+    %     <http://www.gnu.org/licenses/>.
+    %
+    
     properties(SetAccess = protected)
         DiscreteX    % Sorted list of the X values in this distribution...
         DiscretePDF  % ... and their probabilities...
@@ -32,11 +32,11 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
     
     properties(SetAccess = public)
         XGrain     % A "graininess" factor for X that multiplies times eps(X) in checking Y values against DiscreteX values.
-                   % Y is accepted as equal to DiscreteX(i) if it is within XGrain*eps(DiscreteX(i))
+        % Y is accepted as equal to DiscreteX(i) if it is within XGrain*eps(DiscreteX(i))
         CDFGrain   % A "graininess" factor for CDF.  P is accepted as equal to DiscreteCDF(i) if it is within CDFGrain*eps(DiscreteCDF(i))
         ExhaustiveBins  % Set to true if all X values should be considered as falling within a bin.
     end
-
+    
     methods
         
         function obj=dDiscrete(FamName)
@@ -47,12 +47,12 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
             obj.CDFGrain = 2;  % InverseCDF returns a too-small value where CDF is increasing slowly
             obj.ExhaustiveBins = false;
         end
-
+        
         function []=ClearBeforeResetParmsD(obj)
             obj.Initialized = false;
             obj.StoredTablesInitialized = false;
         end
-
+        
         function []=TrimTables(obj,MinPDF,MaxCDF)
             % Trim the tables to remove X values with too-small PDF or too-large CDF
             HighPos = find(obj.DiscreteCDF>=MaxCDF,1);
@@ -137,7 +137,7 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
             for i=1:numel(X)
                 i_of_x = find(X(i)<=obj.DiscreteXmax,1);  % first bin such that X < DiscreteXmax
                 if (numel(i_of_x) == 1) && ( X(i) >= obj.DiscreteXmin(i_of_x) )
-                   thispdf(i) = obj.DiscretePDF(i_of_x);
+                    thispdf(i) = obj.DiscretePDF(i_of_x);
                 end
             end
         end
@@ -147,17 +147,17 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
             if ~obj.StoredTablesInitialized
                 MakeTables(obj);
             end
-            thiscdf = zeros(size(X));             
+            thiscdf = zeros(size(X));
             for i=1:numel(X)
                 i_of_x = find(X(i)<=obj.DiscreteXmax,1);
                 if (numel(i_of_x) == 0)
-                   thiscdf(i) = 1;
+                    thiscdf(i) = 1;
                 elseif i_of_x > 1
-                   thiscdf(i) = obj.DiscreteCDF(i_of_x);
+                    thiscdf(i) = obj.DiscreteCDF(i_of_x);
                 elseif X(i)>obj.DiscreteXmin(1)  % X is in the first bin
-                   thiscdf(i) = obj.DiscreteCDF(1);
+                    thiscdf(i) = obj.DiscreteCDF(1);
                 else
-                   thiscdf(i) = 0;      % X is below the first bin
+                    thiscdf(i) = 0;      % X is below the first bin
                 end
             end
         end
@@ -167,19 +167,19 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
             if ~obj.StoredTablesInitialized
                 MakeTables(obj);
             end
-%           Useful for debugging:
-%           try
-%           if min(P)<0
-%               disp('NJeff too small');
-%           elseif max(P)>obj.DiscreteCDFmax(end)
-%               disp('NJeff too large');
-%           end
-%           catch
-%               disp('Problem here');
-%           end
-%           if ~(min(P)>=0)&&(max(P)<=obj.DiscreteCDFmax(end))
-%               disp('Combined fail');
-%           end
+            %           Useful for debugging:
+            %           try
+            %           if min(P)<0
+            %               disp('NJeff too small');
+            %           elseif max(P)>obj.DiscreteCDFmax(end)
+            %               disp('NJeff too large');
+            %           end
+            %           catch
+            %               disp('Problem here');
+            %           end
+            %           if ~(min(P)>=0)&&(max(P)<=obj.DiscreteCDFmax(end))
+            %               disp('Combined fail');
+            %           end
             assert((min(P)>=0)&&(max(P)<=obj.DiscreteCDFmax(end)),['InverseCDF requires 0<=P<=1 but found min(P) and max(P) of ' num2str(min(P)) ' and ' num2str(max(P))]);
             thisval=zeros(size(P));
             for iel=1:numel(thisval)
@@ -217,7 +217,7 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
                 ToI = obj.NValues;
             end
         end
-
+        
         function thisval=SumX_CToNxPDF(obj,FromI,ToI,C,N)
             thisval = 0;
             for i = FromI:ToI
@@ -274,7 +274,7 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
                 thisval = obj.SumX_CToNxPDF(FromI,ToI,Around,N) / ConditionalP;
             end
         end
-
+        
         function thisval=ConditionalRawMoment(obj,FromX,ToX,N)
             thisval = obj.ConditionalMoment(FromX,ToX,0,N);
         end
@@ -322,32 +322,37 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
             % This function creates an output row vector BinMax defining the top edges of bins covering the RV's range.
             % Each bin covers a probability of at least MinPr.  Edges are moved slightly above observations to
             % avoid numerical problems (e.g., with histcounts).
-            PrUsed = 0;
-            NSaved = 0;
-
-            % Find the indices of the X's at the top of each bin:
-            BinIs = zeros(1,obj.NValues);  % Allocate the maximum space needed, if every value has its own bin.
-            while (PrUsed<1-MinPr)
-                NSaved = NSaved + 1;
-                i_of_p = find(obj.DiscreteCDFmax>=PrUsed+MinPr,1);
-                if numel(i_of_p)==0
-                    i_of_p = obj.NValues;  % Use the largest value
+            if obj.NValues <= 20
+                BinMax = obj.DiscreteX;
+                BinProb = obj.DiscretePDF;
+            else
+                PrUsed = 0;
+                NSaved = 0;
+                
+                % Find the indices of the X's at the top of each bin:
+                BinIs = zeros(1,obj.NValues);  % Allocate the maximum space needed, if every value has its own bin.
+                while (PrUsed<1-MinPr)
+                    NSaved = NSaved + 1;
+                    i_of_p = find(obj.DiscreteCDFmax>=PrUsed+MinPr,1);
+                    if numel(i_of_p)==0
+                        i_of_p = obj.NValues;  % Use the largest value
+                    end
+                    BinIs(NSaved) = i_of_p;
+                    PrUsed = obj.DiscreteCDF(i_of_p);
                 end
-                BinIs(NSaved) = i_of_p;
-                PrUsed = obj.DiscreteCDF(i_of_p);
+                if PrUsed<1
+                    % NSaved = NSaved + 1;  % Add the remaining probability into the final bin
+                    BinIs(NSaved) = numel(obj.DiscreteX);
+                end
+                BinIs(NSaved+1:end) = [];
+                try
+                    BinMax = ((obj.DiscreteX(BinIs) + obj.DiscreteXmax(BinIs))/2);  % Good place for bin boundary
+                catch
+                    disp('Error computing BinMax.');
+                end
+                BinCDF = obj.DiscreteCDF(BinIs);
+                BinProb = diff([0 BinCDF]);
             end
-            if PrUsed<1
-                % NSaved = NSaved + 1;  % Add the remaining probability into the final bin
-                BinIs(NSaved) = numel(obj.DiscreteX);
-            end
-            BinIs(NSaved+1:end) = [];
-            try
-                BinMax = ((obj.DiscreteX(BinIs) + obj.DiscreteXmax(BinIs))/2);  % Good place for bin boundary
-            catch
-                disp('Error computing BinMax.');
-            end
-            BinCDF = obj.DiscreteCDF(BinIs);
-            BinProb = diff([0 BinCDF]);
         end
         
     end  % methods

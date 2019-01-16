@@ -168,6 +168,30 @@ classdef dContinuous < dGeneric   % Calls by reference
             thisval =  PDFs .* (Xs-C).^N;
         end
         
+        function thisval=EVFun(obj,Fun,FromX,ToX)
+            % Expected value of any function of X.
+            % This function returns the integral from FromX to ToX of any function Fun(x) * PDF(x).
+            % It uses the distribution lower & upper bounds if FromX & ToX are not provided,
+            % or if either is empty or outside the corresponding bound.
+            assert(obj.Initialized,UninitializedError(obj));
+            if nargin==2
+                FromX = obj.LowerBound;
+                ToX = obj.UpperBound;
+            else
+                if (numel(FromX)==0) || (FromX<obj.LowerBound)
+                    FromX = obj.LowerBound;
+                end
+                if (numel(ToX)==0) || (ToX>obj.UpperBound)
+                    ToX = obj.UpperBound;
+                end
+            end
+            if FromX >= ToX
+                thisval = 0;
+            else
+                thisval = integral(@(x) PDF(obj,x).*(Fun(x)), FromX,ToX); % ,'AbsTol',AbsTol,'RelTol',RelTol);
+            end
+        end
+        
         function thisval=IntegralXToNxPDF(obj,FromX,ToX,N)
             % Returns the integral from FromX to ToX of X^N * PDF.   Note that the
             %  function value for N == 0 should be one and this property can

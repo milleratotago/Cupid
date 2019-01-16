@@ -1,13 +1,16 @@
-% Examples of Probit analysis
+%% Demo of Probit Analysis
+% This demo shows how to use Cupid for "probit analysis", which
+% I describe using the terminology of psychophysical experiments.
+% For further information, look in the PDF documentation file.
+%
+% The first part of the demo illustrates analyses for the yes/no task,
+% and the second part illustrates m-alternative forced-choice (mAFC) tasks.
 
 
-% The first part of this demo illustrates analyses for the yes/no task,
-% and the second part illustrates mAFC.
-
-
-%% ********************** Yes/no task
-
+%% Yes/no task, maximum-likelihood fit
+%
 % Generate some artificial data for illustrating the YN analyses.
+% Normally you would have your own data, which should be in an analogous format.
 
 mydist = Normal(50,5);                 % Hypothesized underlying distribution of X's
 Cs = mydist.InverseCDF(.10:.20:.90);   % A set of stimulus values at which to run tests.
@@ -17,41 +20,26 @@ PrCgreaterthanX = ...
     [.05 .31 .51 .71 .95];             % The proportion of times that X is less than Cs(i) for each i.
                                        % These are approximately the CDF values of the Cs, but not exactly so that the
                                        % distribution parameters will need some adjustment
-Gs = Ns .* PrCgreaterthanX;               % Number of observations of Cs(i) greater than X
+Gs = Ns .* PrCgreaterthanX;            % Number of observations of Cs(i) greater than X
 
-%% Illustrate the command YNProbitLnLikelihood:
-%  Compute the log-likelihood of a dataset (in this case, an artificial dataset)
-%  under the hypothesized distribution.
+%%
+% The sample data have now been generated.
+%%
+% Next we try to fit the sample data with the assumed underlying Normal distribution.
+% The fitting process estimates the mean and sd of the normal based on these artifical data, by maximizing likelihood.
+mydist.EstProbitYNML(Cs,Ns,Gs)
+%%
+% If you want, you can directly compute the likelihood of the sample data under the fitted distribution.
 mydist.YNProbitLnLikelihood(Cs,Ns,Gs)
 
-
-%% Illustrate the command EstProbitYNML
-
-%  Estimate the mean and sd of the best-fitting normal
-%  based on these artifical data, by maximizing likelihood.
-mydist.EstProbitYNML(Cs,Ns,Gs)
-
-mydist.YNProbitLnLikelihood(Cs,Ns,Gs)   % Note that the likelihood is a little larger with the new parameters
-
-
-mydist = Normal(50,5);  % Reset to the starting distribution.
-
-%% Illustrate the command YNProbitChiSq:
-%  Compute the chi-square goodness of fit of the artificial data
-%  under the distribution.
-mydist.YNProbitChiSq(Cs,Ns,Gs)
-
-%% Illustrate the command EstProbitYNChiSq
-%  Estimate the mean and sd of the best-fitting normal
-%  based on these artifical data, by minimizing chi-square.
+%% Yes/no task, minimum-chi-square fit
+% Alternatively, it is possible to estimate parameters by minimizing chi-square.
 mydist.EstProbitYNChiSq(Cs,Ns,Gs)
 
-mydist.YNProbitChiSq(Cs,Ns,Gs)   % Note that the chi-square is a little smaller with the new parameters
 
 
 
-%% ********************** mAFC tasks
-
+%% mAFC task, maximum-likelihood fit
 % Generate some artificial data to be used in illustrating the mAFC analyses.
 % In these tasks each response is "correct" or "incorrect".
 % Each response is correct if (Cs>X) || ( (Cs<X) && (there is a correct guess from mAFC alternatives) )
@@ -63,31 +51,14 @@ pCorrect = PrCgreaterthanX + ...
     (1-PrCgreaterthanX)/mAFC;     % pCorrect = PrCgreaterthanX plus correct guesses
 Gs = Ns .* pCorrect;              % Number of times the observed response is correct
 
-%% Illustrate the command mAFCProbitLnLikelihood:
-%  Compute the log-likelihood of the artificial data
-%  under the distribution.
-mydist.mAFCProbitLnLikelihood(mAFC,Cs,Ns,Gs)
-
-%% Illustrate the command EstProbitmAFCML
-%  Estimate the mean and sd of the best-fitting normal
-%  based on these artifical data, by maximizing likelihood.
+%%
+% Now we can use these simulated data to estimate the mean and sd of the best-fitting normal
+% based on these artifical data, by maximizing likelihood.
 mydist.EstProbitmAFCML(mAFC,Cs,Ns,Gs)
 
-mydist.mAFCProbitLnLikelihood(mAFC,Cs,Ns,Gs)   % Note that the likelihood is a little larger with the new parameters
 
-mydist = Normal(50,5);  % Reset to the starting distribution.
-
-%% Illustrate the command mAFCProbitChiSq:
-%  Compute the log-likelihood of the artificial data
-%  under the distribution.
-mydist.mAFCProbitChiSq(mAFC,Cs,Ns,Gs)
-
-
-%% Illustrate the command EstProbitmAFCChiSq
-%  Estimate the mean and sd of the best-fitting normal
-%  based on these artifical data, by minimizing chi-square.
+%% mAFC task, minimum-chi-square fit
+% Alternatively, it is possible to estimate parameters by minimizing chi-square.
 mydist.EstProbitmAFCChiSq(mAFC,Cs,Ns,Gs)
-
-mydist.mAFCProbitChiSq(mAFC,Cs,Ns,Gs)   % Note that the chi-square is a little smaller with the new parameters
 
 

@@ -141,6 +141,33 @@ classdef Beta < dContinuous
             end
         end
         
+        function [s,EndingVals,fval,exitflag,output]=EstMom(obj,TargetVals,varargin)
+            assert(obj.Initialized,UninitializedError(obj));
+            if (numel(varargin)==0) && (numel(TargetVals)==2)
+                Mu = TargetVals(1);
+                SigSqr = TargetVals(2);
+                SpecialCase = SigSqr < Mu*(1-Mu);
+            else
+                SpecialCase = false;
+            end
+            if SpecialCase
+                % In this case the 2 parameters can be computed directly from the two moments. For details
+                % see https://en.wikipedia.org/wiki/Beta_distribution#Two_unknown_parameters
+                common = Mu*(1-Mu)/SigSqr - 1;
+                PassA = Mu * common;
+                PassB = (1-Mu) * common;
+                obj.ResetParms([PassA, PassB]);
+                s = obj.StringName;
+                EndingVals = [PassA, PassB];
+                fval = 0;
+                exitflag = 0;
+                output = [];
+            else
+                [s,EndingVals,fval,exitflag,output]=EstMom@dGeneric(obj,TargetVals,varargin{:});
+            end
+            
+        end
+        
     end  % methods
     
 end  % class Beta

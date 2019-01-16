@@ -1,5 +1,4 @@
-% DemoMLSE
-
+%% Standard errors and confidence intervals of parameter estimates
 % This demo illustrates how to get standard errors & confidence intervals
 % for maximum likelihood parameter estimates using Fisher information.
 
@@ -12,18 +11,24 @@ Nxs = 50;
 dist = Normal(TrueMu,TrueSigma);
 xs = dist.Random(Nxs,1);
 
+%%
 % Fit the dist:
 dist.EstML(xs)
 
-% Compute the standard errors of estimation:
+%%
+% Use the MLSE function to compute the standard errors of estimation:
 [SE, Cov] = dist.MLSE(xs,'rr')
 
+%%
 % Compute 95% confidence intervals around the parameter estimates:
 zcrit = 1.96;  % for 95% confidence, 2-tailed
 mubounds = [dist.mu-zcrit*SE(1), dist.mu+zcrit*SE(1)]
 sigmabounds = [dist.sigma-zcrit*SE(2), dist.sigma+zcrit*SE(2)]
 
-%% Repeat this process many times and check how often the bounds capture the estimates:
+%%
+% To verify that the process works, repeat it many times
+% and check how often the bounds capture the estimates.
+% It should be 95% for 95% confidence intervals.
 nSims = 1000;
 
 nMuInbounds = 0;
