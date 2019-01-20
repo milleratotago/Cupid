@@ -1,0 +1,198 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Using native MATLAB probability distribution objects within Cupid</title><meta name="generator" content="MATLAB 9.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-01-16"><meta name="DC.source" content="Demo_dMATLAB.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Using native MATLAB probability distribution objects within Cupid</h1><!--introduction--><p>This demo illustrates how to use native MATLAB probability distribution objects within Cupid. In this demo file, the m* objects are MATLAB probability distributions, and the c* objects are Cupid distributions.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Example: Rician distribution</a></li><li><a href="#5">Example: A convolution of two Ricians</a></li><li><a href="#9">Example: The distribution of the minimum of two different Ricians</a></li></ul></div><h2 id="1">Example: Rician distribution</h2><p>Set up and use the Rician distribution as an example:</p><p>First, create a MATLAB probability distribution object. The Rician parameters s &amp; sigma are positive reals.</p><pre class="codeinput">mRician = makedist(<span class="string">'Rician'</span>,<span class="string">'s'</span>,2,<span class="string">'sigma'</span>,3);
+</pre><p>Create a new Cupid distribution based on the MATLAB Rician. 'rr' indicates that both parameters are real numbers, The lower bounds for the parameters are [0 0], and the upper bounds for the parameters are [+inf +inf]</p><pre class="codeinput">cRician = dMATLABc(mRician,<span class="string">'rr'</span>,[0 0],[+inf +inf]);
+</pre><p>That's it.  Now you can use any of Cupid's commands with this Rician distribution.  For example:</p><pre class="codeinput">cRician.PlotDens;
+[cRician.Mean, cRician.Variance]
+</pre><pre class="codeoutput">ans =
+       4.1665       4.6401
+</pre><img vspace="5" hspace="5" src="Demo_dMATLAB_01.png" alt=""> <p>You can even use Cupid's facilities to adjust the parameters of the Rician, here for example to give a desired mean and variance of 5. There are a lot of warnings that NCX2INV does not converge, however. Let's turn these off to avoid clutter.</p><pre class="codeinput">warning(<span class="string">'off'</span>,<span class="string">'stats:ncx2inv:NotConverge'</span>);
+warning(<span class="string">'off'</span>,<span class="string">'stats:ncx2inv:LastStep'</span>);
+cRician.EstMom([5 5])
+
+[cRician.Mean, cRician.Variance]
+</pre><pre class="codeoutput">The last step was:  -0.00005363The last step was:  -0.00002575The last step was:  -0.00002713The last step was:   0.00002715The last step was:  -0.00002706The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00002705The last step was:   0.00002705The last step was:   0.00005410The last step was:   0.00002705The last step was:  -0.00002705The last step was:  -0.00005410The last step was:   0.00002705The last step was:  -0.00002705The last step was:  -0.00002705The last step was:   0.00002705The last step was:  -0.00002705The last step was:   0.00005411The last step was:  -0.00002705The last step was:   0.00005410The last step was:  -0.00005410The last step was:  -0.00002705The last step was:   0.00005410The last step was:   0.00002705The last step was:  -0.00005410The last step was:  -0.00002705The last step was:   0.00005410The last step was:  -0.00005410The last step was:   0.00005410The last step was:  -0.00002705The last step was:  -0.00002705The last step was:   0.00005410The last step was:  -0.00002705The last step was:  -0.00005410The last step was:  -0.00002705The last step was:   0.00005410The last step was:   0.00002705The last step was:  -0.00002705The last step was:   0.00002705The last step was:  -0.00002705The last step was:   0.00002705The last step was:   0.00002705ans =
+Rician(4.0969,2.5705)
+ans =
+            5            5
+</pre><h2 id="5">Example: A convolution of two Ricians</h2><p>Since cRician is a Cupid distribution, it can be used with any of the transformed or derived distributions in Cupid. This example shows how to form the sum of two Ricians:</p><pre class="codeinput">cConv = Convolution(cRician,cRician);
+[cConv.Mean, cConv.Variance]
+</pre><pre class="codeoutput">ans =
+           10           10
+</pre><p>Note that this convolution has two copies of the same distribution object so they will necessarily always have same parameter values (even if parameters are adjusted). To avoid that, make separate cRician1 and cRician2 objects.</p><p>Adjust the parameters so that the convolution has a mean and variance of 11</p><pre class="codeinput">cConv.EstMom([11 11],<span class="string">'ffrr'</span>)
+</pre><pre class="codeoutput">The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00005515The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00002771The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002754The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002768The last step was:   0.00002705The last step was:   0.00005531The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00005547The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00005533The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00005533The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00005533The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00008298The last step was:   0.00002705The last step was:  -0.00011065The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002766The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002766The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002766The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00000692The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00005533The last step was:   0.00002705The last step was:   0.00005533The last step was:   0.00002705The last step was:  -0.00002766The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00002766The last step was:   0.00002705The last step was:  -0.00005532The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002766The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00002766The last step was:   0.00002705The last step was:   0.00002766The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00002766The last step was:   0.00002705The last step was:   0.00002766The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002766The last step was:   0.00002705The last step was:   0.00005533The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00005532The last step was:   0.00002705The last step was:  -0.00002766The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00005533The last step was:   0.00002705The last step was:  -0.00002766The last step was:   0.00002705The last step was:  -0.00005533The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00002766The last step was:   0.00002705The last step was:  -0.00002766The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00005532The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00002766The last step was:   0.00002705The last step was:   0.00002766The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00005533The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00002766The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00001383The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00005532The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00005533The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002766The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00002766The last step was:   0.00002705The last step was:  -0.00002766The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00005533The last step was:   0.00002705The last step was:  -0.00001383The last step was:   0.00002705The last step was:   0.00002766The last step was:   0.00002705The last step was:   0.00005533The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00005533The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00005532The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002766The last step was:   0.00002705The last step was:   0.00005533The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00005532The last step was:   0.00002705The last step was:   0.00005533The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00002766The last step was:   0.00002705The last step was:   0.00002766The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00005532The last step was:   0.00002705The last step was:   0.00002705The last step was:   0.00005533The last step was:   0.00002705The last step was:   0.00002705The last step was:  -0.00002766The last step was:   0.00002705The last step was:  -0.00002766ans =
+Convolution(Rician(4.6855,2.6265),Rician(4.6855,2.6265))
+</pre><p>To save time, the 'ffrr' parameter tells Cupid not to adjust the parameters of the first distribution, since they are actually identical to the parameters of the second distribution (remember, it is all one distribution). Unfortunately, 'rrff' does not also work, because of how Cupid sets parameters.</p><pre class="codeinput">[cConv.Mean, cConv.Variance]
+
+cConv.PlotDens
+</pre><pre class="codeoutput">ans =
+           11           11
+</pre><img vspace="5" hspace="5" src="Demo_dMATLAB_02.png" alt=""> <h2 id="9">Example: The distribution of the minimum of two different Ricians</h2><p>For simplicity, re-use the previous Rician, resetting its parameters to some arbitrary desired values.</p><pre class="codeinput">cRician.ResetParms([2 3]);
+</pre><p>Make a second Cupid Rician distribution so that it can have different parameter values than the original one.</p><pre class="codeinput">mRician2 = makedist(<span class="string">'Rician'</span>,<span class="string">'s'</span>,2.5,<span class="string">'sigma'</span>,3);
+cRician2 = dMATLABc(mRician2,<span class="string">'rr'</span>,[0 0],[+inf +inf]);  <span class="comment">% s &amp; sigma are positive reals.</span>
+</pre><p>Now create the distribution of the minimum (i.e., 1st order statistic) of these two Ricians:</p><pre class="codeinput">cOrder = Order(1,cRician,cRician2);
+cOrder.PlotDens;
+cOrder.CDF([2 4])
+</pre><pre class="codeoutput">ans =
+      0.28562      0.74341
+</pre><img vspace="5" hspace="5" src="Demo_dMATLAB_03.png" alt=""> <p>Even though its underlying distributions were derived from MATLAB distributions, all of the usual Cupid functions work with it.  For example, next we adjust the parameters of the second Rician so that the distribution of the minimum has CDF(2)=.25 and CDF(4)=.75:</p><pre class="codeinput">cOrder.EstPctile([2 4],[.25 .75],<span class="string">'fffrr'</span>)  <span class="comment">% fix the ith order parameter and the two parameter values of the first Rician</span>
+cOrder.CDF([2 4])
+</pre><pre class="codeoutput">The last step was:  -0.00005196The last step was:  -0.00005257The last step was:   0.00005341The last step was:  -0.00011174The last step was:   0.00002982The last step was:  -0.00005512The last step was:  -0.00005481The last step was:   0.00002891The last step was:  -0.00005674The last step was:  -0.00002815The last step was:  -0.00002813The last step was:   0.00005684The last step was:   0.00002829The last step was:   0.00002836The last step was:  -0.00002836The last step was:  -0.00002836The last step was:  -0.00002836The last step was:  -0.00002836The last step was:  -0.00005672The last step was:   0.00008508The last step was:   0.00005672The last step was:   0.00005672The last step was:   0.00005672The last step was:   0.00002836The last step was:   0.00005672The last step was:   0.00005672The last step was:   0.00005672The last step was:  -0.00005672The last step was:   0.00005672The last step was:   0.00008508The last step was:  -0.00002836The last step was:   0.00005672The last step was:  -0.00002836The last step was:  -0.00005672The last step was:   0.00005672The last step was:  -0.00005672The last step was:   0.00002836The last step was:  -0.00002836The last step was:   0.00002836The last step was:  -0.00005672The last step was:  -0.00002836The last step was:   0.00005672The last step was:   0.00005672The last step was:   0.00005672The last step was:   0.00005672The last step was:   0.00002836The last step was:   0.00002836The last step was:  -0.00005672The last step was:  -0.00005672The last step was:   0.00002836The last step was:   0.00005672The last step was:  -0.00002836The last step was:  -0.00005672The last step was:   0.00002836The last step was:  -0.00008508The last step was:  -0.00005672The last step was:  -0.00002836The last step was:  -0.00005672The last step was:  -0.00002836The last step was:  -0.00005672The last step was:  -0.00002836The last step was:   0.00005672The last step was:  -0.00005672ans =
+Order(1,Rician(2,3),Rician(3.6113,1.8049))
+ans =
+         0.25         0.75
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2016b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Using native MATLAB probability distribution objects within Cupid
+% This demo illustrates how to use native MATLAB probability distribution objects within Cupid.
+% In this demo file, the m* objects are MATLAB probability distributions,
+% and the c* objects are Cupid distributions.
+
+%% Example: Rician distribution
+% Set up and use the Rician distribution as an example:
+%
+% First, create a MATLAB probability distribution object.
+% The Rician parameters s & sigma are positive reals.
+mRician = makedist('Rician','s',2,'sigma',3);
+
+%%
+% Create a new Cupid distribution based on the MATLAB Rician.
+% 'rr' indicates that both parameters are real numbers,
+% The lower bounds for the parameters are [0 0],
+% and the upper bounds for the parameters are [+inf +inf]
+cRician = dMATLABc(mRician,'rr',[0 0],[+inf +inf]);
+
+%%
+% That's it.  Now you can use any of Cupid's commands
+% with this Rician distribution.  For example:
+cRician.PlotDens;
+[cRician.Mean, cRician.Variance]
+
+%%
+% You can even use Cupid's facilities to adjust the parameters of the Rician,
+% here for example to give a desired mean and variance of 5.
+% There are a lot of warnings that NCX2INV does not converge, however.
+% Let's turn these off to avoid clutter.
+warning('off','stats:ncx2inv:NotConverge');
+warning('off','stats:ncx2inv:LastStep');
+cRician.EstMom([5 5])
+
+[cRician.Mean, cRician.Variance]
+
+%% Example: A convolution of two Ricians
+% Since cRician is a Cupid distribution, it can be used with any
+% of the transformed or derived distributions in Cupid.
+% This example shows how to form the sum of two Ricians:
+
+cConv = Convolution(cRician,cRician);
+[cConv.Mean, cConv.Variance]
+%%
+% Note that this convolution has two copies of the same distribution object so they
+% will necessarily always have same parameter values (even if parameters are adjusted).
+% To avoid that, make separate cRician1 and cRician2 objects.
+
+%%
+% Adjust the parameters so that the convolution has a mean and variance of 11
+cConv.EstMom([11 11],'ffrr')
+%%
+% To save time, the 'ffrr' parameter tells Cupid not to adjust the parameters of the first distribution, since
+% they are actually identical to the parameters of the second distribution (remember, it is all one distribution).
+% Unfortunately, 'rrff' does not also work, because of how Cupid sets parameters.
+
+[cConv.Mean, cConv.Variance]
+
+cConv.PlotDens
+
+%%  Example: The distribution of the minimum of two different Ricians
+%
+% For simplicity, re-use the previous Rician, resetting its parameters to some arbitrary desired values.
+cRician.ResetParms([2 3]);
+
+%%
+% Make a second Cupid Rician distribution so that it can have different parameter values than the original one.
+mRician2 = makedist('Rician','s',2.5,'sigma',3);
+cRician2 = dMATLABc(mRician2,'rr',[0 0],[+inf +inf]);  % s & sigma are positive reals.
+
+%%
+% Now create the distribution of the minimum (i.e., 1st order statistic) of these two Ricians:
+cOrder = Order(1,cRician,cRician2);
+cOrder.PlotDens;
+cOrder.CDF([2 4])
+
+%%
+% Even though its underlying distributions were derived from MATLAB distributions,
+% all of the usual Cupid functions work with it.  For example, next we adjust the
+% parameters of the second Rician so that the distribution of the minimum has
+% CDF(2)=.25 and CDF(4)=.75:
+cOrder.EstPctile([2 4],[.25 .75],'fffrr')  % fix the ith order parameter and the two parameter values of the first Rician
+cOrder.CDF([2 4])
+
+
+##### SOURCE END #####
+--></body></html>

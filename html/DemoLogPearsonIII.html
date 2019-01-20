@@ -1,0 +1,169 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Constructing a complex distribution with a series of transformations.</title><meta name="generator" content="MATLAB 9.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-01-16"><meta name="DC.source" content="DemoLogPearsonIII.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Constructing a complex distribution with a series of transformations.</h1><p>As an example of how to construct a complex distribution with a series of transformations, this demo shows how to make a <i>Log-Pearson III</i> distribution. According to <a href="http://daad.wb.tu-harburg.de/?id=522">http://daad.wb.tu-harburg.de/?id=522</a> , the Pearson III distribution is a shifted gamma with shift c, and the Log-Pearson III is the exponentiate version of that. So, to build this distribution we need the following sequence of steps: # Make a gamma distribution. # Shift the gamma distribution with an additive constant. # Exponentiate the shifted gamma.</p><p>Start by making a gamma distribution:</p><pre class="codeinput">GammaShape = 4;
+GammaRate = 20;
+startGamma = RNGamma(GammaShape,GammaRate);
+</pre><p>Shift the gamma by adding in a constant. The resulting distribution is a Pearson III distribution:</p><pre class="codeinput">ShiftConst = 2;
+PearsonIII = AddTrans(startGamma,ShiftConst);
+</pre><p>According to the same site, the Log-Pearson III is a distribution whose log is Pearson III. That means that the Log-Pearson III distribution is an exponential transformation of the original PearsonIII. (Because, taking the log will undo the exponential transform.) So, we can make the desired Log-Pearson III by using the Exp transform:</p><pre class="codeinput">LogPearsonIII = ExpTrans(PearsonIII);
+</pre><p>We are done. The constructed LogPearsonIII is now an example of a Log Pearson III distribution.</p><p>Let's see what it looks like (with its current parameters):</p><pre class="codeinput">LogPearsonIII.PlotDens;
+</pre><img vspace="5" hspace="5" src="DemoLogPearsonIII_01.png" alt=""> <p>Here are a few of its properties:</p><pre class="codeinput">LPIIImean = LogPearsonIII.Mean
+LPIIImedian = LogPearsonIII.Median
+LPIIIsd = LogPearsonIII.SD
+</pre><pre class="codeoutput">LPIIImean =
+       9.0718
+LPIIImedian =
+       8.8782
+LPIIIsd =
+      0.95825
+</pre><p>If we had some data we could estimate the parameters, so let's make up some fake data to use for that. Normally you would use your own real data.</p><pre class="codeinput">NDataPoints = 200;
+FakeData = RNGamma(7,1).Random(NDataPoints,1) + 3;  <span class="comment">% Just some arbitrary data.</span>
+</pre><p>Now estimate the distribution's parameters (by maximum likelihood) based on the fake data. (This may take a minute):</p><pre class="codeinput">LogPearsonIII.EstML(FakeData)
+</pre><pre class="codeoutput"> 
+Exiting: Maximum number of function evaluations has been exceeded
+         - increase MaxFunEvals option.
+         Current function value: 448.811200 
+
+ans =
+ExpTrans(AddTrans(RNGamma(271122.4542,2181.3684),-122.0326))
+</pre><p>Plot the new distribution with the estimated parameters:</p><pre class="codeinput">LogPearsonIII.PlotDens;
+</pre><img vspace="5" hspace="5" src="DemoLogPearsonIII_02.png" alt=""> <p>For comparison purposes, make a histogram of the (fake) data:</p><pre class="codeinput">figure; histogram(FakeData,<span class="string">'normalization'</span>,<span class="string">'pdf'</span>);
+</pre><img vspace="5" hspace="5" src="DemoLogPearsonIII_03.png" alt=""> <p>Presumably, the distribution with the estimated parameters should match up pretty well with the histogram.</p><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2016b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Constructing a complex distribution with a series of transformations.
+% As an example of how to construct a complex distribution with a series
+% of transformations, this demo shows how to make a _Log-Pearson III_ distribution.
+% According to http://daad.wb.tu-harburg.de/?id=522 ,
+% the Pearson III distribution is a shifted gamma with shift c,
+% and the Log-Pearson III is the exponentiate version of that.
+% So, to build this distribution we need the following sequence of steps:
+% # Make a gamma distribution.
+% # Shift the gamma distribution with an additive constant.
+% # Exponentiate the shifted gamma.
+%
+% Start by making a gamma distribution:
+
+GammaShape = 4;
+GammaRate = 20;
+startGamma = RNGamma(GammaShape,GammaRate);
+
+%%
+% Shift the gamma by adding in a constant. The resulting distribution
+% is a Pearson III distribution:
+ShiftConst = 2;
+PearsonIII = AddTrans(startGamma,ShiftConst);
+
+%%
+% According to the same site, the Log-Pearson III
+% is a distribution whose log is Pearson III.
+% That means that the Log-Pearson III distribution is an
+% exponential transformation of the original PearsonIII.
+% (Because, taking the log will undo the exponential transform.)
+% So, we can make the desired Log-Pearson III by using the Exp transform:
+
+LogPearsonIII = ExpTrans(PearsonIII);
+%%
+% We are done. The constructed LogPearsonIII is now an example of a Log Pearson III distribution.
+%
+% Let's see what it looks like (with its current parameters):
+LogPearsonIII.PlotDens;
+
+%%
+% Here are a few of its properties:
+LPIIImean = LogPearsonIII.Mean
+LPIIImedian = LogPearsonIII.Median
+LPIIIsd = LogPearsonIII.SD
+
+%%
+% If we had some data we could estimate the parameters,
+% so let's make up some fake data to use for that.
+% Normally you would use your own real data.
+NDataPoints = 200; 
+FakeData = RNGamma(7,1).Random(NDataPoints,1) + 3;  % Just some arbitrary data.
+
+%%
+% Now estimate the distribution's parameters 
+% (by maximum likelihood) based on the fake data.
+% (This may take a minute):
+LogPearsonIII.EstML(FakeData)
+
+%%
+% Plot the new distribution with the estimated parameters:
+LogPearsonIII.PlotDens;
+
+%%
+% For comparison purposes, make a histogram of the (fake) data:
+figure; histogram(FakeData,'normalization','pdf');
+%%
+% Presumably, the distribution with the estimated parameters
+% should match up pretty well with the histogram.
+
+
+##### SOURCE END #####
+--></body></html>

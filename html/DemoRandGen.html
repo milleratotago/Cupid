@@ -1,0 +1,463 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Multivariate random number generation demo</title><meta name="generator" content="MATLAB 9.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-01-16"><meta name="DC.source" content="DemoRandGen.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Multivariate random number generation demo</h1><!--introduction--><p>This demo illustrates how the class "RandGen" can be used to generate multivariate random numbers. The marginals of the different RVs can be any distributions known to CUPID, and the marginal distributions can all be different.</p><p>In the first several examples, RandGen functions are used directly in a non-object-oriented (OO) fashion. The last examples show how to use RandGen in an OO fashion.</p><p>IMPORTANT: RandGen uses some routines from ExtractNameVal at https://github.com/milleratotago/ExtractNameVal so you need to have that in addition to Cupid.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">A simple non-OO example</a></li><li><a href="#7">Relation of correlations to RhoController values (non-OO).</a></li><li><a href="#9">Adjusting RhoController values to get desired correlations (non-OO).</a></li><li><a href="#11">An example with discrete random variables (non-OO)</a></li><li><a href="#12">Example of object-oriented use</a></li><li><a href="#17">An OO example with discrete RVs</a></li></ul></div><h2 id="1">A simple non-OO example</h2><pre class="codeinput">NCases = 25;  <span class="comment">% Number of random cases to be generated.</span>
+</pre><p>Specify the number of random variables (RVs) and their marginal distributions.</p><pre class="codeinput">NRVs = 3;
+RVs = cell(NRVs,1);
+RVs{1} = Normal(0,1);   <span class="comment">% Each RV can be any legal Cupid distribution.</span>
+RVs{2} = Exponential(.01);
+RVs{3} = Triangular(20,50);
+</pre><p>Specify the upper triangular of a matrix determining the correlations among the RVs.</p><pre class="codeinput">RhoControllers = <span class="keyword">...</span>
+    [ 1  0.4  0.2; <span class="keyword">...</span>
+    0   1   0.6; <span class="keyword">...</span>
+    0   0    1   ];
+RhoControllers = RhoControllers + triu(RhoControllers,1)';  <span class="comment">% Copy the upper triangular portion into the lower triangular.</span>
+</pre><p>IMPORTANT NOTE:  The numbers in this RhoController matrix are not the <i>actual</i> correlations among the RVs. They are only monotonically related to those correlations. There is more information about this in a later example describing how to adjust the RhoControllers to get a desired true correlation matrix.</p><pre class="codeinput">randoms = RandGen.GenRands(RVs,RhoControllers,NCases)
+</pre><pre class="codeoutput">randoms =
+     -0.28561       18.476       35.437
+      0.13116       69.813        40.03
+     -0.37353       14.645       28.975
+      0.77297        116.9       34.137
+      -1.0784       6.9469       25.543
+      0.21603       40.144       33.036
+     -0.93824       32.187       28.725
+      0.17117        99.25       29.259
+      -0.4383       53.554       35.339
+     -0.61158       24.555       40.476
+       1.7412       217.82       38.493
+      0.27992       32.111       35.312
+       0.8435        199.8       46.968
+      -0.2604       9.1523       26.602
+     -0.41277       58.544        28.13
+      -0.9547       1.5326       28.992
+     -0.85605       76.135       34.957
+     0.075247       197.45       35.306
+    -0.027699       28.996       35.679
+     -0.43733      0.17938       25.999
+       1.0169       154.61       37.462
+     -0.79015       41.422       33.216
+    -0.096663       217.79       43.088
+    -0.004617       84.924       40.841
+       1.3102       75.516       34.505
+</pre><p>Note that NCases is a vector, which is somewhat different than the usual convention when generating random numbers.  For example,</p><pre class="codeinput">u = rand(10);
+</pre><p>produces a 10x10 matrix of random numbers.</p><h2 id="7">Relation of correlations to RhoController values (non-OO).</h2><p>Continuing on the simple example, this section shows that the true correlations among these RVs do NOT match the numbers in RhoControllers.  For the example, this is done by generating a large number of cases so that the true correlations can be estimated very accurately.  That is, the number of cases is large enough that the mismatches between computed correlations and RhoController values are not just due to random error.</p><pre class="codeinput">NCases = 5000;
+randoms = RandGen.GenRands(RVs,RhoControllers,NCases);
+obscorrs = corr(randoms)
+</pre><pre class="codeoutput">obscorrs =
+            1      0.36919      0.18975
+      0.36919            1      0.53191
+      0.18975      0.53191            1
+</pre><p>Note that the observed correlations do not match the values in RhoControllers.</p><h2 id="9">Adjusting RhoController values to get desired correlations (non-OO).</h2><p>So how do you get the specific target correlations that you want? For convenience, GenRands can be told to adjust the RhoControllers automatically to give you the target correlations that you want. This allows you to skip the FindRhoControllerMatrix step from the previous section.</p><pre class="codeinput">TargetCorrs = <span class="keyword">...</span>
+    [ 1  0.5  0.3; <span class="keyword">...</span>
+    0   1   0.5; <span class="keyword">...</span>
+    0   0    1   ]
+</pre><pre class="codeoutput">TargetCorrs =
+            1          0.5          0.3
+            0            1          0.5
+            0            0            1
+</pre><p>The optional argument 'Adjust' tells GenRands to find the required RhoControllers itself. With that argument, you can also specify a value for NStepsApprox (the default is 200).</p><pre class="codeinput">NCases = 250000;   <span class="comment">% Generate a lot of random numbers to get good estimates of the correlations.</span>
+randoms = RandGen.GenRands(RVs,TargetCorrs,NCases,<span class="string">'Adjust'</span>,<span class="string">'NSteps'</span>,500);
+
+corr(randoms)  <span class="comment">% Check that the correlations are in fact quite close to our targets.</span>
+</pre><pre class="codeoutput">ans =
+            1      0.49978      0.29865
+      0.49978            1      0.49916
+      0.29865      0.49916            1
+</pre><h2 id="11">An example with discrete random variables (non-OO)</h2><p>Nothing is really different except that the random variables are discrete.</p><pre class="codeinput">NRVs = 2;
+RVs = cell(NRVs,1);
+RVs{1}=Poisson(23);   <span class="comment">% The Poisson parameter is the mean</span>
+RVs{2}=Poisson(12);
+TargetCorrs = [1  0.3; 0.3 1];  <span class="comment">% Replace 0.3 with whatever correlation you want.</span>
+NCases = 10000;
+r = RandGen.GenRands(RVs,TargetCorrs,NCases,<span class="string">'Adjust'</span>,<span class="string">'NSteps'</span>,500);
+corr(r)
+figure; histogram(r(:,1));
+</pre><pre class="codeoutput">ans =
+            1      0.30287
+      0.30287            1
+</pre><img vspace="5" hspace="5" src="DemoRandGen_01.png" alt=""> <h2 id="12">Example of object-oriented use</h2><p>Define the random variables pretty much as before.</p><pre class="codeinput">NRVs = 3;
+RVs = cell(NRVs,1);
+RVs{1} = RNGamma(4,.05);   <span class="comment">% Each RV can be any legal Cupid distribution.</span>
+RVs{2} = Exponential(.01);
+RVs{3} = Triangular(20,50);
+
+TargetCorrs = <span class="keyword">...</span>
+    [ 1 -0.2  0.8; <span class="keyword">...</span>
+    0   1  -0.4; <span class="keyword">...</span>
+    0   0    1   ]
+</pre><pre class="codeoutput">TargetCorrs =
+            1         -0.2          0.8
+            0            1         -0.4
+            0            0            1
+</pre><p>Now create a new random number generator object. It needs the same information as before to specify the multivariate distribution.</p><pre class="codeinput">mymultivar = RandGen(RVs,TargetCorrs,<span class="string">'Adjust'</span>,<span class="string">'NSteps'</span>,500,<span class="string">'Histograms'</span>,<span class="string">'Scattergrams'</span>);
+
+disp(<span class="string">'Here are the values of RhoControllers, in case you want to save them for later re-use:'</span>);
+temp1 = mymultivar.RhoControllers
+disp(<span class="string">'FYI, here are the maximum &amp; minimal attainable correlations with these RVs:'</span>);
+tempMax = mymultivar.RhoMax
+tempMin = mymultivar.RhoMin
+</pre><pre class="codeoutput">Here are the values of RhoControllers, in case you want to save them for later re-use:
+temp1 =
+            1     -0.23248      0.82515
+     -0.23248            1     -0.44444
+      0.82515     -0.44444            1
+FYI, here are the maximum &amp; minimal attainable correlations with these RVs:
+tempMax =
+            0      0.97757      0.96906
+            0            0      0.89582
+            0            0            0
+tempMin =
+            0      -0.7875     -0.96906
+            0            0     -0.89582
+            0            0            0
+</pre><p>Now call the object's function to generate some random numbers from this distribution. By default, this function will also produce a histogram for each variable and a scatterplot for each pair of variables.</p><pre class="codeinput">r=mymultivar.Rands(10000);
+</pre><img vspace="5" hspace="5" src="DemoRandGen_02.png" alt=""> <img vspace="5" hspace="5" src="DemoRandGen_03.png" alt=""> <img vspace="5" hspace="5" src="DemoRandGen_04.png" alt=""> <img vspace="5" hspace="5" src="DemoRandGen_05.png" alt=""> <img vspace="5" hspace="5" src="DemoRandGen_06.png" alt=""> <img vspace="5" hspace="5" src="DemoRandGen_07.png" alt=""> <p>Here is how you would turn off automatic plotting of the two figures.</p><pre class="codeinput">mymultivar.WantHistograms = false;
+mymultivar.WantScattergrams = false;
+r2=mymultivar.Rands(10000);  <span class="comment">% No figures are plotted.</span>
+</pre><p>When would you want to use the OO approach?  Its main advantage is that it is faster if you generate many sets of random numbers from the same multivariate distribution.  This is because the object "remembers" the adjusted RhoControllers values so that you can get repeated samples from the same multivariate distribution without going through the (slow) RhoController adjustment step each time.  Here is an example:</p><pre class="codeinput">NSamples = 3;
+NCases = 10;
+
+<span class="keyword">for</span> iSample = 1:NSamples
+    ThisSample = mymultivar.Rands(NCases)
+    <span class="comment">% Some processing of ThisSample</span>
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">ThisSample =
+       38.553       25.175       29.746
+       69.899       73.752       34.621
+       166.38       64.153       41.835
+       78.671          247       38.866
+       56.851       91.422       32.862
+        96.38       4.4011       42.733
+       64.569       323.84       33.342
+       86.457       48.361       37.091
+       52.266       71.049       32.462
+        154.9       10.515       43.236
+ThisSample =
+       53.158       61.693       39.057
+       53.608       3.6771       36.407
+       50.438       93.594       25.378
+       42.185       19.307       32.382
+       77.262       201.14       34.288
+       159.64       63.726         40.8
+       95.502       38.426       35.384
+       99.551        174.4       31.344
+       37.333       225.91       28.048
+       60.562       18.624       34.889
+ThisSample =
+       76.746       162.32       36.611
+       71.799       71.553       35.144
+       93.342       42.625        35.29
+       79.596       7.4497       40.322
+       55.808       26.111       36.183
+        45.45       135.38       25.989
+       92.778       330.03       38.065
+       33.625       87.599       29.358
+       148.96       48.918       44.945
+       108.39       72.374       39.823
+</pre><h2 id="17">An OO example with discrete RVs</h2><pre class="codeinput">NRVs = 3;
+RVs = cell(NRVs,1);
+RVs{1} = Poisson(4);   <span class="comment">% Each RV can be any legal Cupid distribution.</span>
+RVs{2} = UniformInt(1,10);
+RVs{3} = Binomial(20,.5);
+
+TargetCorrs = <span class="keyword">...</span>
+    [ 1 -0.2  0.8; <span class="keyword">...</span>
+    0   1  -0.4; <span class="keyword">...</span>
+    0   0    1   ]
+
+mymultivar = RandGen(RVs,TargetCorrs,<span class="string">'Adjust'</span>,<span class="string">'NSteps'</span>,500,<span class="string">'Histograms'</span>,<span class="string">'Scattergrams'</span>);
+</pre><pre class="codeoutput">TargetCorrs =
+            1         -0.2          0.8
+            0            1         -0.4
+            0            0            1
+</pre><p>Here are the values of RhoControllers, in case you want to save them for later re-use. mymultivar holds onto them, but you might want to save them in a file to speed up later runs.</p><pre class="codeinput">temp1 = mymultivar.RhoControllers
+disp(<span class="string">'FYI, here are the maximum &amp; minimal attainable correlations with these RVs:'</span>);
+tempMax = mymultivar.RhoMax
+tempMin = mymultivar.RhoMin
+
+r=mymultivar.Rands(10000);
+
+mymultivar.WantHistograms = false;
+mymultivar.WantScattergrams = false;
+</pre><pre class="codeoutput">temp1 =
+            1     -0.21075      0.82146
+     -0.21075            1     -0.41673
+      0.82146     -0.41673            1
+FYI, here are the maximum &amp; minimal attainable correlations with these RVs:
+tempMax =
+            0      0.95409      0.97559
+            0            0      0.95952
+            0            0            0
+tempMin =
+            0     -0.95409     -0.97559
+            0            0     -0.95952
+            0            0            0
+</pre><img vspace="5" hspace="5" src="DemoRandGen_08.png" alt=""> <img vspace="5" hspace="5" src="DemoRandGen_09.png" alt=""> <img vspace="5" hspace="5" src="DemoRandGen_10.png" alt=""> <img vspace="5" hspace="5" src="DemoRandGen_11.png" alt=""> <img vspace="5" hspace="5" src="DemoRandGen_12.png" alt=""> <img vspace="5" hspace="5" src="DemoRandGen_13.png" alt=""> <p>Now verify that the random numbers from this distribution have the desired correlations.</p><pre class="codeinput">NCases = 250000;
+ThisSample = mymultivar.Rands(NCases);
+corr(ThisSample)
+<span class="keyword">for</span> iRV = 1:NRVs
+    figure;
+    histogram(ThisSample(:,iRV));
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">ans =
+            1     -0.19919      0.79999
+     -0.19919            1     -0.39903
+      0.79999     -0.39903            1
+</pre><img vspace="5" hspace="5" src="DemoRandGen_14.png" alt=""> <img vspace="5" hspace="5" src="DemoRandGen_15.png" alt=""> <img vspace="5" hspace="5" src="DemoRandGen_16.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2016b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Multivariate random number generation demo
+% This demo illustrates how the class "RandGen" can be used to generate multivariate random numbers.
+% The marginals of the different RVs can be any distributions known to CUPID,
+% and the marginal distributions can all be different.
+%
+% In the first several examples, RandGen functions are used directly in a non-object-oriented (OO) fashion.
+% The last examples show how to use RandGen in an OO fashion.
+%
+% IMPORTANT: RandGen uses some routines from ExtractNameVal at https://github.com/milleratotago/ExtractNameVal
+% so you need to have that in addition to Cupid.
+
+%% A simple non-OO example
+
+NCases = 25;  % Number of random cases to be generated.
+
+%%
+% Specify the number of random variables (RVs)
+% and their marginal distributions.
+NRVs = 3;
+RVs = cell(NRVs,1);
+RVs{1} = Normal(0,1);   % Each RV can be any legal Cupid distribution.
+RVs{2} = Exponential(.01);
+RVs{3} = Triangular(20,50);
+
+%%
+% Specify the upper triangular of a matrix determining
+% the correlations among the RVs.
+RhoControllers = ...
+    [ 1  0.4  0.2; ...
+    0   1   0.6; ...
+    0   0    1   ];
+RhoControllers = RhoControllers + triu(RhoControllers,1)';  % Copy the upper triangular portion into the lower triangular.
+%%
+% IMPORTANT NOTE:  The numbers in this RhoController matrix
+% are not the _actual_ correlations among the RVs.
+% They are only monotonically related to those correlations.
+% There is more information about this in a later example
+% describing how to adjust the RhoControllers to get
+% a desired true correlation matrix.
+
+randoms = RandGen.GenRands(RVs,RhoControllers,NCases)
+
+%%
+% Note that NCases is a vector, which is somewhat different than the usual
+% convention when generating random numbers.  For example,
+u = rand(10);
+%%
+% produces a 10x10 matrix of random numbers.
+
+%% Relation of correlations to RhoController values (non-OO).
+% Continuing on the simple example, this section shows that the true correlations
+% among these RVs do NOT match the numbers in RhoControllers.  For the example, this
+% is done by generating a large number of cases so that the true correlations can be
+% estimated very accurately.  That is, the number of cases is large enough
+% that the mismatches between computed correlations and RhoController values
+% are not just due to random error.
+NCases = 5000;
+randoms = RandGen.GenRands(RVs,RhoControllers,NCases);
+obscorrs = corr(randoms)
+%%
+% Note that the observed correlations do not match the values in RhoControllers.
+
+%% Adjusting RhoController values to get desired correlations (non-OO).
+% So how do you get the specific target correlations that you want?
+% For convenience, GenRands can be told to adjust the RhoControllers
+% automatically to give you the target correlations that you want.
+% This allows you to skip the FindRhoControllerMatrix step from the previous section.
+TargetCorrs = ...
+    [ 1  0.5  0.3; ...
+    0   1   0.5; ...
+    0   0    1   ]
+
+%%
+% The optional argument 'Adjust' tells GenRands to find the required RhoControllers itself.
+% With that argument, you can also specify a value for NStepsApprox (the default is 200).
+NCases = 250000;   % Generate a lot of random numbers to get good estimates of the correlations.
+randoms = RandGen.GenRands(RVs,TargetCorrs,NCases,'Adjust','NSteps',500);
+
+corr(randoms)  % Check that the correlations are in fact quite close to our targets.
+
+%% An example with discrete random variables (non-OO)
+% Nothing is really different except that the random variables are discrete.
+NRVs = 2;
+RVs = cell(NRVs,1);
+RVs{1}=Poisson(23);   % The Poisson parameter is the mean
+RVs{2}=Poisson(12);
+TargetCorrs = [1  0.3; 0.3 1];  % Replace 0.3 with whatever correlation you want.
+NCases = 10000;
+r = RandGen.GenRands(RVs,TargetCorrs,NCases,'Adjust','NSteps',500);
+corr(r)
+figure; histogram(r(:,1));
+
+
+%% Example of object-oriented use
+% Define the random variables pretty much as before.
+NRVs = 3;
+RVs = cell(NRVs,1);
+RVs{1} = RNGamma(4,.05);   % Each RV can be any legal Cupid distribution.
+RVs{2} = Exponential(.01);
+RVs{3} = Triangular(20,50);
+
+TargetCorrs = ...
+    [ 1 -0.2  0.8; ...
+    0   1  -0.4; ...
+    0   0    1   ]
+
+%%
+% Now create a new random number generator object.
+% It needs the same information as before to specify the multivariate distribution.
+mymultivar = RandGen(RVs,TargetCorrs,'Adjust','NSteps',500,'Histograms','Scattergrams');
+
+disp('Here are the values of RhoControllers, in case you want to save them for later re-use:');
+temp1 = mymultivar.RhoControllers
+disp('FYI, here are the maximum & minimal attainable correlations with these RVs:');
+tempMax = mymultivar.RhoMax
+tempMin = mymultivar.RhoMin
+
+%%
+% Now call the object's function to generate some random numbers from this distribution.
+% By default, this function will also produce a histogram for each variable
+% and a scatterplot for each pair of variables.
+r=mymultivar.Rands(10000);
+
+%%
+% Here is how you would turn off automatic plotting of the two figures.
+mymultivar.WantHistograms = false;
+mymultivar.WantScattergrams = false;
+r2=mymultivar.Rands(10000);  % No figures are plotted.
+
+%%
+% When would you want to use the OO approach?  Its main advantage
+% is that it is faster if you generate many sets of random numbers
+% from the same multivariate distribution.  This is because
+% the object "remembers" the adjusted RhoControllers values
+% so that you can get repeated samples from the same multivariate
+% distribution without going through the (slow) RhoController
+% adjustment step each time.  Here is an example:
+
+NSamples = 3;
+NCases = 10;
+
+for iSample = 1:NSamples
+    ThisSample = mymultivar.Rands(NCases)
+    % Some processing of ThisSample
+end
+
+%% An OO example with discrete RVs
+
+NRVs = 3;
+RVs = cell(NRVs,1);
+RVs{1} = Poisson(4);   % Each RV can be any legal Cupid distribution.
+RVs{2} = UniformInt(1,10);
+RVs{3} = Binomial(20,.5);
+
+TargetCorrs = ...
+    [ 1 -0.2  0.8; ...
+    0   1  -0.4; ...
+    0   0    1   ]
+
+mymultivar = RandGen(RVs,TargetCorrs,'Adjust','NSteps',500,'Histograms','Scattergrams');
+
+%%
+% Here are the values of RhoControllers, in case you want to save them for later re-use.
+% mymultivar holds onto them, but you might want to save them in a file to speed up later runs.
+temp1 = mymultivar.RhoControllers
+disp('FYI, here are the maximum & minimal attainable correlations with these RVs:');
+tempMax = mymultivar.RhoMax
+tempMin = mymultivar.RhoMin
+
+r=mymultivar.Rands(10000);
+
+mymultivar.WantHistograms = false;
+mymultivar.WantScattergrams = false;
+
+%%
+% Now verify that the random numbers from this distribution have the desired correlations.
+NCases = 250000;
+ThisSample = mymultivar.Rands(NCases);
+corr(ThisSample)
+for iRV = 1:NRVs
+    figure;
+    histogram(ThisSample(:,iRV));
+end
+
+
+
+
+
+
+##### SOURCE END #####
+--></body></html>

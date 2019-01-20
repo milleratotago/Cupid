@@ -1,0 +1,298 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Start with this demo</title><meta name="generator" content="MATLAB 9.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-01-16"><meta name="DC.source" content="DemoCupid1.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Start with this demo</h1><!--introduction--><p>This demo gives a brief demonstration of what CUPID does &amp; how to use it.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Usually the first step is to create a distribution object.</a></li><li><a href="#2">Plotting the distribution.</a></li><li><a href="#3">A few more example distributions.</a></li><li><a href="#4">Distributions can also be used without assigning them to objects.</a></li><li><a href="#5">Compute distribution properties.</a></li><li><a href="#7">Generate random numbers.</a></li><li><a href="#8">Parameter estimation.</a></li><li><a href="#9">Parameter estimation with some parameter(s) fixed:</a></li><li><a href="#10">Forming truncated distributions.</a></li><li><a href="#11">Forming transformed distributions.</a></li><li><a href="#16">Other derived distributions: E.g., Order statistics.</a></li><li><a href="#18">Composing distributions.</a></li></ul></div><h2 id="1">Usually the first step is to create a distribution object.</h2><p>A CUPID distribution is creating by giving the object name (in this case "Normal") and the distribution parameters, like this:</p><pre class="codeinput">IQdist = Normal(100,10);
+</pre><h2 id="2">Plotting the distribution.</h2><p>Once it is created, you can do many different things with the distribution object, including fitting it to data.  One of the simplest things is to plot its density and cumulative density functions, like this:</p><pre class="codeinput">IQdist.PlotDens;
+</pre><img vspace="5" hspace="5" src="DemoCupid1_01.png" style="width:560px;height:420px;" alt=""> <h2 id="3">A few more example distributions.</h2><p>The PDF documentation lists dozens of basic distributions that have been implemented so far. It is easy to add new distributions for which you know at least either the PDF or the CDF. Here are two more quick examples:</p><pre class="codeinput">WaitingTime = Exponential(.3);
+WaitingTime.PlotDens;
+
+Cost = Weibull(3,10,2);
+Cost.PlotDens;
+</pre><img vspace="5" hspace="5" src="DemoCupid1_02.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="DemoCupid1_03.png" style="width:560px;height:420px;" alt=""> <h2 id="4">Distributions can also be used without assigning them to objects.</h2><p>That is, you can just give a distribution name and function, say like this:</p><pre class="codeinput">expMean = Exponential(.3).Mean;
+fprintf(<span class="string">'The mean of an exponential distribution with rate parameter .3 is %f\n'</span>,expMean);
+</pre><pre class="codeoutput">The mean of an exponential distribution with rate parameter .3 is 3.333333
+</pre><h2 id="5">Compute distribution properties.</h2><p>The PDF documentation lists the many functions that can be computed for any CUPID distribution. To invoke the object's function, I like to use the OBJECTNAME.FUNCTION syntax: Here are a few examples:</p><pre class="codeinput">fprintf(<span class="string">'Mean IQ = %f\n'</span>,IQdist.Mean);
+fprintf(<span class="string">'An IQ of 120 is at the %4.1fth percentile\n'</span>,100*IQdist.CDF(120));
+fprintf(<span class="string">'The IQ at the 99th percentile = %f\n'</span>,IQdist.InverseCDF(.99));
+fprintf(<span class="string">'The variance of the waiting times = %f\n'</span>,WaitingTime.Variance);
+fprintf(<span class="string">'Median Cost = %f\n'</span>,Cost.Median);
+</pre><pre class="codeoutput">Mean IQ = 100.000000
+An IQ of 120 is at the 97.7th percentile
+The IQ at the 99th percentile = 123.263479
+The variance of the waiting times = 11.111111
+Median Cost = 4.892037
+</pre><p>Because of the object-oriented approach, all of these properties can be computed for any new distribution, even if only the PDF or CDF is available.</p><h2 id="7">Generate random numbers.</h2><p>A vector or matrix of random numbers can be generated from any distribution:</p><pre class="codeinput">WaitingTime.Random(10,1)
+</pre><pre class="codeoutput">ans =
+       6.1587
+     0.099494
+      0.14592
+       2.4094
+      0.74264
+       6.5091
+       2.8777
+      0.29343
+      0.77644
+      0.13784
+</pre><h2 id="8">Parameter estimation.</h2><p>The parameters of any CUPID distribution can be estimated in various ways, including: maximum likelihood, method of moments, chi-square goodness of fit, matching certain desired percentiles, etc. As one example, here is the command to estimate the parameters of the IQdist distribution so that the IQdist scores of 80 and 120 are at the 40th and 60th percentiles, respectively.</p><pre class="codeinput">IQdist.EstPctile([80 120],[0.4 0.6]);
+fprintf(<span class="string">'The estimation process changes the parameters of the distribution.\n'</span>);
+fprintf(<span class="string">'The distribution now has a mean and sd of %f and %f,\n'</span>,IQdist.Mean,IQdist.SD)
+fprintf(<span class="string">' for which scores 80 and 120 have CDF of %f and %f as requested.\n\n'</span>,IQdist.CDF(80),IQdist.CDF(120));
+</pre><pre class="codeoutput">The estimation process changes the parameters of the distribution.
+The distribution now has a mean and sd of 100.000000 and 78.943078,
+ for which scores 80 and 120 have CDF of 0.400000 and 0.600000 as requested.
+
+</pre><h2 id="9">Parameter estimation with some parameter(s) fixed:</h2><p>During parameter estimation, it is also possible to hold one or more parameter values fixed by including an optional "ParmCodes" parameter. For example, suppose we want to hold the mean fixed at 100 and adjust the SD so that an IQdist of 140 is at the 99th percentile:</p><pre class="codeinput">IQdist.EstPctile([140],[0.99],<span class="string">'fr'</span>);  <span class="comment">% 'fr' says to fix the first parameter and vary the second parameter as a real number.</span>
+fprintf(<span class="string">'This gives a new distribution with mean and sd of %f and %f,\n'</span>,IQdist.Mean,IQdist.SD)
+fprintf(<span class="string">' for which 140 has a CDF of %f as requested.\n\n'</span>,IQdist.CDF(140));
+</pre><pre class="codeoutput">This gives a new distribution with mean and sd of 100.000000 and 17.194333,
+ for which 140 has a CDF of 0.990000 as requested.
+
+</pre><h2 id="10">Forming truncated distributions.</h2><p>Any CUPID distribution can be truncated to look at the conditional distribution with the score in a certain range. For example, we can consider the part of the previous IQ distribution with IQs above 120:</p><pre class="codeinput">HiIQdist = TruncatedXlow(IQdist,120);
+HiIQdist.PlotDens;
+fprintf(<span class="string">'This gives a new distribution with mean and sd of %f and %f.\n'</span>,HiIQdist.Mean,HiIQdist.SD)
+</pre><pre class="codeoutput">This gives a new distribution with mean and sd of 128.496554 and 7.315912.
+</pre><img vspace="5" hspace="5" src="DemoCupid1_04.png" style="width:560px;height:420px;" alt=""> <h2 id="11">Forming transformed distributions.</h2><p>CUPID also has many distribution classes that represent new distributions formed as mathematical transformation of some other distribution. For example, here is the distribution of the square-root of a gamma distribution:</p><pre class="codeinput">SqrtG = SqrtTrans(RNGamma(3,1));
+</pre><p>A transformed distribution can be used just like any other distribution. For example, we can get its properties:</p><pre class="codeinput">fprintf(<span class="string">'This transformed distribution has mean = %8.3f and standard deviation = %8.3f.\n'</span>,SqrtG.Mean,SqrtG.SD);
+</pre><pre class="codeoutput">This transformed distribution has mean =    1.662 and standard deviation =    0.489.
+</pre><p>We can also estimate the parameters of this transformed distribution, here using the method of moments:</p><pre class="codeinput">SqrtG.EstMom([2.3 .09])
+[ SqrtG.Mean SqrtG.Variance]
+</pre><pre class="codeoutput">ans =
+SqrtTrans(RNGamma(14.8163,2.754))
+ans =
+          2.3         0.09
+</pre><p>As another example, here is the distribution of the log of the previous Weibull distribution:</p><pre class="codeinput">LogCost = LogTrans(Cost);
+[LogCost.Mean LogCost.SD]
+</pre><pre class="codeoutput">ans =
+       1.5772     0.072925
+</pre><p>The PDF documentation lists many supported transformations.</p><h2 id="16">Other derived distributions: E.g., Order statistics.</h2><p>Other CUPID classes support distributions that are derived from multiple underlying distributions, including distributions of sums (convolutions), differences, mixtures, order statistics, ... For example, here is the distribution of the minimum (1st order statistic) in a sample of 3 independent scores, one of which is normal, one of which is exponential, and one of which is uniform.</p><pre class="codeinput">Min1 = Order(1,Normal(0,1),Exponential(.3),Uniform(0,1));
+fprintf(<span class="string">'This gives a new distribution with median and sd of %f and %f.\n'</span>,Min1.Median,Min1.SD)
+Min1.PlotDens
+</pre><pre class="codeoutput">This gives a new distribution with median and sd of -0.000000 and 0.734802.
+</pre><img vspace="5" hspace="5" src="DemoCupid1_05.png" style="width:560px;height:420px;" alt=""> <p>There is a short-cut for order statistics from an IID sample: For example, "Ord2of8" is defined as the second order statistic from a sample of 8 Uniform(0,1) random variables:</p><pre class="codeinput">Ord2of8 = OrderIID(2,8,Uniform(0,1));
+fprintf(<span class="string">'This gives a new distribution with mean and sd of %f and %f.\n'</span>,Ord2of8.Mean,Ord2of8.SD)
+Ord2of8.PlotDens
+</pre><pre class="codeoutput">This gives a new distribution with mean and sd of 0.222222 and 0.131468.
+</pre><img vspace="5" hspace="5" src="DemoCupid1_06.png" style="width:560px;height:420px;" alt=""> <h2 id="18">Composing distributions.</h2><p>Because of the OO approach, any derived CUPID distribution is itself a new distribution, and so a further new distribution may be derived from it. In essence, the distribution specifications can be composed, as in f(g(x)). As an example, here is the truncation operation applied to the Ord2of8 distribution:</p><pre class="codeinput">TruncOrdP = TruncatedX(Ord2of8,0,.05);
+fprintf(<span class="string">'The truncated distribution of the order statistic has a mean and sd of %f and %f.\n'</span>,TruncOrdP.Mean,TruncOrdP.SD)
+TruncOrdP.PlotDens
+</pre><pre class="codeoutput">The truncated distribution of the order statistic has a mean and sd of 0.032457 and 0.012013.
+</pre><img vspace="5" hspace="5" src="DemoCupid1_07.png" style="width:560px;height:420px;" alt=""> <p>So, this is the distribution of the 2nd order statistic from 8 uniform(0,1) RVs, conditional on that order statistic falling in the range of 0 to 0.05 (somewhat like a significant p value in hypothesis testing).</p><p>As another example, we start with the Uniform(0,1) distribution, truncate it so that it is restricted to the range p&lt;.05, and then take the 2nd order statistic of 8 such RVs. Do you think that gives the same distribution as TruncOrdP formed earlier?</p><pre class="codeinput">OrdTruncP = OrderIID(2,8,TruncatedX(Uniform(0,1),0,.05));
+fprintf(<span class="string">'The order statistic of the truncated distribution has mean and sd of %f and %f.\n'</span>,OrdTruncP.Mean,OrdTruncP.SD)
+OrdTruncP.PlotDens
+</pre><pre class="codeoutput">The order statistic of the truncated distribution has mean and sd of 0.011111 and 0.006574.
+</pre><img vspace="5" hspace="5" src="DemoCupid1_08.png" style="width:560px;height:420px;" alt=""> <p>Answer: Obviously, no, this is quite a different distribution!</p><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2016b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Start with this demo
+% This demo gives a brief demonstration of what CUPID does & how to use it.
+
+%% Usually the first step is to create a distribution object.
+% A CUPID distribution is creating by giving the object name
+% (in this case "Normal") and the distribution parameters,
+% like this:
+IQdist = Normal(100,10);
+
+%% Plotting the distribution.
+% Once it is created, you can do many different things with the distribution
+% object, including fitting it to data.  One of the simplest things is to plot
+% its density and cumulative density functions, like this:
+IQdist.PlotDens;
+
+%% A few more example distributions.
+% The PDF documentation lists dozens of basic distributions that have been implemented so far.
+% It is easy to add new distributions for which you know at least either the PDF or the CDF.
+% Here are two more quick examples:
+
+WaitingTime = Exponential(.3);
+WaitingTime.PlotDens;
+
+Cost = Weibull(3,10,2);
+Cost.PlotDens;
+
+%% Distributions can also be used without assigning them to objects.
+% That is, you can just give a distribution name and function, say like this:
+
+expMean = Exponential(.3).Mean;
+fprintf('The mean of an exponential distribution with rate parameter .3 is %f\n',expMean);
+
+%% Compute distribution properties.
+% The PDF documentation lists the many functions that can be computed for any CUPID distribution.
+% To invoke the object's function, I like to use the OBJECTNAME.FUNCTION syntax:
+% Here are a few examples:
+fprintf('Mean IQ = %f\n',IQdist.Mean);
+fprintf('An IQ of 120 is at the %4.1fth percentile\n',100*IQdist.CDF(120));
+fprintf('The IQ at the 99th percentile = %f\n',IQdist.InverseCDF(.99));
+fprintf('The variance of the waiting times = %f\n',WaitingTime.Variance);
+fprintf('Median Cost = %f\n',Cost.Median);
+%%
+% Because of the object-oriented approach, all of these properties can be computed
+% for any new distribution, even if only the PDF or CDF is available.
+
+%% Generate random numbers.
+% A vector or matrix of random numbers can be generated from any distribution:
+WaitingTime.Random(10,1)
+
+%% Parameter estimation.
+% The parameters of any CUPID distribution can be estimated in various ways,
+% including: maximum likelihood, method of moments, chi-square goodness of fit,
+% matching certain desired percentiles, etc.
+% As one example, here is the command to estimate the parameters of the IQdist
+% distribution so that the IQdist scores of 80 and 120 are at the 40th and 60th
+% percentiles, respectively.
+IQdist.EstPctile([80 120],[0.4 0.6]);
+fprintf('The estimation process changes the parameters of the distribution.\n');
+fprintf('The distribution now has a mean and sd of %f and %f,\n',IQdist.Mean,IQdist.SD)
+fprintf(' for which scores 80 and 120 have CDF of %f and %f as requested.\n\n',IQdist.CDF(80),IQdist.CDF(120));
+
+%% Parameter estimation with some parameter(s) fixed:
+% During parameter estimation, it is also possible to hold one or more parameter values fixed
+% by including an optional "ParmCodes" parameter.
+% For example, suppose we want to hold the mean fixed at 100 and adjust the SD
+% so that an IQdist of 140 is at the 99th percentile:
+IQdist.EstPctile([140],[0.99],'fr');  % 'fr' says to fix the first parameter and vary the second parameter as a real number.
+fprintf('This gives a new distribution with mean and sd of %f and %f,\n',IQdist.Mean,IQdist.SD)
+fprintf(' for which 140 has a CDF of %f as requested.\n\n',IQdist.CDF(140));
+
+%% Forming truncated distributions.
+% Any CUPID distribution can be truncated to look at the
+% conditional distribution with the score in a certain range.
+% For example, we can consider the part of the previous IQ distribution
+% with IQs above 120:
+HiIQdist = TruncatedXlow(IQdist,120);
+HiIQdist.PlotDens;
+fprintf('This gives a new distribution with mean and sd of %f and %f.\n',HiIQdist.Mean,HiIQdist.SD)
+
+
+%% Forming transformed distributions.
+% CUPID also has many distribution classes that represent new distributions formed
+% as mathematical transformation of some other distribution.
+% For example, here is the distribution of the square-root of a gamma distribution:
+SqrtG = SqrtTrans(RNGamma(3,1));
+
+%%
+% A transformed distribution can be used just like any other distribution.
+% For example, we can get its properties:
+fprintf('This transformed distribution has mean = %8.3f and standard deviation = %8.3f.\n',SqrtG.Mean,SqrtG.SD);
+
+%%
+% We can also estimate the parameters of this transformed distribution,
+% here using the method of moments:
+SqrtG.EstMom([2.3 .09])
+[ SqrtG.Mean SqrtG.Variance]
+
+%%
+% As another example, here is the distribution of the log of the previous Weibull distribution:
+LogCost = LogTrans(Cost);
+[LogCost.Mean LogCost.SD]
+%%
+% The PDF documentation lists many supported transformations.
+
+%% Other derived distributions: E.g., Order statistics.
+% Other CUPID classes support distributions that are derived from multiple
+% underlying distributions, including distributions of sums (convolutions),
+% differences, mixtures, order statistics, ...
+% For example, here is the distribution of the minimum (1st order statistic) in a sample
+% of 3 independent scores, one of which is normal, one of which is exponential,
+% and one of which is uniform.
+Min1 = Order(1,Normal(0,1),Exponential(.3),Uniform(0,1));
+fprintf('This gives a new distribution with median and sd of %f and %f.\n',Min1.Median,Min1.SD)
+Min1.PlotDens
+
+%%
+% There is a short-cut for order statistics from an IID sample:
+% For example, "Ord2of8" is defined as the second order statistic
+% from a sample of 8 Uniform(0,1) random variables:
+Ord2of8 = OrderIID(2,8,Uniform(0,1));
+fprintf('This gives a new distribution with mean and sd of %f and %f.\n',Ord2of8.Mean,Ord2of8.SD)
+Ord2of8.PlotDens
+
+%% Composing distributions.
+% Because of the OO approach, any derived CUPID distribution is itself a new distribution,
+% and so a further new distribution may be derived from it.
+% In essence, the distribution specifications can be composed, as in f(g(x)).
+% As an example, here is the truncation operation applied to the Ord2of8 distribution:
+TruncOrdP = TruncatedX(Ord2of8,0,.05);
+fprintf('The truncated distribution of the order statistic has a mean and sd of %f and %f.\n',TruncOrdP.Mean,TruncOrdP.SD)
+TruncOrdP.PlotDens
+%%
+% So, this is the distribution of the 2nd order statistic from 8 uniform(0,1) RVs,
+% conditional on that order statistic falling in the range of 0 to 0.05
+% (somewhat like a significant p value in hypothesis testing).
+
+%%
+% As another example, we start with the Uniform(0,1) distribution, truncate it so that it is
+% restricted to the range p<.05, and then take the 2nd order statistic of 8 such RVs.
+% Do you think that gives the same distribution as TruncOrdP formed earlier?
+OrdTruncP = OrderIID(2,8,TruncatedX(Uniform(0,1),0,.05));
+fprintf('The order statistic of the truncated distribution has mean and sd of %f and %f.\n',OrdTruncP.Mean,OrdTruncP.SD)
+OrdTruncP.PlotDens
+%%
+% Answer: Obviously, no, this is quite a different distribution!
+
+
+##### SOURCE END #####
+--></body></html>

@@ -1,0 +1,167 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Demo of Probit Analysis</title><meta name="generator" content="MATLAB 9.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-01-16"><meta name="DC.source" content="DemoProbit.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Demo of Probit Analysis</h1><!--introduction--><p>This demo shows how to use Cupid for "probit analysis", which I describe using the terminology of psychophysical experiments. For further information, look in the PDF documentation file.</p><p>The first part of the demo illustrates analyses for the yes/no task, and the second part illustrates m-alternative forced-choice (mAFC) tasks.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Yes/no task, maximum-likelihood fit</a></li><li><a href="#5">Yes/no task, minimum-chi-square fit</a></li><li><a href="#6">mAFC task, maximum-likelihood fit</a></li><li><a href="#8">mAFC task, minimum-chi-square fit</a></li></ul></div><h2 id="1">Yes/no task, maximum-likelihood fit</h2><p>Generate some artificial data for illustrating the YN analyses. Normally you would have your own data, which should be in an analogous format.</p><pre class="codeinput">mydist = Normal(50,5);                 <span class="comment">% Hypothesized underlying distribution of X's</span>
+Cs = mydist.InverseCDF(.10:.20:.90);   <span class="comment">% A set of stimulus values at which to run tests.</span>
+                                       <span class="comment">% At each test the result will be "Yes" if Cs&gt;X and "no" if Cs&lt;X.</span>
+Ns = 100*ones(size(Cs));               <span class="comment">% Repeat the test 100 times at each value</span>
+PrCgreaterthanX = <span class="keyword">...</span>
+    [.05 .31 .51 .71 .95];             <span class="comment">% The proportion of times that X is less than Cs(i) for each i.</span>
+                                       <span class="comment">% These are approximately the CDF values of the Cs, but not exactly so that the</span>
+                                       <span class="comment">% distribution parameters will need some adjustment</span>
+Gs = Ns .* PrCgreaterthanX;            <span class="comment">% Number of observations of Cs(i) greater than X</span>
+</pre><p>The sample data have now been generated.</p><p>Next we try to fit the sample data with the assumed underlying Normal distribution. The fitting process estimates the mean and sd of the normal based on these artifical data, by maximizing likelihood.</p><pre class="codeinput">mydist.EstProbitYNML(Cs,Ns,Gs)
+</pre><pre class="codeoutput">ans =
+Normal(49.9085,4.1586)
+</pre><p>If you want, you can directly compute the likelihood of the sample data under the fitted distribution.</p><pre class="codeinput">mydist.YNProbitLnLikelihood(Cs,Ns,Gs)
+</pre><pre class="codeoutput">ans =
+      -232.03
+</pre><h2 id="5">Yes/no task, minimum-chi-square fit</h2><p>Alternatively, it is possible to estimate parameters by minimizing chi-square.</p><pre class="codeinput">mydist.EstProbitYNChiSq(Cs,Ns,Gs)
+</pre><pre class="codeoutput">ans =
+Normal(49.9036,4.1876)
+</pre><h2 id="6">mAFC task, maximum-likelihood fit</h2><p>Generate some artificial data to be used in illustrating the mAFC analyses. In these tasks each response is "correct" or "incorrect". Each response is correct if (Cs&gt;X)  ( (Cs&lt;X) &amp;&amp; (there is a correct guess from mAFC alternatives) )</p><pre class="codeinput">mAFC = 3;  <span class="comment">% 3-alternative forced-choice task</span>
+
+mydist = Normal(50,5);            <span class="comment">% Hypothesized underlying distribution</span>
+pCorrect = PrCgreaterthanX + <span class="keyword">...</span>
+    (1-PrCgreaterthanX)/mAFC;     <span class="comment">% pCorrect = PrCgreaterthanX plus correct guesses</span>
+Gs = Ns .* pCorrect;              <span class="comment">% Number of times the observed response is correct</span>
+</pre><p>Now we can use these simulated data to estimate the mean and sd of the best-fitting normal based on these artifical data, by maximizing likelihood.</p><pre class="codeinput">mydist.EstProbitmAFCML(mAFC,Cs,Ns,Gs)
+</pre><pre class="codeoutput">ans =
+Normal(49.888,4.2341)
+</pre><h2 id="8">mAFC task, minimum-chi-square fit</h2><p>Alternatively, it is possible to estimate parameters by minimizing chi-square.</p><pre class="codeinput">mydist.EstProbitmAFCChiSq(mAFC,Cs,Ns,Gs)
+</pre><pre class="codeoutput">ans =
+Normal(49.8947,4.2531)
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2016b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Demo of Probit Analysis
+% This demo shows how to use Cupid for "probit analysis", which
+% I describe using the terminology of psychophysical experiments.
+% For further information, look in the PDF documentation file.
+%
+% The first part of the demo illustrates analyses for the yes/no task,
+% and the second part illustrates m-alternative forced-choice (mAFC) tasks.
+
+
+%% Yes/no task, maximum-likelihood fit
+%
+% Generate some artificial data for illustrating the YN analyses.
+% Normally you would have your own data, which should be in an analogous format.
+
+mydist = Normal(50,5);                 % Hypothesized underlying distribution of X's
+Cs = mydist.InverseCDF(.10:.20:.90);   % A set of stimulus values at which to run tests.
+                                       % At each test the result will be "Yes" if Cs>X and "no" if Cs<X.
+Ns = 100*ones(size(Cs));               % Repeat the test 100 times at each value
+PrCgreaterthanX = ...
+    [.05 .31 .51 .71 .95];             % The proportion of times that X is less than Cs(i) for each i.
+                                       % These are approximately the CDF values of the Cs, but not exactly so that the
+                                       % distribution parameters will need some adjustment
+Gs = Ns .* PrCgreaterthanX;            % Number of observations of Cs(i) greater than X
+
+%%
+% The sample data have now been generated.
+%%
+% Next we try to fit the sample data with the assumed underlying Normal distribution.
+% The fitting process estimates the mean and sd of the normal based on these artifical data, by maximizing likelihood.
+mydist.EstProbitYNML(Cs,Ns,Gs)
+%%
+% If you want, you can directly compute the likelihood of the sample data under the fitted distribution.
+mydist.YNProbitLnLikelihood(Cs,Ns,Gs)
+
+%% Yes/no task, minimum-chi-square fit
+% Alternatively, it is possible to estimate parameters by minimizing chi-square.
+mydist.EstProbitYNChiSq(Cs,Ns,Gs)
+
+
+
+
+%% mAFC task, maximum-likelihood fit
+% Generate some artificial data to be used in illustrating the mAFC analyses.
+% In these tasks each response is "correct" or "incorrect".
+% Each response is correct if (Cs>X) || ( (Cs<X) && (there is a correct guess from mAFC alternatives) )
+
+mAFC = 3;  % 3-alternative forced-choice task
+
+mydist = Normal(50,5);            % Hypothesized underlying distribution
+pCorrect = PrCgreaterthanX + ...
+    (1-PrCgreaterthanX)/mAFC;     % pCorrect = PrCgreaterthanX plus correct guesses
+Gs = Ns .* pCorrect;              % Number of times the observed response is correct
+
+%%
+% Now we can use these simulated data to estimate the mean and sd of the best-fitting normal
+% based on these artifical data, by maximizing likelihood.
+mydist.EstProbitmAFCML(mAFC,Cs,Ns,Gs)
+
+
+%% mAFC task, minimum-chi-square fit
+% Alternatively, it is possible to estimate parameters by minimizing chi-square.
+mydist.EstProbitmAFCChiSq(mAFC,Cs,Ns,Gs)
+
+
+
+##### SOURCE END #####
+--></body></html>

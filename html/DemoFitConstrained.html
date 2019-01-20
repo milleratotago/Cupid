@@ -1,0 +1,566 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Fitting distributions with constraints</title><meta name="generator" content="MATLAB 9.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-01-16"><meta name="DC.source" content="DemoFitConstrained.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Fitting distributions with constraints</h1><!--introduction--><p>This demo script gives some examples of how to fit one or more distributions with certain contraints on the distribution(s) parameter(s).</p><p>This type of fitting requires you to write special functions to enforce the constraints, as will be illustrated with numerous examples.  The example constraint functions are all in the file DemoFitConstrainedFns.m.</p><p><b>*NOTE</b>*: In each example, the first step is to generate a fake dataset so that there are data available for fitting. Presumably you would already have the data that you wanted to fit, so you would skip this step.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Example: Maximum likelihood fit of a normal distribution with the constraint sigma&gt;0.1*mu.</a></li><li><a href="#7">Example: Maximum likelihood fit of two normal distributions with the constraint that they have the same sigma.</a></li><li><a href="#11">Example: Maximum likelihood fit of three distributions with equality across distributions of certain parameters.</a></li><li><a href="#15">Example: ChiSquare fit of two normal distributions with the constraint that they have the same sigma</a></li><li><a href="#21">Example: Fit two logistic distributions with a constraint on the sum of their CDFs at a certain point.</a></li><li><a href="#26">Example: Constrain properties of the distributions rather than parameters.</a></li><li><a href="#30">Example: Constrain properties of the distributions rather than parameters (more bullet-proof).</a></li><li><a href="#34">Example: Constrain one distribution to be a mixture of two others.</a></li></ul></div><h2 id="1">Example: Maximum likelihood fit of a normal distribution with the constraint sigma&gt;0.1*mu.</h2><p>Clear these variables so that MATLAB will not be confused by their previous types.</p><pre class="codeinput">clear <span class="string">Dists</span>;
+clear <span class="string">Datasets</span>;
+</pre><p>First generate a fake dataset (see <b>*NOTE</b>*).</p><pre class="codeinput">n1=100;  <span class="comment">% arbitrary sample size</span>
+Datasets{1} = Normal(55,4.5).Random(n1,1);
+</pre><p>Note that the constraint is not truly satisfied because the true sigma is less than 5.5=0.1*mu.</p><p>Set some parameters defining the desired fit:</p><pre class="codeinput">Dists{1} = Normal(45,4);       <span class="comment">% The distribution to be fit.  These parameter values are not actually used.</span>
+sErrorFn = <span class="string">'-LnLikelihood'</span>;    <span class="comment">% The name of the error function to be minimized; see FitConstrained.m for a list of the options.</span>
+StartingVals = [40, sqrt(5)];  <span class="comment">% Starting values for the two parameters expected by DemoFitConstraintFn0.</span>
+ConstraintFn = @DemoFitConstrainedFns.Fn0;
+</pre><p>The user-supplied constraint function converts fminsearch's suggested parameter values into suggested parameter values for the distributions that are being fit, implementing the constraint. Look at the example functions to see exactly how that is done.</p><p>Now perform the actual fit:</p><pre class="codeinput">[Dists, ErrScores] = FitConstrained(Dists,Datasets,sErrorFn,ConstraintFn,StartingVals);
+disp([<span class="string">'The fitted distribution is '</span> Dists{1}.StringName]);
+</pre><pre class="codeoutput">The fitted distribution is Normal(55.0413,5.5041)
+</pre><p>What would the fit have been without the constraint?</p><pre class="codeinput">nocon = Dists{1}.EstML(Datasets{1});
+disp([<span class="string">'In comparison, without the constraint the estimated distribution is:'</span> nocon]);
+</pre><pre class="codeoutput">In comparison, without the constraint the estimated distribution is:Normal(55.1709,4.8111)
+</pre><h2 id="7">Example: Maximum likelihood fit of two normal distributions with the constraint that they have the same sigma.</h2><p>Clear these variables so that MATLAB will not be confused by their previous types.</p><pre class="codeinput">clear <span class="string">Dists</span>;
+clear <span class="string">Datasets</span>;
+</pre><p>First generate a fake dataset (see <b>*NOTE</b>*).</p><pre class="codeinput">n1=100; n2=90;  <span class="comment">% arbitrary sample sizes</span>
+Datasets{1} = Normal(10,10).Random(n1,1);
+Datasets{2} = Normal(20,12).Random(n2,1);
+</pre><p>Note that the constraint is not truly satisfied because the true sigmas are not equal.</p><p>Set some parameters defining the desired fit:</p><pre class="codeinput">Dists{1} = Normal(15,11);  <span class="comment">% The distributions to be fit.  These parameter values are not actually used.</span>
+Dists{2} = Normal(15,11);
+sErrorFn = <span class="string">'-LnLikelihood'</span>;  <span class="comment">% The name of the error function to be minimized; see FitConstrained.m for a list of the options.</span>
+StartingVals = [15, 15, sqrt(11)];      <span class="comment">% Starting values for the three parameters expected by DemoFitConstraintFn1.</span>
+ConstraintFn = @DemoFitConstrainedFns.Fn1;
+</pre><p>We supply a different constraint function to implement these constraints.</p><p>Now perform the actual fit:</p><pre class="codeinput">[Dists, ErrScores] = FitConstrained(Dists,Datasets,sErrorFn,ConstraintFn,StartingVals);
+disp([<span class="string">'The fitted distributions are '</span> Dists{1}.StringName <span class="string">' and '</span> Dists{2}.StringName]);
+</pre><pre class="codeoutput">The fitted distributions are Normal(9.1704,10.8661) and Normal(19.5631,10.8661)
+</pre><h2 id="11">Example: Maximum likelihood fit of three distributions with equality across distributions of certain parameters.</h2><p>For this example, we fit three distributions: a normal, an exponential, and an ex-Gaussian, with the constraint that the parameters of the ex-Gaussian are equal to those of the normal and exponential.</p><p>Clear these variables so that MATLAB will not be confused by their previous types.</p><pre class="codeinput">clear <span class="string">Dists</span>;
+clear <span class="string">Datasets</span>;
+</pre><p>First generate a fake dataset (see <b>*NOTE</b>*).</p><pre class="codeinput">n1=100; n2=90; n3 = 130;  <span class="comment">% arbitrary sample sizes</span>
+Datasets{1} = Normal(300,30).Random(n1,1);
+Datasets{2} = exprnd(100,n2,1);
+Datasets{3} = Normal(320,32).Random(n3,1) + exprnd(100,n3,1);
+</pre><p>Note that the constraint is not truly satisfied because the parameters of the exGaussian are not identical to those of the normal and exponential.</p><p>Set some parameters defining the desired fit:</p><pre class="codeinput">Dists{1} = Normal(15,11);       <span class="comment">% The distributions to be fit.  These parameter values are not actually used.</span>
+Dists{2} = ExponenMn(100);      <span class="comment">% Use the exponential whose parameter is the mean, not rate.</span>
+Dists{3} = ExGauMn(15,11,100);  <span class="comment">% Use the exGaussian whose exponential parameter is the mean, not rate.</span>
+sErrorFn = <span class="string">'-LnLikelihood'</span>;     <span class="comment">% The name of the error function to be minimized; see FitConstrained.m for a list of the options.</span>
+StartingVals = [290, sqrt(23), sqrt(100)];  <span class="comment">% Starting values for the three parameters expected by DemoFitConstraintFn2.</span>
+ConstraintFn = @DemoFitConstrainedFns.Fn2;
+</pre><p>Yet another constraint function.</p><p>Now perform the actual fit:</p><pre class="codeinput">[Dists, ErrScores] = FitConstrained(Dists,Datasets,sErrorFn,ConstraintFn,StartingVals);
+disp([<span class="string">'The fitted distributions are '</span> Dists{1}.StringName <span class="string">', '</span> Dists{2}.StringName <span class="string">', and '</span> Dists{3}.StringName]);
+</pre><pre class="codeoutput">The fitted distributions are Normal(301.3088,30.9243), ExponenMn(105.9795), and ExGauMn(301.3088,30.9243,105.9795)
+</pre><h2 id="15">Example: ChiSquare fit of two normal distributions with the constraint that they have the same sigma</h2><p>This example requires construction of more complicated Datasets, because the GofFChiSq error function requires both bin specifications and counts as input data.</p><p>Clear these variables so that MATLAB will not be confused by their previous types.</p><pre class="codeinput">clear <span class="string">Dists</span>;
+clear <span class="string">Datasets</span>;
+</pre><p>First generate a fake dataset (see <b>*NOTE</b>*).</p><pre class="codeinput">n1=400; n2=590;  <span class="comment">% arbitrary sample sizes</span>
+Scores1 = Normal(10,10).Random(n1,1);
+Scores2 = Normal(20,12).Random(n2,1);
+</pre><p>Note that the constraint is not truly satisfied because the true sigmas are not equal.</p><p>Use histcounts to bin and count the scores, since GofFChiSq works with bins and probabilities, not raw scores.</p><pre class="codeinput">[counts1,bins1] = histcounts(Scores1);
+[counts2,bins2] = histcounts(Scores2);
+</pre><p>Make the datasets that will be passed to GofFChiSq. Each dataset specifies GofFChiSq's parameters of BinUpperBounds and BinProbs, in that order.</p><pre class="codeinput">Datasets{1}{1} = bins1(2:end);
+Datasets{1}{2} = counts1/sum(counts1);
+Datasets{2}{1} = bins2(2:end);
+Datasets{2}{2} = counts2/sum(counts2);
+</pre><p>Now we are done generating the fake datasets.</p><p>Set some parameters defining the desired fit:</p><pre class="codeinput">Dists{1} = Normal(15,11);  <span class="comment">% The distributions to be fit.  These parameter values are not actually used.</span>
+Dists{2} = Normal(15,11);
+sErrorFn = <span class="string">'GofFChiSq'</span>;  <span class="comment">% The name of the error function to be minimized; see FitConstrained.m for a list of the options.</span>
+StartingVals = [15, 15, sqrt(11)];      <span class="comment">% Starting values for the three parameters expected by DemoFitConstraintFn1.</span>
+ConstraintFn = @DemoFitConstrainedFns.Fn1;
+</pre><p>Now perform the actual fit:</p><pre class="codeinput">[Dists, ErrScores] = FitConstrained(Dists,Datasets,sErrorFn,ConstraintFn,StartingVals);
+disp([<span class="string">'The fitted distributions are '</span> Dists{1}.StringName <span class="string">' and '</span> Dists{2}.StringName]);
+</pre><pre class="codeoutput">The fitted distributions are Normal(10.5859,10.3254) and Normal(19.3713,10.3254)
+</pre><h2 id="21">Example: Fit two logistic distributions with a constraint on the sum of their CDFs at a certain point.</h2><p>In this example we fit two logistic distributions to two 2AFC psychometric functions with the constraint described by Bausenhart et al, Behav Res (2012) 44:1157&#8211;1174 DOI 10.3758/s13428-012-0207-z The constraint is that the CDFs of these 2 distributions evaluated at s=50 should sum to 1.0 This example also requires construction of complicated Datasets, because the mAFCProbitLnLikelihood error function requires multiple inputs.</p><p>Clear these variables so that MATLAB will not be confused by their previous types.</p><pre class="codeinput">clear <span class="string">Dists</span>;
+clear <span class="string">Datasets</span>;
+</pre><p>First generate a fake dataset (see <b>*NOTE</b>*).</p><pre class="codeinput">m = 2;       <span class="comment">% Use a 2AFC task for this example.</span>
+pGuess = 1/m;
+s = 50;      <span class="comment">% This example uses a constant of s=50 (also used in DemoFitConstraintFn4)</span>
+Constants = [10:10:90];     <span class="comment">% Stimulus values used in psychometric testing</span>
+NTrials = 50*ones(size(Constants));   <span class="comment">% Number of tests at each constant</span>
+CDF1 = Logistic(45,10).CDF(Constants);
+CDF2 = Logistic(55,10).CDF(Constants);
+PCorr1 = CDF1 + (1-CDF1)*pGuess;
+PCorr2 = CDF2 + (1-CDF2)*pGuess;
+NCorrect1 = binornd(NTrials,PCorr1);
+NCorrect2 = binornd(NTrials,PCorr2);
+</pre><p>Note: I think that the constraint is truly satisfied in this case.</p><p>Now finish constructing the datasets that will be passed to mAFCProbitLnLikelihood. Each dataset specifies mAFCProbitLnLikelihood's required parameters, in order. Here is the function definition as a reminder of what datasets are required: function thisval=mAFCProbitLnLikelihood(obj, PassM, Constants, NTrials, NCorrect)</p><pre class="codeinput">Datasets{1}{1} = m;  <span class="comment">% the value of PassM</span>
+Datasets{1}{2} = Constants;
+Datasets{1}{3} = NTrials;
+Datasets{1}{4} = NCorrect1;
+Datasets{2}{1} = m;
+Datasets{2}{2} = Constants;
+Datasets{2}{3} = NTrials;
+Datasets{2}{4} = NCorrect2;
+</pre><p>Now we are done generating the fake datasets.</p><p>Set some parameters defining the desired fit:</p><pre class="codeinput">Dists{1} = Logistic(50,10);  <span class="comment">% The distributions to be fit.  These parameter values are not actually used.</span>
+Dists{2} = Logistic(50,10);
+sErrorFn = <span class="string">'-mAFCProbitLnLikelihood'</span>;   <span class="comment">% The name of the error function to be minimized; see FitConstrained.m for a list of the options.</span>
+StartingVals = [15, 15, sqrt(11)];      <span class="comment">% Starting values for the three parameters expected by DemoFitConstraintFn4.</span>
+ConstraintFn = @DemoFitConstrainedFns.Fn4;
+</pre><p>Now perform the actual fit:</p><pre class="codeinput">[Dists, ErrScores] = FitConstrained(Dists,Datasets,sErrorFn,ConstraintFn,StartingVals);
+disp([<span class="string">'The fitted distributions are '</span> Dists{1}.StringName <span class="string">' and '</span> Dists{2}.StringName]);
+disp(<span class="string">'The constraint implies that the CDFs of these distributions evaluated at s=50 should sum to 1.0:'</span>);
+disp([<span class="string">'The actual sum is '</span> num2str(Dists{1}.CDF(s) + Dists{2}.CDF(s))]);
+</pre><pre class="codeoutput">The fitted distributions are Logistic(42.5434,10.0147) and Logistic(58.6888,11.6695)
+The constraint implies that the CDFs of these distributions evaluated at s=50 should sum to 1.0:
+The actual sum is 1
+</pre><h2 id="26">Example: Constrain properties of the distributions rather than parameters.</h2><p>Example: Constrain some properties of the distributions--here, their means and SDs-- rather than constraining their parameters. In this example, fminsearch can suggest any real parameter values that it wants, and this could cause the search to fail if an illegal parameter value is suggested (e.g., negative variance) See the following example for a more bullet-proof approach.</p><p>Clear these variables so that MATLAB will not be confused by their previous types.</p><pre class="codeinput">clear <span class="string">Dists</span>;
+clear <span class="string">Datasets</span>;
+</pre><p>First generate a fake dataset (see <b>*NOTE</b>*).</p><pre class="codeinput">n1=200; n2=190;  <span class="comment">% arbitrary sample sizes</span>
+TrueDist1 = Laplace(105,21);
+fprintf(<span class="string">'The true mean and standard deviation of Dist1 are %f and %f.\n'</span>,TrueDist1.Mean,TrueDist1.SD);
+TrueDist2 = RNGamma(10,.10);   <span class="comment">% Second true distribution is Gamma</span>
+fprintf(<span class="string">'The true mean and standard deviation of Dist2 are %f and %f.\n'</span>,TrueDist2.Mean,TrueDist2.SD);
+Datasets{1} = TrueDist1.Random(n1,1);   <span class="comment">% Data from first true distribution.</span>
+Datasets{2} = TrueDist2.Random(n2,1);   <span class="comment">% Data from first true distribution.</span>
+</pre><pre class="codeoutput">The true mean and standard deviation of Dist1 are 105.000000 and 29.698485.
+The true mean and standard deviation of Dist2 are 100.000000 and 31.622777.
+</pre><p>Note that the constraint is not truly satisfied because the distributions do not have identical means &amp; std devs. Now we are done generating the fake datasets.</p><p>Set some parameters defining the desired fit:</p><pre class="codeinput">Dists{1} = Laplace; <span class="comment">% The distributions to be fit.  These parameter values are not actually used.</span>
+Dists{2} = RNGamma;
+sErrorFn = <span class="string">'-LnLikelihood'</span>;   <span class="comment">% The name of the error function to be minimized; see FitConstrained.m for a list of the options.</span>
+StartingVals = [100,20,10,.10];      <span class="comment">% Starting values for the four parameters expected by DemoFitConstraintFn5.</span>
+ConstraintFn = @DemoFitConstrainedFns.Fn5;
+</pre><p>Now perform the actual fit:</p><pre class="codeinput">[Dists, ErrScores] = FitConstrained(Dists,Datasets,sErrorFn,ConstraintFn,StartingVals);
+disp([<span class="string">'The fitted distributions are '</span> Dists{1}.StringName <span class="string">' and '</span> Dists{2}.StringName]);
+disp(<span class="string">'The constraint implies that the fitted distributions should have equal means and std devs:'</span>);
+fprintf(<span class="string">'The estimated mean and standard deviation of Dist1 are %f and %f.\n'</span>,Dists{1}.Mean,Dists{1}.SD);
+fprintf(<span class="string">'The estimated mean and standard deviation of Dist2 are %f and %f.\n'</span>,Dists{2}.Mean,Dists{2}.SD);
+</pre><pre class="codeoutput"> 
+Exiting: Maximum number of function evaluations has been exceeded
+         - increase MaxFunEvals option.
+         Current function value: 1853.106309 
+
+The fitted distributions are Laplace(104.6338,22.491) and RNGamma(10.8219,0.10343)
+The constraint implies that the fitted distributions should have equal means and std devs:
+The estimated mean and standard deviation of Dist1 are 104.633799 and 31.807116.
+The estimated mean and standard deviation of Dist2 are 104.633695 and 31.806750.
+</pre><h2 id="30">Example: Constrain properties of the distributions rather than parameters (more bullet-proof).</h2><p>Example: Constrain two distributions to produce the same mean and standard deviation. This example relies on the distribution-specific functions ParmsToReals and RealsToParms to constrain each distribution''s parameter values to their possible ranges. This requires a bit more elaborate programming, but it is better than the previous example because it ensures that no illegal parameter combinations are tried.</p><p>Clear these variables so that MATLAB will not be confused by their previous types.</p><pre class="codeinput">clear <span class="string">Dists</span>;
+clear <span class="string">Datasets</span>;
+</pre><p>First generate a fake dataset (see <b>*NOTE</b>*).</p><pre class="codeinput">n1=200; n2=190;  <span class="comment">% arbitrary sample sizes</span>
+TrueDist1 = Normal(105,18);
+TrueDist2 = RNGamma(11,1/8);
+Datasets{1} = TrueDist1.Random(n1,1);   <span class="comment">% Data from distributions.</span>
+Datasets{2} = TrueDist2.Random(n2,1);
+</pre><p>Note that the constraint is not truly satisfied because these distributions do not have the same variance. Now we are done generating the fake datasets.</p><p>Set some parameters defining the desired fit:</p><pre class="codeinput">Dists{1} = Normal(100,10);
+Dists{2} = RNGamma(10,1/10);
+sErrorFn = <span class="string">'-LnLikelihood'</span>;   <span class="comment">% The name of the error function to be minimized; see FitConstrained.m for a list of the options.</span>
+StartingVals = [Dists{1}.ParmsToReals(Dists{1}.ParmValues) Dists{2}.ParmsToReals(Dists{2}.ParmValues)];      <span class="comment">% Starting values for the parameters expected by DemoFitConstraintFn7.</span>
+ConstraintFn = @DemoFitConstrainedFns.Fn7;
+</pre><p>Now perform the actual fit:</p><pre class="codeinput">SearchOptions = optimset(<span class="string">'MaxFunEvals'</span>,10^6);  <span class="comment">% By the way, SearchOptions can be used</span>
+[Dists, ErrScores] = FitConstrained(Dists,Datasets,sErrorFn,ConstraintFn,StartingVals,SearchOptions);
+disp([<span class="string">'The fitted distributions are '</span> Dists{1}.StringName <span class="string">' and '</span> Dists{2}.StringName]);
+disp(<span class="string">'The constraint implies that the fitted distributions should have equal means and std devs:'</span>);
+fprintf(<span class="string">'The estimated mean and standard deviation of Dist1 are %f and %f.\n'</span>,Dists{1}.Mean,Dists{1}.SD);
+fprintf(<span class="string">'The estimated mean and standard deviation of Dist2 are %f and %f.\n'</span>,Dists{2}.Mean,Dists{2}.SD);
+</pre><pre class="codeoutput">The fitted distributions are Normal(96.0704,25.6984) and RNGamma(13.9754,0.14547)
+The constraint implies that the fitted distributions should have equal means and std devs:
+The estimated mean and standard deviation of Dist1 are 96.070361 and 25.698427.
+The estimated mean and standard deviation of Dist2 are 96.070343 and 25.698439.
+</pre><h2 id="34">Example: Constrain one distribution to be a mixture of two others.</h2><p>In this example we fit 2 normal distributions separately, but we also have a third distribution that is a mixture of the first two.</p><p>Clear these variables so that MATLAB will not be confused by their previous types.</p><pre class="codeinput">clear <span class="string">Dists</span>;
+clear <span class="string">Datasets</span>;
+</pre><p>First generate a fake dataset (see <b>*NOTE</b>*).</p><pre class="codeinput">n1=200; n2=190; n3=500;  <span class="comment">% arbitrary sample sizes</span>
+TrueDist1 = Normal(100,10);
+TrueDist2 = Normal(150,10);
+TrueDist3 = Mixture(0.35,TrueDist1,.65,TrueDist2);
+Datasets{1} = TrueDist1.Random(n1,1);   <span class="comment">% Data from distributions.</span>
+Datasets{2} = TrueDist2.Random(n2,1);
+Datasets{3} = TrueDist3.Random(n3,1);
+</pre><p>Note that the constraint is truly satisfied because distribution is a mixture of distributions 1 and 2. Now we are done generating the fake datasets.</p><p>Set some parameters defining the desired fit:</p><pre class="codeinput">Dists{1} = Normal;
+Dists{2} = Normal;
+</pre><p>The parameters in the next line are not actually used but they must be specified so that the mixture distribution can be initialized properly.</p><pre class="codeinput">Dists{3} = Mixture(.5,Normal(100,10),Normal(100,10));
+sErrorFn = <span class="string">'-LnLikelihood'</span>;   <span class="comment">% The name of the error function to be minimized; see FitConstrained.m for a list of the options.</span>
+StartingVals = [.5,100,10,150,15];      <span class="comment">% Starting values for the parameters expected by DemoFitConstraintFn6.</span>
+ConstraintFn = @DemoFitConstrainedFns.Fn6;
+</pre><p>Now perform the actual fit:</p><pre class="codeinput">SearchOptions = optimset(<span class="string">'MaxFunEvals'</span>,10^6);  <span class="comment">% By the way, SearchOptions can be used</span>
+[Dists, ErrScores] = FitConstrained(Dists,Datasets,sErrorFn,ConstraintFn,StartingVals,SearchOptions);
+fprintf(<span class="string">'The fitted distributions are %s, %s,\n  and %s.'</span>,Dists{1}.StringName,Dists{2}.StringName,Dists{3}.StringName);
+</pre><pre class="codeoutput">Warning: Normal checking likelihood of impossible data values. 
+Warning: Normal checking likelihood of impossible data values. 
+The fitted distributions are Normal(101.1605,10.2766), Normal(149.1461,9.7775),
+  and Mixture(0.35356,Normal(101.1605,10.2766),0.64644,Normal(149.1461,9.7775)).</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2016b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Fitting distributions with constraints
+% This demo script gives some examples of how to fit one or more distributions
+% with certain contraints on the distribution(s) parameter(s).
+%
+% This type of fitting requires you to write special functions to enforce the constraints,
+% as will be illustrated with numerous examples.  The example constraint
+% functions are all in the file DemoFitConstrainedFns.m.
+%
+% **NOTE**: In each example, the first step is to generate a fake dataset
+% so that there are data available for fitting. Presumably you would already
+% have the data that you wanted to fit, so you would skip this step.
+
+%% Example: Maximum likelihood fit of a normal distribution with the constraint sigma>0.1*mu.
+% Clear these variables so that MATLAB will not be confused by their previous types.
+clear Dists;
+clear Datasets;
+
+%%
+% First generate a fake dataset (see **NOTE**).
+n1=100;  % arbitrary sample size
+Datasets{1} = Normal(55,4.5).Random(n1,1);
+%%
+% Note that the constraint is not truly satisfied because the true sigma is less than 5.5=0.1*mu.
+%
+% Set some parameters defining the desired fit:
+Dists{1} = Normal(45,4);       % The distribution to be fit.  These parameter values are not actually used.
+sErrorFn = '-LnLikelihood';    % The name of the error function to be minimized; see FitConstrained.m for a list of the options.
+StartingVals = [40, sqrt(5)];  % Starting values for the two parameters expected by DemoFitConstraintFn0.
+ConstraintFn = @DemoFitConstrainedFns.Fn0;
+%%
+% The user-supplied constraint function converts fminsearch's suggested parameter values
+% into suggested parameter values for the distributions that are being fit, implementing the constraint.
+% Look at the example functions to see exactly how that is done.
+
+%%
+% Now perform the actual fit:
+[Dists, ErrScores] = FitConstrained(Dists,Datasets,sErrorFn,ConstraintFn,StartingVals);
+disp(['The fitted distribution is ' Dists{1}.StringName]);
+
+%%
+% What would the fit have been without the constraint?
+nocon = Dists{1}.EstML(Datasets{1});
+disp(['In comparison, without the constraint the estimated distribution is:' nocon]);
+
+
+%% Example: Maximum likelihood fit of two normal distributions with the constraint that they have the same sigma.
+% Clear these variables so that MATLAB will not be confused by their previous types.
+clear Dists;
+clear Datasets;
+
+%%
+% First generate a fake dataset (see **NOTE**).
+n1=100; n2=90;  % arbitrary sample sizes
+Datasets{1} = Normal(10,10).Random(n1,1);
+Datasets{2} = Normal(20,12).Random(n2,1);
+%%
+% Note that the constraint is not truly satisfied because the true sigmas are not equal.
+%
+% Set some parameters defining the desired fit:
+Dists{1} = Normal(15,11);  % The distributions to be fit.  These parameter values are not actually used.
+Dists{2} = Normal(15,11);
+sErrorFn = '-LnLikelihood';  % The name of the error function to be minimized; see FitConstrained.m for a list of the options.
+StartingVals = [15, 15, sqrt(11)];      % Starting values for the three parameters expected by DemoFitConstraintFn1.
+ConstraintFn = @DemoFitConstrainedFns.Fn1;
+%%
+% We supply a different constraint function to implement these constraints.
+%
+% Now perform the actual fit:
+[Dists, ErrScores] = FitConstrained(Dists,Datasets,sErrorFn,ConstraintFn,StartingVals);
+disp(['The fitted distributions are ' Dists{1}.StringName ' and ' Dists{2}.StringName]);
+
+
+%% Example: Maximum likelihood fit of three distributions with equality across distributions of certain parameters.
+% For this example, we fit three distributions: a normal, an exponential, and an ex-Gaussian, with the
+% constraint that the parameters of the ex-Gaussian are equal to those of the normal and exponential.
+%
+% Clear these variables so that MATLAB will not be confused by their previous types.
+clear Dists;
+clear Datasets;
+
+%%
+% First generate a fake dataset (see **NOTE**).
+n1=100; n2=90; n3 = 130;  % arbitrary sample sizes
+Datasets{1} = Normal(300,30).Random(n1,1);
+Datasets{2} = exprnd(100,n2,1);
+Datasets{3} = Normal(320,32).Random(n3,1) + exprnd(100,n3,1);
+%%
+% Note that the constraint is not truly satisfied because the parameters of the exGaussian
+% are not identical to those of the normal and exponential.
+%
+% Set some parameters defining the desired fit:
+Dists{1} = Normal(15,11);       % The distributions to be fit.  These parameter values are not actually used.
+Dists{2} = ExponenMn(100);      % Use the exponential whose parameter is the mean, not rate.
+Dists{3} = ExGauMn(15,11,100);  % Use the exGaussian whose exponential parameter is the mean, not rate.
+sErrorFn = '-LnLikelihood';     % The name of the error function to be minimized; see FitConstrained.m for a list of the options.
+StartingVals = [290, sqrt(23), sqrt(100)];  % Starting values for the three parameters expected by DemoFitConstraintFn2.
+ConstraintFn = @DemoFitConstrainedFns.Fn2;
+%%
+% Yet another constraint function.
+%
+% Now perform the actual fit:
+[Dists, ErrScores] = FitConstrained(Dists,Datasets,sErrorFn,ConstraintFn,StartingVals);
+disp(['The fitted distributions are ' Dists{1}.StringName ', ' Dists{2}.StringName ', and ' Dists{3}.StringName]);
+
+
+
+%% Example: ChiSquare fit of two normal distributions with the constraint that they have the same sigma
+% This example requires construction of more complicated Datasets, because the GofFChiSq error function
+% requires both bin specifications and counts as input data.
+%
+% Clear these variables so that MATLAB will not be confused by their previous types.
+clear Dists;
+clear Datasets;
+
+%%
+% First generate a fake dataset (see **NOTE**).
+n1=400; n2=590;  % arbitrary sample sizes
+Scores1 = Normal(10,10).Random(n1,1);
+Scores2 = Normal(20,12).Random(n2,1);
+%%
+% Note that the constraint is not truly satisfied because the true sigmas are not equal.
+%
+% Use histcounts to bin and count the scores, since GofFChiSq works
+% with bins and probabilities, not raw scores.
+[counts1,bins1] = histcounts(Scores1);
+[counts2,bins2] = histcounts(Scores2);
+%%
+% Make the datasets that will be passed to GofFChiSq.
+% Each dataset specifies GofFChiSq's parameters of BinUpperBounds and BinProbs, in that order.
+Datasets{1}{1} = bins1(2:end);
+Datasets{1}{2} = counts1/sum(counts1);
+Datasets{2}{1} = bins2(2:end);
+Datasets{2}{2} = counts2/sum(counts2);
+%%
+% Now we are done generating the fake datasets.
+%
+% Set some parameters defining the desired fit:
+Dists{1} = Normal(15,11);  % The distributions to be fit.  These parameter values are not actually used.
+Dists{2} = Normal(15,11);
+sErrorFn = 'GofFChiSq';  % The name of the error function to be minimized; see FitConstrained.m for a list of the options.
+StartingVals = [15, 15, sqrt(11)];      % Starting values for the three parameters expected by DemoFitConstraintFn1.
+ConstraintFn = @DemoFitConstrainedFns.Fn1;
+
+%%
+% Now perform the actual fit:
+[Dists, ErrScores] = FitConstrained(Dists,Datasets,sErrorFn,ConstraintFn,StartingVals);
+disp(['The fitted distributions are ' Dists{1}.StringName ' and ' Dists{2}.StringName]);
+
+
+
+%% Example: Fit two logistic distributions with a constraint on the sum of their CDFs at a certain point.
+% In this example we fit two logistic distributions to two 2AFC psychometric functions with
+% the constraint described by Bausenhart et al, Behav Res (2012) 44:1157–1174
+% DOI 10.3758/s13428-012-0207-z
+% The constraint is that the CDFs of these 2 distributions evaluated at s=50 should sum to 1.0
+% This example also requires construction of complicated Datasets, because
+% the mAFCProbitLnLikelihood error function requires multiple inputs.
+%
+% Clear these variables so that MATLAB will not be confused by their previous types.
+clear Dists;
+clear Datasets;
+
+%%
+% First generate a fake dataset (see **NOTE**).
+m = 2;       % Use a 2AFC task for this example.
+pGuess = 1/m;
+s = 50;      % This example uses a constant of s=50 (also used in DemoFitConstraintFn4)
+Constants = [10:10:90];     % Stimulus values used in psychometric testing
+NTrials = 50*ones(size(Constants));   % Number of tests at each constant
+CDF1 = Logistic(45,10).CDF(Constants);
+CDF2 = Logistic(55,10).CDF(Constants);
+PCorr1 = CDF1 + (1-CDF1)*pGuess;
+PCorr2 = CDF2 + (1-CDF2)*pGuess;
+NCorrect1 = binornd(NTrials,PCorr1);
+NCorrect2 = binornd(NTrials,PCorr2);
+%%
+% Note: I think that the constraint is truly satisfied in this case.
+%
+% Now finish constructing the datasets that will be passed to mAFCProbitLnLikelihood.
+% Each dataset specifies mAFCProbitLnLikelihood's required parameters, in order.
+% Here is the function definition as a reminder of what datasets are required:
+% function thisval=mAFCProbitLnLikelihood(obj, PassM, Constants, NTrials, NCorrect)
+Datasets{1}{1} = m;  % the value of PassM
+Datasets{1}{2} = Constants;
+Datasets{1}{3} = NTrials;
+Datasets{1}{4} = NCorrect1;
+Datasets{2}{1} = m;
+Datasets{2}{2} = Constants;
+Datasets{2}{3} = NTrials;
+Datasets{2}{4} = NCorrect2;
+%%
+% Now we are done generating the fake datasets.
+%
+% Set some parameters defining the desired fit:
+Dists{1} = Logistic(50,10);  % The distributions to be fit.  These parameter values are not actually used.
+Dists{2} = Logistic(50,10);
+sErrorFn = '-mAFCProbitLnLikelihood';   % The name of the error function to be minimized; see FitConstrained.m for a list of the options.
+StartingVals = [15, 15, sqrt(11)];      % Starting values for the three parameters expected by DemoFitConstraintFn4.
+ConstraintFn = @DemoFitConstrainedFns.Fn4;
+
+%%
+% Now perform the actual fit:
+[Dists, ErrScores] = FitConstrained(Dists,Datasets,sErrorFn,ConstraintFn,StartingVals);
+disp(['The fitted distributions are ' Dists{1}.StringName ' and ' Dists{2}.StringName]);
+disp('The constraint implies that the CDFs of these distributions evaluated at s=50 should sum to 1.0:');
+disp(['The actual sum is ' num2str(Dists{1}.CDF(s) + Dists{2}.CDF(s))]);
+
+
+%% Example: Constrain properties of the distributions rather than parameters.
+% Example: Constrain some properties of the distributionsREPLACE_WITH_DASH_DASHhere, their means and SDsREPLACE_WITH_DASH_DASH
+% rather than constraining their parameters.
+% In this example, fminsearch can suggest any real parameter values that it wants, and this
+% could cause the search to fail if an illegal parameter value is suggested (e.g., negative variance)
+% See the following example for a more bullet-proof approach.
+%
+% Clear these variables so that MATLAB will not be confused by their previous types.
+clear Dists;
+clear Datasets;
+
+%%
+% First generate a fake dataset (see **NOTE**).
+n1=200; n2=190;  % arbitrary sample sizes
+TrueDist1 = Laplace(105,21);
+fprintf('The true mean and standard deviation of Dist1 are %f and %f.\n',TrueDist1.Mean,TrueDist1.SD);
+TrueDist2 = RNGamma(10,.10);   % Second true distribution is Gamma
+fprintf('The true mean and standard deviation of Dist2 are %f and %f.\n',TrueDist2.Mean,TrueDist2.SD);
+Datasets{1} = TrueDist1.Random(n1,1);   % Data from first true distribution.
+Datasets{2} = TrueDist2.Random(n2,1);   % Data from first true distribution.
+%%
+% Note that the constraint is not truly satisfied because the distributions do not
+% have identical means & std devs.
+% Now we are done generating the fake datasets.
+%
+% Set some parameters defining the desired fit:
+Dists{1} = Laplace; % The distributions to be fit.  These parameter values are not actually used.
+Dists{2} = RNGamma;
+sErrorFn = '-LnLikelihood';   % The name of the error function to be minimized; see FitConstrained.m for a list of the options.
+StartingVals = [100,20,10,.10];      % Starting values for the four parameters expected by DemoFitConstraintFn5.
+ConstraintFn = @DemoFitConstrainedFns.Fn5;
+
+%%
+% Now perform the actual fit:
+[Dists, ErrScores] = FitConstrained(Dists,Datasets,sErrorFn,ConstraintFn,StartingVals);
+disp(['The fitted distributions are ' Dists{1}.StringName ' and ' Dists{2}.StringName]);
+disp('The constraint implies that the fitted distributions should have equal means and std devs:');
+fprintf('The estimated mean and standard deviation of Dist1 are %f and %f.\n',Dists{1}.Mean,Dists{1}.SD);
+fprintf('The estimated mean and standard deviation of Dist2 are %f and %f.\n',Dists{2}.Mean,Dists{2}.SD);
+
+%% Example: Constrain properties of the distributions rather than parameters (more bullet-proof).
+% Example: Constrain two distributions to produce the same mean and standard deviation.
+% This example relies on the distribution-specific functions ParmsToReals and RealsToParms
+% to constrain each distribution''s parameter values to their possible ranges.
+% This requires a bit more elaborate programming, but it is better than the previous example
+% because it ensures that no illegal parameter combinations are tried.
+%
+% Clear these variables so that MATLAB will not be confused by their previous types.
+clear Dists;
+clear Datasets;
+
+%%
+% First generate a fake dataset (see **NOTE**).
+n1=200; n2=190;  % arbitrary sample sizes
+TrueDist1 = Normal(105,18);
+TrueDist2 = RNGamma(11,1/8);
+Datasets{1} = TrueDist1.Random(n1,1);   % Data from distributions.
+Datasets{2} = TrueDist2.Random(n2,1);
+%%
+% Note that the constraint is not truly satisfied because these distributions
+% do not have the same variance.
+% Now we are done generating the fake datasets.
+%
+% Set some parameters defining the desired fit:
+Dists{1} = Normal(100,10);
+Dists{2} = RNGamma(10,1/10);
+sErrorFn = '-LnLikelihood';   % The name of the error function to be minimized; see FitConstrained.m for a list of the options.
+StartingVals = [Dists{1}.ParmsToReals(Dists{1}.ParmValues) Dists{2}.ParmsToReals(Dists{2}.ParmValues)];      % Starting values for the parameters expected by DemoFitConstraintFn7.
+ConstraintFn = @DemoFitConstrainedFns.Fn7;
+
+%%
+% Now perform the actual fit:
+SearchOptions = optimset('MaxFunEvals',10^6);  % By the way, SearchOptions can be used
+[Dists, ErrScores] = FitConstrained(Dists,Datasets,sErrorFn,ConstraintFn,StartingVals,SearchOptions);
+disp(['The fitted distributions are ' Dists{1}.StringName ' and ' Dists{2}.StringName]);
+disp('The constraint implies that the fitted distributions should have equal means and std devs:');
+fprintf('The estimated mean and standard deviation of Dist1 are %f and %f.\n',Dists{1}.Mean,Dists{1}.SD);
+fprintf('The estimated mean and standard deviation of Dist2 are %f and %f.\n',Dists{2}.Mean,Dists{2}.SD);
+
+%% Example: Constrain one distribution to be a mixture of two others.
+% In this example we fit 2 normal distributions separately, but we also
+% have a third distribution that is a mixture of the first two.
+% 
+% Clear these variables so that MATLAB will not be confused by their previous types.
+clear Dists;
+clear Datasets;
+
+%%
+% First generate a fake dataset (see **NOTE**).
+n1=200; n2=190; n3=500;  % arbitrary sample sizes
+TrueDist1 = Normal(100,10);
+TrueDist2 = Normal(150,10);
+TrueDist3 = Mixture(0.35,TrueDist1,.65,TrueDist2);
+Datasets{1} = TrueDist1.Random(n1,1);   % Data from distributions.
+Datasets{2} = TrueDist2.Random(n2,1);
+Datasets{3} = TrueDist3.Random(n3,1);
+%%
+% Note that the constraint is truly satisfied because distribution is a mixture
+% of distributions 1 and 2.
+% Now we are done generating the fake datasets.
+%
+% Set some parameters defining the desired fit:
+Dists{1} = Normal;
+Dists{2} = Normal;
+%%
+% The parameters in the next line are not actually used but they must
+% be specified so that the mixture distribution can be initialized properly.
+Dists{3} = Mixture(.5,Normal(100,10),Normal(100,10));
+sErrorFn = '-LnLikelihood';   % The name of the error function to be minimized; see FitConstrained.m for a list of the options.
+StartingVals = [.5,100,10,150,15];      % Starting values for the parameters expected by DemoFitConstraintFn6.
+ConstraintFn = @DemoFitConstrainedFns.Fn6;
+
+%%
+% Now perform the actual fit:
+SearchOptions = optimset('MaxFunEvals',10^6);  % By the way, SearchOptions can be used
+[Dists, ErrScores] = FitConstrained(Dists,Datasets,sErrorFn,ConstraintFn,StartingVals,SearchOptions);
+fprintf('The fitted distributions are %s, %s,\n  and %s.',Dists{1}.StringName,Dists{2}.StringName,Dists{3}.StringName);
+
+
+##### SOURCE END #####
+--></body></html>
