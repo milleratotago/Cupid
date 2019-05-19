@@ -209,7 +209,9 @@ classdef (Abstract) dTransMono < dEither
         %         end
         
         function thisval=Random(obj,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             %             if obj.DistType=='d'
             %                 thisval = Random@dDiscrete(obj,varargin{:});
             %             else

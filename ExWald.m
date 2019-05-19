@@ -151,17 +151,23 @@ classdef ExWald < dContinuous
         end
         
         function thisval=Mean(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 1 / obj.rate + Mean(obj.WaldBasis);
         end
         
         function thisval=Variance(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = Variance(obj.Standard_Exponential) / obj.rate^2 + Variance(obj.WaldBasis);
         end
         
         function thisval=Random(obj,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = Random(obj.Standard_Exponential,varargin{:}) / obj.rate + Random(obj.WaldBasis,varargin{:});
         end
         

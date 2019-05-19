@@ -38,7 +38,9 @@ classdef Order < dEither
             for iDist=1:obj.SampleSize
                 nextptr = iDist + 1;
                 obj.BasisRV{iDist} = s{nextptr};
-                assert(obj.BasisRV{iDist}.Initialized,['Unable to initialize Order BasisRV number ' num2str(iDist)]);
+                if ~obj.BasisRV{iDist}.Initialized
+                    error(['Unable to initialize Order BasisRV number ' num2str(iDist)]);
+                end
             end
             
             % Determine distribution type:
@@ -55,7 +57,7 @@ classdef Order < dEither
             elseif OneIsDiscrete && ~(OneIsContinuous || OneIsMixed)
                 obj.DistType = 'd';
             else
-                assert(false,'Order can only handle all-continuous or all-discrete Basis distributions (so far)');
+                error('Order can only handle all-continuous or all-discrete Basis distributions (so far)');
             end
             
             % Assemble DefaultParmCodes & count NDistParms & CumNParms

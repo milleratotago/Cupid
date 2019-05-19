@@ -76,6 +76,6 @@ classdef utF < utContinuous;
     end  % TestClassSetup
 
         
-end  % utt
+end  % utF
 
 

@@ -98,27 +98,37 @@ classdef Cosine < dContinuous
         end
         
         function thisval=MGF(obj,Theta)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = pi^2*sinh(obj.halfwidth*Theta) / (obj.halfwidth*Theta*(pi^2+obj.halfwidth^2*Theta^2)) * exp(obj.mu*Theta);
         end
         
         function thisval=Mean(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = obj.mu;
         end
         
         function thisval=Variance(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = obj.halfwidth^2 * (1/3 - 2/pi^2);
         end
         
         function thisval=RawSkewness(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval= 0;
         end
         
         function thisval=Kurtosis(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval= 3 + 6 * (90 - pi^4) / ( 5*(pi^2-6)^2 );
         end
         

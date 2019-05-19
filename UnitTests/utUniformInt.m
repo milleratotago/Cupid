@@ -20,7 +20,7 @@ classdef utUniformInt < utDiscrete;
     methods (TestClassSetup, ParameterCombination='sequential')
         
         function ClassSetup(testCase,parmLo,parmHi)
-            % Computations specific to the normal distribution.
+            % Computations specific to the distribution.
             testCase.Dist = UniformInt(parmLo,parmHi);
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

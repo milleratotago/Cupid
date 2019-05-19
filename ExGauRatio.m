@@ -28,8 +28,12 @@ classdef ExGauRatio < ExGauss
             obj.sigma = newparmvalues(2);
             obj.ratio = newparmvalues(3);
             obj.rate = 1 / (obj.ratio*obj.sigma);
-            assert(obj.sigma>0,'ExGauRatio sigma must be > 0.');
-            assert(obj.ratio>0,'ExGauRatio ratio must be > 0.');
+            if obj.sigma<=0
+                error('ExGauRatio sigma must be > 0.');
+            end
+            if obj.ratio<=0
+                error('ExGauRatio ratio must be > 0.');
+            end
             ReInit(obj);
         end
         

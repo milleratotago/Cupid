@@ -102,12 +102,14 @@ classdef UniGap < dContinuous
             thisval = (Part1 + Part2) / 2;
         end
         
-        function thisval=Random(obj,varargin)
+        function thisval = Random(obj,varargin)
             assert(obj.Initialized,UninitializedError(obj));
             thisval = nan(varargin{:});
-            rand1 = rand(varargin{:});  % below or above gap
+            thisdist = zeros(varargin{:},'uint8');
+%            rand1 = rand(varargin{:});  % below or above gap
+%            Below0 = rand1<=0.5;
+            Below0 = rand(varargin{:}) <= 0.5;  % below or above gap
             rand2 = rand(varargin{:});  % position within segment below or above gap
-            Below0 = rand1<=0.5;
             thisval(Below0) = obj.LowerBound + rand2(Below0)*obj.t;
             Above0 = ~Below0;
             thisval(Above0) = obj.t + rand2(Above0)*obj.t;

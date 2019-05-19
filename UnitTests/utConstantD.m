@@ -1,10 +1,8 @@
-classdef utNegativeBinomial < utDiscrete;
+classdef utConstantD < utDiscrete;
     
     properties (ClassSetupParameter)
-        parmN = struct('p2',2  , 'p4',4     , 'p20',20 );
-        parmp = struct('p_1',.1, 'p_83',.83 , 'p_8',.8 );
+        thisConstant = struct('n2',-2  , 'p4',4, 'n20',-20, 'p100',100, 'p500',500 );
     end
-    % Note relaxed moment tolerances when using Poisson approximations
     
     properties
        Dummy1, Dummy2  % Provide the dummy variables that were used to make parent classes abstract.
@@ -12,7 +10,7 @@ classdef utNegativeBinomial < utDiscrete;
 
     methods
         
-        function testCase=utNegativeBinomial(varargin)  % Constructor
+        function testCase=utConstantD(varargin)  % Constructor
             testCase=testCase@utDiscrete(varargin{:});
         end
         
@@ -20,19 +18,22 @@ classdef utNegativeBinomial < utDiscrete;
     
     methods (TestClassSetup, ParameterCombination='sequential')
         
-        function ClassSetup(testCase,parmN,parmp)
+        function ClassSetup(testCase,thisConstant)
             % Computations specific to the distribution.
-            testCase.Dist = NegativeBinomial(parmN,parmp);
+            testCase.Dist = ConstantD(thisConstant);
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 
-            testCase.xvalues = testCase.Dist.LowerBound:testCase.Dist.UpperBound;
+            testCase.xvalues = thisConstant;
             
-            % Set up some X values for which MLE should return the true parameters:
-            npoints = 500;
-            testCase.xMLE = testCase.Dist.InverseCDF( (1:2:(2*npoints-1)) / (2*npoints) );
+            % Compute whatever values known are known from other sources:
+            testCase.Expected.Mean = thisConstant;
+            testCase.Expected.Variance = 0;
             
             % Adjust tolerances as appropriate for this distribution & parameters:
             SetTolerances(testCase,0.005);
+
+%            testCase.SkipMGFs = true;
+            testCase.SkipAllEst = true;
 
             utGenericMethodSetup(testCase);   % Initialize many standard computations
 
@@ -40,6 +41,6 @@ classdef utNegativeBinomial < utDiscrete;
         
     end  % TestClassSetup
     
-end  % utNegativeBinomial
+end  % utConstantD
 
 

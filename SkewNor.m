@@ -1,5 +1,7 @@
 classdef SkewNor < dContinuous
     % SkewNor(Location,Scale,Shape):  See the introduction at http:%azzalini.stat.unipd.it/SN/Intro/intro.html.
+    % NewJeff: According to https://au.mathworks.com/matlabcentral/answers/33953-skew-normal-and-owen-s-t-function#comment_695158
+    %   it is possible to calculate the cdf of a skew normal distribution using Owen's T function.
     
     properties(SetAccess = protected)
         Loc, Scale, Shape,

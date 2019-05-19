@@ -103,18 +103,24 @@ classdef HyperbolicTan < dContinuous
         end
         
         function thisval=Mean(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = log(2) / obj.Scale;
         end
         
         function thisval=Variance(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             EXSqr = (pi/obj.Scale)^2 / 12.0;
             thisval = EXSqr - Mean(obj)^2;
         end
         
         function thisval=Median(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 0.5493 / obj.Scale;
         end
         

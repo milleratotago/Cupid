@@ -109,22 +109,30 @@ classdef Laplace < dContinuous
         end
         
         function thisval=Mean(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = obj.location;
         end
         
         function thisval=Variance(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 2 * obj.scale^2;
         end
         
         function thisval=RawSkewness(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 0;
         end
         
         function thisval=Kurtosis(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 6;
         end
         

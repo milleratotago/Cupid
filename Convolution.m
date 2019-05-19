@@ -39,12 +39,16 @@ classdef Convolution < dTransDuo
         end
         
         function thisval=Mean(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = obj.BasisRV1.Mean + obj.BasisRV2.Mean;
         end
         
         function thisval=Variance(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = obj.BasisRV1.Variance + obj.BasisRV2.Variance;
         end
         

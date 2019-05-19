@@ -57,8 +57,12 @@ classdef TriangularG < dContinuous
         end
         
         function []=ReInit(obj)
-            assert(obj.min<obj.peak,['TriangularG must satisfy min<peak but these are ' num2str(obj.min) ' and ' num2str(obj.peak)]);
-            assert(obj.peak<obj.max,['TriangularG must satisfy peak<max but these are ' num2str(obj.peak) ' and ' num2str(obj.max)]);
+            if ~(obj.min<obj.peak)
+                error(['TriangularG must satisfy min<peak but these are ' num2str(obj.min) ' and ' num2str(obj.peak)]);
+            end
+            if ~(obj.peak<obj.max)
+                error(['TriangularG must satisfy peak<max but these are ' num2str(obj.peak) ' and ' num2str(obj.max)]);
+            end
             obj.center = (obj.min + obj.max) / 2;
             obj.heightfac = 4 / (obj.max-obj.min)^2;
             obj.LowerBound = obj.min;

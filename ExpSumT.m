@@ -71,7 +71,9 @@ classdef ExpSumT < dContinuous
         end
         
         function thiscdf=CDF(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thiscdf = zeros(size(X));
             InBounds = (X>=obj.LowerBound) & (X<=obj.UpperBound);
             thiscdf(X>=obj.UpperBound) = 1;
@@ -93,7 +95,9 @@ classdef ExpSumT < dContinuous
         end
 
         function thisval=Random(obj,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             rand1 = rand(varargin{:})*(1-exp(-obj.cutoff*obj.rate1));
             rand1trunc = -log(1-rand1)/obj.rate1;
             rand2 = -log(rand(varargin{:}))/obj.rate2;

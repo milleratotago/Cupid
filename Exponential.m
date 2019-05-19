@@ -57,14 +57,18 @@ classdef Exponential < dContinuous
         end
         
         function thispdf=PDF(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thispdf = zeros(size(X));
             InBounds = (X>=obj.LowerBound) & (X<=obj.UpperBound);
             thispdf(InBounds) = exp(-obj.rate*X(InBounds)) * obj.rate;
         end
         
         function thiscdf=CDF(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thiscdf = zeros(size(X));
             InBounds = (X>=obj.LowerBound) & (X<=obj.UpperBound);
             thiscdf(X>=obj.UpperBound) = 1;
@@ -72,38 +76,52 @@ classdef Exponential < dContinuous
         end
         
         function thisval=InverseCDF(obj,P)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             assert(min(P)>=0&&max(P)<=1,'InverseCDF requires 0<=P<=1');
             thisval = -log(1 - P) / obj.rate;
         end
         
         function thisval=Mean(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 1.0 / obj.rate;
         end
         
         function thisval=Variance(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 1.0 / obj.rate^2;
         end
         
         function thisval=RawSkewness(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = SD(obj)*obj.CubeRootOf2;
         end
         
         function thisval=RelSkewness(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 2;
         end
         
         function thisval=Kurtosis(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 9;
         end
         
         function thisval=Random(obj,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             try
                 thisval = -log(rand(varargin{:})) / obj.rate;
             catch
@@ -112,7 +130,9 @@ classdef Exponential < dContinuous
         end
         
         function s=EstML(obj,Observations,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             meanObs = mean(Observations);
             ResetParms(obj,1/meanObs);
             BuildMyName(obj);

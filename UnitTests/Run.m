@@ -74,10 +74,12 @@ function Run(CaseNs)
             rpt{end+1} = SingleTest('Laplace');
             rpt{end+1} = SingleTest('Logistic');
             rpt{end+1} = SingleTest('Lognormal');
+            rpt{end+1} = SingleTest('LognormalMCV');
             rpt{end+1} = SingleTest('LognormalMS');
             rpt{end+1} = SingleTest('NakaRush');
             rpt{end+1} = SingleTest('Normal');
             rpt{end+1} = SingleTest('Pareto');
+            rpt{end+1} = SingleTest('ProdUni01');
             rpt{end+1} = SingleTest('Quantal');
             rpt{end+1} = SingleTest('Quick');
             rpt{end+1} = SingleTest('Rayleigh');
@@ -111,6 +113,7 @@ function Run(CaseNs)
             rpt{end+1} = SingleTest('RankDist');
             rpt{end+1} = SingleTest('UniformInt');
 %            rpt{end+1} = SingleTest('YNdPrime');
+%            rpt{end+1} = SingleTest('YNdPrimeSym');
             sectiontime = toc(sectiontime) / 60;
             WriteMarker([MarkerRoot '2DisFas'],rpt,sectiontime);
         end
@@ -133,6 +136,7 @@ function Run(CaseNs)
             rpt{end+1} = SingleTest('PhiInvTrans');
             rpt{end+1} = SingleTest('PowerTrans');
             rpt{end+1} = SingleTest('Product');
+            rpt{end+1} = SingleTest('ProdUni0p');
             rpt{end+1} = SingleTest('Ratio');
             rpt{end+1} = SingleTest('SqrTrans');
             rpt{end+1} = SingleTest('SqrtTrans');

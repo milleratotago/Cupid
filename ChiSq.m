@@ -90,19 +90,25 @@ classdef ChiSq < dContinuous
         end
         
         function thisval=Mean(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             % JKB Vol 1 Eqn 18.10
             thisval = obj.df;
         end
         
         function thisval=Variance(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             % JKB Vol 1 Eqn 18.10
             thisval = 2*obj.df;
         end
         
         function thisval=RawMoment(obj,I)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             % JKB Vol 1 Eqn 18.8
             thisval = 1;
             for J = 1:I
@@ -111,18 +117,24 @@ classdef ChiSq < dContinuous
         end
         
         function thisval=MGF(obj,Theta) % From Johnson Kotz Balakrishnan
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             assert(abs(Theta)<0.5,'ChiSq MGF only defined for abs(Theta) < 0.5');
             thisval = (1-2*Theta)^(-obj.df/2);
         end
         
         function thisval=RelSkewness(obj) % From Mathematica
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 2 * sqrt(2) * sqrt(1/obj.df);
         end
         
         function thisval=Kurtosis(obj) % From Mathematica
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 3 + 12/ obj.df;
         end
         

@@ -100,7 +100,9 @@ classdef dContinuous < dGeneric   % Calls by reference
             % Get the CDF by numerical integral if it is not defined in the descendant.
             % This is an example of an anonymous function, integrating a function with
             % multiple parameters (obj & X), and integrating a class function.
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thiscdf=zeros(size(X));
             InBounds = (X>=obj.LowerBound) & (X<=obj.UpperBound);
             thiscdf(X>=obj.UpperBound) = 1;
@@ -138,11 +140,17 @@ classdef dContinuous < dGeneric   % Calls by reference
         end
         
         function thisval=InverseCDF(obj,P)
-            assert(obj.Initialized,UninitializedError(obj));
-            %            assert((min(P)>=0)&&(max(P)<=1),'InverseCDF requires 0<=P<=1');
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
+            if min(P)<0
+                error(['InverseCDF requires all P>0 but this call has a P of ',num2str(min(P))]);
+            end
+            if max(P)>1
+                error(['InverseCDF requires all P<1 but this call has a P of ',num2str(max(P))]);
+            end
             thisval = zeros(size(P));
             for i=1:numel(P)
-                assert((P(i)>=0)&&(P(i)<=1),['InverseCDF requires 0<=P<=1 but P = ' num2str(P(i))]);
                 try
                     % fzero fails if CDF is too big for LowerBound or too small for UpperBound
                     os=optimset('TolFun',obj.InverseCDFTol);
@@ -158,7 +166,9 @@ classdef dContinuous < dGeneric   % Calls by reference
         end
         
         function thisval=Random(obj,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = InverseCDF(obj,rand(varargin{:}));
         end
         
@@ -173,7 +183,9 @@ classdef dContinuous < dGeneric   % Calls by reference
             % This function returns the integral from FromX to ToX of any function Fun(x) * PDF(x).
             % It uses the distribution lower & upper bounds if FromX & ToX are not provided,
             % or if either is empty or outside the corresponding bound.
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if nargin==2
                 FromX = obj.LowerBound;
                 ToX = obj.UpperBound;
@@ -196,7 +208,9 @@ classdef dContinuous < dGeneric   % Calls by reference
             % Returns the integral from FromX to ToX of X^N * PDF.   Note that the
             %  function value for N == 0 should be one and this property can
             %  be used as a check of the accuracy of the computation of PDF.
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if N >= 1
                 AbsTol = obj.IntegralPDFXNAbsTol(N);
                 RelTol = obj.IntegralPDFXNRelTol(N);
@@ -219,7 +233,9 @@ classdef dContinuous < dGeneric   % Calls by reference
             % Returns the integral from FromX to ToX of (X-C)^N * PDF
             % Note that the function value for N == 0 should be one and this property can
             % be used as a check of the accuracy of the computation of PDF.
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if N >= 1
                 AbsTol = obj.IntegralPDFXmuNAbsTol(N);
                 RelTol = obj.IntegralPDFXmuNRelTol(N);
@@ -239,7 +255,9 @@ classdef dContinuous < dGeneric   % Calls by reference
         end
         
         function thisval=ConditionalRawMoment(obj,FromX,ToX,I)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             ConditionalP = CDF(obj,ToX) - CDF(obj,FromX);
             if (ConditionalP == 0)
                 thisval = 0;
@@ -249,7 +267,9 @@ classdef dContinuous < dGeneric   % Calls by reference
         end
         
         function thisval=ConditionalCenMoment(obj,FromX,ToX,I)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             ConditionalP = CDF(obj,ToX) - CDF(obj,FromX);
             if (ConditionalP == 0)
                 thisval = 0;
@@ -261,7 +281,9 @@ classdef dContinuous < dGeneric   % Calls by reference
         
         function thisval=IntegralCDF(obj,FromX,ToX,N)
             % integrates CDF to find raw moments.
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if N >= 1
                 AbsTol = obj.IntegralCDFXNAbsTol(N);
                 RelTol = obj.IntegralCDFXNRelTol(N);
@@ -276,7 +298,9 @@ classdef dContinuous < dGeneric   % Calls by reference
             % Returns integral from FromX to ToX of exp(Theta*X) * PDF.
             % Note that MGF(obj, 0, LowerBound, UpperBound) should be one and this property
             %  can be used as a check of the accuracy of computing PDF.
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             FromX = max(FromX,obj.LowerBound);
             ToX = min(ToX,obj.UpperBound);
             thisval=integral(@(x) exp(Theta*x).*PDF(obj,x),FromX,ToX,'AbsTol',obj.IntegralMGFAbsTol,'RelTol',obj.IntegralMGFRelTol);

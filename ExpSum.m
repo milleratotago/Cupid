@@ -63,7 +63,9 @@ classdef ExpSum < dContinuous
         end
         
         function thispdf=PDF(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thispdf = zeros(size(X));
             InBounds = (X>=obj.LowerBound) & (X<=obj.UpperBound);
             thispdf(InBounds) = (exp(-obj.rate1*X(InBounds))-exp(-obj.rate2*X(InBounds))) * obj.StoredMult;
@@ -75,7 +77,9 @@ classdef ExpSum < dContinuous
         end
         
         function thiscdf=CDF(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thiscdf = zeros(size(X));
             InBounds = (X>=obj.LowerBound) & (X<=obj.UpperBound);
             thiscdf(X>=obj.UpperBound) = 1;
@@ -93,17 +97,23 @@ classdef ExpSum < dContinuous
         end
         
         function thisval=Mean(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 1 / obj.rate1 + 1 / obj.rate2;
         end
         
         function thisval=Variance(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 1 / obj.rate1^2 + 1 / obj.rate2^2;
         end
         
         function thisval=Random(obj,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             RN1 = rand(varargin{:});
             RN2 = rand(varargin{:});
             thisval = -log(RN1) / obj.rate1 - log(RN2) / obj.rate2;

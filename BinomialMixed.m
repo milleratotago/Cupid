@@ -31,7 +31,9 @@ classdef BinomialMixed < dDiscrete
         end
         
         function BuildMyName(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             s = mat2str(obj.P,obj.NumDP);
             s = strrep(s,' ',',');
             obj.StringName = ['BinomialMixed(' s ')'];

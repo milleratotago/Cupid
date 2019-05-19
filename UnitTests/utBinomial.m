@@ -21,7 +21,7 @@ classdef utBinomial < utDiscrete;
     methods (TestClassSetup, ParameterCombination='sequential')
         
         function ClassSetup(testCase,parmN,parmp)
-            % Computations specific to the normal distribution.
+            % Computations specific to the distribution.
             testCase.Dist = Binomial(parmN,parmp);
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

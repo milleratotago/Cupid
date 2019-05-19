@@ -75,7 +75,9 @@ classdef dEither < dContinuous & dDiscrete
             % Returns the sum or integral from FromX to ToX of (X-C)^N * PDF
             % Note that the function value for N == 0 should be one and this property can
             % be used as a check of the accuracy of the computation of PDF.
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             switch obj.DistType
                 case 'c'
                     thisval=IntegralX_CToNxPDF@dContinuous(obj,FromX,ToX,C,N);
@@ -109,7 +111,9 @@ classdef dEither < dContinuous & dDiscrete
         end
         
         function thisval=IntegralCDF(obj,FromX,ToX,N)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             switch obj.DistType
                 case 'c'
                     thisval=IntegralCDF@dContinuous(obj,FromX,ToX,N);
@@ -121,7 +125,9 @@ classdef dEither < dContinuous & dDiscrete
         end
         
         function thisval=MGFrng(obj,Theta,FromX,ToX)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             switch obj.DistType
                 case 'c'
                     thisval=MGFrng@dContinuous(obj,Theta,FromX,ToX);
@@ -133,7 +139,9 @@ classdef dEither < dContinuous & dDiscrete
         end
         
         function x=XsToPlot(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             switch obj.DistType
                 case 'c'
                     x=XsToPlot@dContinuous(obj);

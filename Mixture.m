@@ -87,7 +87,9 @@ classdef Mixture < dEither
                     obj.MixtureP(iDist) = 1 - sum(obj.MixtureP(1:iDist-1));  % Not saved
                 end
                 obj.BasisRV{iDist} = s{nextptr};
-                assert(obj.BasisRV{iDist}.Initialized,['Unable to initialize Mixture BasisRV number ' num2str(iDist)]);
+                if ~obj.BasisRV{iDist}.Initialized
+                    error(['Unable to initialize Mixture BasisRV number ' num2str(iDist)]);
+                end
             end
             
             % Determine distribution type:
@@ -104,7 +106,7 @@ classdef Mixture < dEither
             elseif OneIsDiscrete && ~(OneIsContinuous || OneIsMixed)
                 obj.DistType = 'd';
             else
-                assert(false,'Mixture can only handle all-continuous or all-discrete Basis distributions (so far)');
+                error('Mixture can only handle all-continuous or all-discrete Basis distributions (so far)');
             end
             
         end
@@ -302,7 +304,7 @@ classdef Mixture < dEither
                     thisval = This * obj.MixtureP(iDist) + thisval;
                 end
 %            else
-%                assert(false,'Unable to compute Mixture distribution RawMoment.');
+%                error('Unable to compute Mixture distribution RawMoment.');
 %            end
         end
         
@@ -314,17 +316,19 @@ classdef Mixture < dEither
                     thisval = This * obj.MixtureP(iDist) + thisval;
                 end
 %            else
-%                assert(false,'Unable to compute Mixture distribution IntegralXToNxPDF.');
+%                error('Unable to compute Mixture distribution IntegralXToNxPDF.');
 %            end
         end
         
-        function thisval=Random(obj,varargin)
+        function [thisval, thisdist] = Random(obj,varargin)
             assert(obj.Initialized,UninitializedError(obj));
             thisval = zeros(varargin{:});
+            thisdist = zeros(varargin{:},'uint16');
             for iel=1:numel(thisval)
                 thisp = rand;
                 iDist = find(thisp<=obj.CumulativeP,1);  % find the first distribution with thisp<=CumProb
                 thisval(iel) = obj.BasisRV{iDist}.Random;
+                thisdist(iel) = iDist;
             end
         end
         

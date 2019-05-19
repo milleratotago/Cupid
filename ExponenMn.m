@@ -39,7 +39,9 @@ classdef ExponenMn < Exponential
         %        end
         
         function s=EstML(obj,Observations,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             meanObs = mean(Observations);
             ResetParms(obj,meanObs);
             BuildMyName(obj);

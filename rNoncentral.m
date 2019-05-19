@@ -79,7 +79,14 @@ classdef rNoncentral < dContinuous
         end
         
         function []=ReInit(obj)
-            assert((obj.TrueRho>=-obj.RhoExtreme)&&(obj.TrueRho<=obj.RhoExtreme),['rNoncentral TrueRho is ' num2str(obj.TrueRho) ' but must be between +/-' num2str(obj.RhoExtreme)]);
+            if ~((obj.TrueRho>=-obj.RhoExtreme)&&(obj.TrueRho<=obj.RhoExtreme))
+                warning(['Resetting rNoncentral TrueRho ' num2str(obj.TrueRho) ' which must be between +/-' num2str(obj.RhoExtreme)]);
+                if obj.TrueRho>obj.RhoExtreme
+                    obj.TrueRho = obj.RhoExtreme;
+                else
+                    obj.TrueRho = -obj.RhoExtreme;
+                end
+            end
             obj.DF = obj.SampleSize - 2;
             obj.UseApprox = obj.SampleSize >= obj.MinSampleSizeForApprox;
             

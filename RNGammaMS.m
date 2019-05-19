@@ -54,6 +54,10 @@ classdef RNGammaMS < RNGamma
             end
         end
         
+        function s = EstMom(obj,TargetVals,varargin)
+            s = EstMomMS(obj,TargetVals,varargin{:});
+        end
+
     end  % methods
     
 end  % class RNGammaMS

@@ -1,0 +1,14 @@
+<productinfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="optional">
+    <?xml-stylesheet type="text/xsl"href="optional"?>
+    <!-- info.xml file for the Cupid toolbox -->
+    <!-- Version 1.0 -->
+    <!-- Copyright 2019 Jeff Miller. -->
+    
+    <matlabrelease>2016b</matlabrelease>
+    <name>Cupid</name>
+    <type>toolbox</type>
+    <icon></icon>
+    <help_location>html</help_location>
+    
+</productinfo>

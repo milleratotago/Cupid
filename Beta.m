@@ -96,24 +96,32 @@ classdef Beta < dContinuous
         end
         
         function thisval=Mean(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = obj.A / (obj.A + obj.B);
         end
         
         function thisval=Variance(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = obj.A * obj.B / (obj.A + obj.B)^2 / (obj.A + obj.B + 1);
         end
         
         function thisval=RelSkewness(obj)
             % From Mathematica
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 2 * (obj.B - obj.A) * sqrt(1 + obj.A + obj.B) / ( sqrt(obj.A*obj.B) * (2 + obj.A + obj.B) );
         end
         
         function thisval=Kurtosis(obj)
             % From Mathematica
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 3*(1 + obj.A + obj.B)*(obj.A*obj.B*(-6 + obj.A + obj.B) + 2*(obj.A + obj.B)^2)/ (obj.A*obj.B*(2 + obj.A + obj.B)*(3 + obj.A + obj.B));
         end
         
@@ -142,7 +150,9 @@ classdef Beta < dContinuous
         end
         
         function [s,EndingVals,fval,exitflag,output]=EstMom(obj,TargetVals,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if (numel(varargin)==0) && (numel(TargetVals)==2)
                 Mu = TargetVals(1);
                 SigSqr = TargetVals(2);

@@ -40,9 +40,15 @@ classdef ExWaldMSM < ExWald
             obj.WaldMean = newparmvalues(1);
             obj.WaldSD = newparmvalues(2);
             obj.ExpMean = newparmvalues(3);
-            assert(obj.WaldMean>obj.MinWaldMean,['ExWaldMSM WaldMean must be > ' num2str(obj.MinWaldMean) '.']);
-            assert(obj.WaldSD>obj.MinWaldSD,['ExWaldMSM WaldSD must be > ' num2str(obj.MinWaldSD) '.']);
-            assert(obj.ExpMean>obj.MinExpMean,['ExWaldMSM ExpMean must be > ' num2str(obj.MinExpMean) '.']);
+            if obj.WaldMean<=obj.MinWaldMean
+                error(['ExWaldMSM WaldMean must be > ' num2str(obj.MinWaldMean) '.']);
+            end
+            if obj.WaldSD<obj.MinWaldSD
+                error(['ExWaldMSM WaldSD must be > ' num2str(obj.MinWaldSD) '.']);
+            end
+            if obj.ExpMean<obj.MinExpMean
+                error(['ExWaldMSM ExpMean must be > ' num2str(obj.MinExpMean) '.']);
+            end
             PassA = sqrt(obj.WaldMean)*obj.WaldMean/obj.WaldSD;
             PassMu = PassA / obj.WaldMean;
             PassRate = 1/obj.ExpMean;

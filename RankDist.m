@@ -1,11 +1,14 @@
 classdef RankDist < dDiscrete
     % RankDist(SampleSize,BasisX,BasisY): The probability distribution of the rank of X within a sample consisting
-    % of one value of X and (SampleSize-1) values of Y.  RANK 1 MEANS LARGEST!
+    % of one value of X and (SampleSize-1) values of Y.
     
     % Notes:
-    % NewJeff: Bad numerical errors lead to negative PDFs with RankDist(30,ChiSq(80),ChiSq(40))
-    % NewJeff: This version only works with continuous Basis distributions.  With discrete ones, ties would be a problem.
+    % o RANK 1 MEANS LARGEST!
     % o By default SampleSize is NOT adjusted when parameter fitting.
+    % o This version only works with at least one continuous Basis distributions.
+    %   If both were discrete, ties could be a problem.
+
+    % NewJeff: Bad numerical errors lead to negative PDFs with RankDist(30,ChiSq(80),ChiSq(40))
     
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
         SampleSize, BasisX, BasisY

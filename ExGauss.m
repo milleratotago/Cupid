@@ -46,10 +46,6 @@ classdef ExGauss < dContinuous
             ReInit(obj);
         end
         
-        function CheckSigma(obj)
-            assert(obj.sigma>=obj.MinSigma,[obj.FamilyName ' sigma is ' num2str(obj.sigma) ' but must be > obj.MinSigma = ' num2str(obj.MinSigma) '.']);
-        end
-        
         function PerturbParms(obj,ParmCodes)
             % Perturb parameter values a little bit, e.g., prior to estimation attempts for testing.
             % Here, just make mu a little larger and the variances a little bit more equal.
@@ -67,8 +63,12 @@ classdef ExGauss < dContinuous
         end
         
         function []=ReInit(obj)
-            CheckSigma(obj);
-            assert(obj.rate>0,'ExGauss rate must be > 0.');
+            if obj.sigma<obj.MinSigma
+                error([obj.FamilyName ' sigma is ' num2str(obj.sigma) ' but must be > obj.MinSigma = ' num2str(obj.MinSigma) '.']);
+            end
+            if obj.rate<=0
+                error('ExGauss rate must be > 0.');
+            end
             obj.UseNormalApprox = obj.sigma*obj.rate^2 > obj.UseNormalApproxCutoff;
             obj.LowerBound = obj.mu - obj.Standard_Normal.ZExtreme * obj.sigma;
             if obj.UseNormalApprox
@@ -154,29 +154,41 @@ classdef ExGauss < dContinuous
         end
         
         function thisval=Mean(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = obj.mu + 1 / obj.rate;
         end
         
         function thisval=Variance(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = obj.sigma^2 + 1 / obj.rate^2;
         end
         
         function thisval=RelSkewness(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 2/(obj.sigma*obj.rate)^3 * (1 + 1/(obj.rate*obj.sigma)^2)^(-1.5);
         end
         
         function thisval=Kurtosis(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 3*(1+2/(obj.sigma*obj.rate)^2 + 3/(obj.sigma*obj.rate)^4) / ...
                 (1 + 1/(obj.sigma*obj.rate)^2)^2;
         end
         
         function thisval=Random(obj,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
-            thisval = Random(obj.Standard_Normal,varargin{:}) * obj.sigma + obj.mu + Random(obj.Standard_Exponential,varargin{:}) / obj.rate;
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
+            % The built-in MATLAB generators are faster, so replace the next line.
+            % thisval = Random(obj.Standard_Normal,varargin{:}) * obj.sigma + obj.mu + Random(obj.Standard_Exponential,varargin{:}) / obj.rate;
+            thisval = randn(varargin{:})*obj.sigma + obj.mu + exprnd(1/obj.rate,varargin{:});
             % The following might be faster:
             % - log(Standard_Uniform.Random) / obj.rate;
             % - log(CurrentRNG.RealRNG) / obj.rate;
@@ -193,7 +205,9 @@ classdef ExGauss < dContinuous
             % Estimate from 1st 3 moments = mean, variance, and skewness of data values
             % Following dGeneric.EstMom, the skewness measure in TargetVals(3) is
             %  is assumed to be E[(X-mu)^3] = RawSkewness^3
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if numel(varargin)<1
                 ParmCodes = obj.DefaultParmCodes;
             else

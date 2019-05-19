@@ -291,7 +291,9 @@ classdef dGeneric < handle  % Calls by reference
         % **************** Basic functions for all random variables:
 
         function [thispdf, InBounds, Done] = MaybeSplinePDF(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thispdf=zeros(size(X));
             InBounds = (X>=obj.LowerBound) & (X<=obj.UpperBound);
             if obj.UseSplinePDF
@@ -303,7 +305,9 @@ classdef dGeneric < handle  % Calls by reference
         end
         
         function [thiscdf, InBounds, Done] = MaybeSplineCDF(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thiscdf=zeros(size(X));
             thiscdf(X>obj.UpperBound) = 1;
             InBounds = (X>=obj.LowerBound) & (X<=obj.UpperBound);
@@ -316,12 +320,16 @@ classdef dGeneric < handle  % Calls by reference
         end
         
         function thisval=RawMoment(obj,I)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = IntegralXToNxPDF(obj,obj.LowerBound,obj.UpperBound,I);
         end
         
         function thisval=CenMoment(obj,I)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             Mu = Mean(obj);
             thisval = IntegralX_CToNxPDF(obj,obj.LowerBound,obj.UpperBound,Mu,I);
         end
@@ -338,40 +346,54 @@ classdef dGeneric < handle  % Calls by reference
         end
 
         function thisval=Median(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval=InverseCDF(obj,0.5);
         end
         
         function thisval=Mean(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = RawMoment(obj,1);
         end
         
         function thisval=Variance(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = CenMoment(obj,2);
             % Alternative computation: RawMoment(2) - (Mean)^2
         end
         
         function thisval=SD(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = sqrt(Variance(obj));
         end
         
         function thisval=VarianceGivenMu(obj,passMu)
             % This will often be faster in cases where you already have the mean.
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = RawMoment(obj,2) - passMu^2;
         end
         
         function thisval=SDGivenMu(obj,passMu)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = sqrt(VarianceGivenMu(obj,passMu));
         end
         
         function thisval=CV(obj)
             % Coefficient of variation = SD / Mean
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             try
                 thisval=SD(obj)/Mean(obj);
             catch CVErr
@@ -381,7 +403,9 @@ classdef dGeneric < handle  % Calls by reference
         
         function thisval=RawSkewness(obj)
             % 3rd central moment^(1/3)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             % thisval = CenMoment(obj,3)^(1/3);
             CenMom3 = CenMoment(obj,3);
             if CenMom3 >= 0
@@ -395,7 +419,9 @@ classdef dGeneric < handle  % Calls by reference
         function thisval=RelSkewness(obj)  % 3rd central moment / sd^3
             % E[(X-u)^3] / SD^3 From Winer, Brown, & Michels, 1991, p. 849:
             % RelSkewness = CenMom3 / CenMom2 / Sqrt(CenMom2)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             XSD = SD(obj);
             XSkew = RawSkewness(obj);
             try
@@ -407,7 +433,9 @@ classdef dGeneric < handle  % Calls by reference
         
         function thisval=Kurtosis(obj)
             % From Winer, Brown, & Michels, 1991, p. 849:
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             try
                 thisval=CenMoment(obj,4) / Variance(obj)^2;
             catch KurtosisError
@@ -417,7 +445,9 @@ classdef dGeneric < handle  % Calls by reference
         end
         
         function thisval=Hazard(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             HiCDF = 1 - CDF(obj,X);
             thisval = PDF(obj,X) ./ HiCDF;
         end
@@ -427,7 +457,9 @@ classdef dGeneric < handle  % Calls by reference
             % Note that the function value for Theta == 0 should be one and this property
             % can be used as a check of the accuracy of computing PDF.
             % Also note PassTheta should be close to zero to avoid numerical problems
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             try
                 thisval=MGFrng(obj,PassTheta,obj.LowerBound,obj.UpperBound);
             catch
@@ -441,7 +473,9 @@ classdef dGeneric < handle  % Calls by reference
             % a small value that decreases with Distance outside the Upperbound or Lowerbound.
             % This imposes a penalty for observations outside the range based on how far outside
             % the range they are, thus helping to push parameter search routines in the right direction.
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             Like = PDF(obj,Observations);
             ZeroPos = find(Like==0);
             if numel(ZeroPos) && ~(obj.SkipImpossibleWarn > 0)
@@ -495,7 +529,9 @@ classdef dGeneric < handle  % Calls by reference
         function thisval=YNProbitLnLikelihood(obj,Constants, NTrials, NGreater)
             % Greater is the number of times that the Constant value is greater
             % than the value in the distribution. NGreater should increase with C.
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             NObservations = numel(Constants);
             % Probit.tex explains why no binomial coefficient is needed.
             thisval = 0;
@@ -511,7 +547,9 @@ classdef dGeneric < handle  % Calls by reference
         function thisval=YNProbitChiSq(obj, Constants, NTrials, NGreater)
             % Greater is the number of times that the Constant value is greater
             % than the value in the distribution. NGreater should increase with C.
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             NObservations = numel(Constants);
             thisval = 0;
             for I = 1:NObservations
@@ -524,7 +562,9 @@ classdef dGeneric < handle  % Calls by reference
         end
         
         function thisval=mAFCProbitLnLikelihood(obj, PassM, Constants, NTrials, NCorrect)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             NObservations = numel(Constants);
             % Probit.tex explains why no binomial coefficient is needed.
             thisval = 0;
@@ -542,7 +582,9 @@ classdef dGeneric < handle  % Calls by reference
         end
         
         function thisval=mAFCProbitChiSq(obj, PassM, Constants, NTrials, NCorrect)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             NObservations = numel(Constants);
             thisval = 0;
             GuessProb = 1 / PassM;
@@ -557,7 +599,9 @@ classdef dGeneric < handle  % Calls by reference
         
         function thisval=GofFChiSq(obj, BinUpperBounds, BinProbs)
             % Note that the lowest bin is assumed to extend down to -infty
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             NBins = numel(BinUpperBounds);
             LastPredictedCDF = 0;
             SumObservedProp = 0;
@@ -596,23 +640,31 @@ classdef dGeneric < handle  % Calls by reference
         
         
         function thisval=Minimum(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval=obj.LowerBound;
         end
         
         function thisval=Maximum(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval=obj.UpperBound;
         end
         
         function thisval=SIQR(obj)
             % Semi-interquartile range.
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = (InverseCDF(obj,0.75) - InverseCDF(obj,0.25) ) / 2;
         end
         
         function thisval=MMMSD(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             ThisSD = SD(obj);
             if (ThisSD == 0)
                 thisval = 0;
@@ -622,7 +674,9 @@ classdef dGeneric < handle  % Calls by reference
         end
         
         function thisval=PctileSkew(obj,P)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             ThisMdn = Median(obj);
             ThisP = InverseCDF(obj,P);
             ThisOMP = InverseCDF(obj,1-P);
@@ -635,19 +689,25 @@ classdef dGeneric < handle  % Calls by reference
         
         function thisval=PDFBin(obj,X, BinWidth)
             % Probability between X and X+BinWidth
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval=CDF(obj,X+BinWidth) - CDF(obj,X);
         end
         
         function thisval=OMCDF(obj,X)
             % One minus CDF(X)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 1-CDF(obj,X);
         end
         
         function thisval=TwoTailProb(obj,X)
             % Twice the tail probability of X
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             ThisCDF = CDF(obj,X);
             if (ThisCDF <= 0.5)
                 thisval = 2*ThisCDF;
@@ -657,7 +717,9 @@ classdef dGeneric < handle  % Calls by reference
         end
         
         function [s,EndingVals,fval,exitflag,output]=EstML(obj,Observations,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if numel(varargin)<1
                 ParmCodes = obj.DefaultParmCodes;
             else
@@ -767,7 +829,9 @@ classdef dGeneric < handle  % Calls by reference
         end % function MLSE
         
         function totalerr=MomentError(obj,TargetVals)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             NToFit = numel(TargetVals);
             totalerr = 0;
             for I=1:NToFit
@@ -784,7 +848,9 @@ classdef dGeneric < handle  % Calls by reference
         end
         
         function [s,EndingVals,fval,exitflag,output]=EstMom(obj,TargetVals,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if numel(varargin)<1
                 ParmCodes = obj.DefaultParmCodes;
             else
@@ -806,6 +872,25 @@ classdef dGeneric < handle  % Calls by reference
             end
         end
         
+        function s = EstMomMS(obj,TargetVals,varargin)
+            % A special short-cut moment estimator for when
+            % the distribution parameters are defined as MS
+            % (e.g., LogNormalMS, RNGammaMS).
+            if numel(varargin)<1
+                ParmCodes = obj.DefaultParmCodes;
+            else
+                ParmCodes = varargin{1};
+            end
+            newmu = ifelse(ParmCodes(1)=='f',obj.mu,TargetVals(1));
+            if (ParmCodes(2)=='f')||(numel(TargetVals)==1)
+                newsigma = obj.sigma;
+            else
+                newsigma = sqrt(TargetVals(2));  % Cannot use ifelse in case there is only one TargetVal
+            end
+            obj.ResetParms([newmu newsigma]);
+            s = obj.StringName;
+        end
+
         function ObsMoments = MomentsFromScores(obj,Observations)
             ObsMoments(1) = mean(Observations);
             if obj.NDistParms > 1
@@ -820,7 +905,9 @@ classdef dGeneric < handle  % Calls by reference
         end
         
         function [s,EndingVals,fval,exitflag,output]=EstChiSq(obj,BinUpperBounds,BinProbs,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if numel(varargin)<1
                 ParmCodes = obj.DefaultParmCodes;
             else
@@ -849,7 +936,9 @@ classdef dGeneric < handle  % Calls by reference
             %   to measure CDF differences on log(odds) scale
             %   to consider CDFs as fixed and minimize differences on the X scale, as suggested at
             %   https://au.mathworks.com/help/stats/examples/fitting-a-univariate-distribution-using-cumulative-probabilities.html
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             totalerr = 0;
             NToFit = numel(XValues);
             for I = 1:NToFit
@@ -874,7 +963,9 @@ classdef dGeneric < handle  % Calls by reference
         end
         
         function [s,EndingVals,fval,exitflag,output]=EstPctile(obj,XValues,TargetCDFs,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if numel(varargin)<1
                 ParmCodes = obj.DefaultParmCodes;
             else
@@ -924,9 +1015,15 @@ classdef dGeneric < handle  % Calls by reference
         function [s,EndingVals,fval,exitflag,output]=EstPctBounds(obj,LowerBound,UpperBound,TargetProb,varargin)
             % Adjust parameter(s) so that the desired TargetProb % of the distribution
             % falls between the specified bounds.
-            assert(LowerBound<UpperBound,GenericError(obj,['Called EstPctBounds with LowerBound = ' num2str(LowerBound) ' and UpperBound = ' num2str(UpperBound)]))
-            assert(0<TargetProb&&TargetProb<1,GenericError(obj,['Called EstPctBounds with illegal value of TargetProb = ' num2str(TargetProb)]))
-            assert(obj.Initialized,UninitializedError(obj));
+            if LowerBound>=UpperBound
+                error(GenericError(obj,['Called EstPctBounds with LowerBound = ' num2str(LowerBound) ' and UpperBound = ' num2str(UpperBound)]))
+            end
+            if (0>=TargetProb) || (TargetProb>=1)
+                error(GenericError(obj,['Called EstPctBounds with illegal value of TargetProb = ' num2str(TargetProb)]));
+            end
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if numel(varargin)<1
                 ParmCodes = obj.DefaultParmCodes;
             else
@@ -949,7 +1046,9 @@ classdef dGeneric < handle  % Calls by reference
         end
         
         function [s,EndingVals,fval,exitflag,output]=EstProbitYNML(obj,Constants,NTrials,NGreater,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if numel(varargin)<1
                 ParmCodes = obj.DefaultParmCodes;
             else
@@ -972,7 +1071,9 @@ classdef dGeneric < handle  % Calls by reference
         end
         
         function [s,EndingVals,fval,exitflag,output]=EstProbitYNChiSq(obj,Constants,NTrials,NGreater,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if numel(varargin)<1
                 ParmCodes = obj.DefaultParmCodes;
             else
@@ -995,7 +1096,9 @@ classdef dGeneric < handle  % Calls by reference
         end
         
         function [s,EndingVals,fval,exitflag,output]=EstProbitmAFCML(obj,M,Constants,NTrials,NGreater,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if numel(varargin)<1
                 ParmCodes = obj.DefaultParmCodes;
             else
@@ -1018,7 +1121,9 @@ classdef dGeneric < handle  % Calls by reference
         end
         
         function [s,EndingVals,fval,exitflag,output]=EstProbitmAFCChiSq(obj,M,Constants,NTrials,NGreater,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if numel(varargin)<1
                 ParmCodes = obj.DefaultParmCodes;
             else
@@ -1142,7 +1247,9 @@ classdef dGeneric < handle  % Calls by reference
         end
         
         function [thisval, InBounds, Done] = MaybeSplineInvCDF(obj,P)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             assert(sum(P<0)+sum(P>1)==0,'Error: All Ps must be between 0 & 1');
             thisval=zeros(size(P));
             InBounds = true(size(P));

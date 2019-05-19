@@ -277,7 +277,9 @@ classdef utGeneric < matlab.unittest.TestCase
         function Hazardcheck(testCase)
             % Make sure the hazard function can be computed & is always positive.
             Useable = testCase.Computed.CDF < 1;
-            testCase.verifyGreaterThanOrEqual(testCase.Computed.Hazard(Useable),0,'Found negative Hazard function values');
+            if numel(testCase.Computed.Hazard(Useable))>0  % may be zero for constant distributions
+                testCase.verifyGreaterThanOrEqual(testCase.Computed.Hazard(Useable),0,'Found negative Hazard function values');
+            end
             % Check that the Hazard function values are consistent with the PDF/CDF values:
             HazardFromPDFCDF = testCase.Computed.PDF(Useable) ./ (1 - testCase.Computed.CDF(Useable));
             testCase.verifyEqual(testCase.Computed.Hazard(Useable),HazardFromPDFCDF,'AbsTol',testCase.HazAbsTol,'RelTol',testCase.HazRelTol,'Hazard function values are not consistent with PDF/CDF values within HazAbsTol/HazRelTol.');
@@ -366,6 +368,10 @@ classdef utGeneric < matlab.unittest.TestCase
         function CheckRandom(testCase)
             % Check that samples of random numbers are consistent with the PDF of the
             % distribution by a chi-square test.
+            % Skip if it is a discrete distribution with only 1 value.
+            if (testCase.Dist.DistType=='d') && (testCase.Dist.NValues==1)
+                return;
+            end
             PassedChisqTest = false;
             NTries = 0;
             [BinMax, BinProb] = testCase.Dist.MakeBinSet(1/testCase.ChiSqNBins);

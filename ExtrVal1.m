@@ -99,17 +99,23 @@ classdef ExtrVal1 < dContinuous
         end
         
         function thisval=Mean(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = obj.alpha + obj.beta * obj.EulerConstant;
         end
         
         function thisval=Variance(obj)  % Mathematica
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = (obj.beta * pi)^2 / 6;
         end
         
         function thisval=Kurtosis(obj)  % Mathematica
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 5.4;  % 27 / 5
         end
         

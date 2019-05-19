@@ -86,7 +86,9 @@ classdef GenNor1 < dContinuous
         end
         
         function thispdf=PDF(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             Z = (abs(X - obj.Mu)/obj.Alpha).^obj.Beta;
             thispdf = obj.PDFmul * exp(-Z);
             thispdf(X<obj.LowerBound) = 0;
@@ -94,7 +96,9 @@ classdef GenNor1 < dContinuous
         end
         
         function thiscdf=CDF(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             sgn = sign(X-obj.Mu);
             % Note: The following line looks a little different than what is shown in Wikipedia
             % because it and MATLAB define gammainc differently by a factor of gamma(1/obj.Beta).
@@ -132,12 +136,16 @@ classdef GenNor1 < dContinuous
 %         end
         
         function thisval=Mean(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = obj.Mu;
         end
         
         function thisval=Median(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = obj.Mu;
         end
         

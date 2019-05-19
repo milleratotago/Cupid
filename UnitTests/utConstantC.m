@@ -1,7 +1,7 @@
-classdef utGeometric < utDiscrete;
+classdef utConstantC < utContinuous;
     
     properties (ClassSetupParameter)
-        parmp = struct('p_1',0.1, 'p_33',.33 , 'p_55',.55 , 'p_73',.73, 'p_48',.48 );
+        thisconstant    = struct( 'p10',10 , 'p50',50 , 'p200',200 );
     end
     
     properties
@@ -10,35 +10,37 @@ classdef utGeometric < utDiscrete;
 
     methods
         
-        function testCase=utGeometric(varargin)  % Constructor
-            testCase=testCase@utDiscrete(varargin{:});
+        function testCase=utConstantC(varargin)  % Constructor
+            testCase=testCase@utContinuous(varargin{:});
         end
         
     end
     
     methods (TestClassSetup, ParameterCombination='sequential')
         
-        function ClassSetup(testCase,parmp)
+        function ClassSetup(testCase,thisconstant)
             % Computations specific to the distribution.
-            testCase.Dist = Geometric(parmp);
+            testCase.Dist = ConstantC(thisconstant);
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 
-            testCase.SetupXs;
+            SetupXs(testCase,100,2000);
             
             % Compute whatever values known are known from other sources:
+            testCase.Expected.Mean = thisconstant;
+            testCase.Expected.SD = 0;
             
             % Adjust tolerances as appropriate for this distribution & parameters:
-            SetTolerances(testCase,0.01);  % Expect some problems due to truncation of discrete distribution
+            SetTolerances(testCase,0.005);
 
-            if parmp>.6  % not enough probability in different bins to do Probit estimation
-                testCase.SkipAllProbitEst = true;
-            end
+%            testCase.SkipMGFs = true;
+            testCase.SkipAllEst = true;
+
             utGenericMethodSetup(testCase);   % Initialize many standard computations
 
         end
         
     end  % TestClassSetup
     
-end  % utGeometric
+end  % utConstantC
 
 

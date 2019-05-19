@@ -53,7 +53,9 @@ classdef Lognormal < dContinuous
         end
         
         function []=ReInit(obj)
-            assert(obj.sigma>0,'Lognormal sigma must be > 0.');
+            if obj.sigma<=0
+                error('Lognormal sigma must be > 0.');
+            end
             obj.Initialized = true;
             obj.LowerBound = InverseCDF(obj,obj.CDFNearlyZero);
             obj.UpperBound = InverseCDF(obj,obj.CDFNearlyOne);

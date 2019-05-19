@@ -20,7 +20,7 @@ classdef utLognormalMS < utContinuous;
     methods (TestClassSetup, ParameterCombination='sequential')
         
         function ClassSetup(testCase,parmpostmu,parmpostsigma)
-            % Computations specific to the normal distribution.
+            % Computations specific to the distribution.
             testCase.Dist = LognormalMS(parmpostmu,parmpostsigma);
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

@@ -70,27 +70,37 @@ classdef Geometric < dDiscrete     % NWJEFF: Not vectorized
         end
         
         function thisval=Mean(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 1/obj.P;
         end
         
         function thisval=Variance(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = (1-obj.P)/obj.P^2;
         end
   
         function thisval=Skewness(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = (2-obj.P)/sqrt(1-obj.P);
         end
   
         function thisval=Kurtosis(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 9 + obj.P^2/(1-obj.P);
         end
   
         function s=EstML(obj,Observations,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             meanObs = mean(Observations);
             ResetParms(obj,1/meanObs);
             BuildMyName(obj);

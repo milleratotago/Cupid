@@ -251,7 +251,9 @@ classdef AttainP < dContinuous % dEither  % Discrete not implemented yet. Maybe 
         end
         
         function thisval=Random(obj,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             r = obj.True.Random(varargin{:});
             thisval = obj.XtoP(r);
         end

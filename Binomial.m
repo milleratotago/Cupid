@@ -105,7 +105,9 @@ classdef Binomial < dDiscrete   % NWJEFF: Not vectorized
         end
         
         function thisval=LegalValue(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = zeros(size(X));
             for i=1:numel(X)
                 if (abs(round(X(i))-X(i))<eps) && (X(i)>=obj.LowerBound) && (X(i)<=obj.UpperBound)
@@ -115,7 +117,9 @@ classdef Binomial < dDiscrete   % NWJEFF: Not vectorized
         end
         
         function thisval=NearestLegal(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = zeros(size(X));
             for iel=1:numel(X)
                 if X(iel) <= obj.LowerBound
@@ -189,27 +193,37 @@ classdef Binomial < dDiscrete   % NWJEFF: Not vectorized
         end
 
         function thisval=Mean(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = obj.NP;
         end
         
         function thisval=Variance(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = obj.NPQ;
         end
         
         function thisval=RelSkewness(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = (obj.Q - obj.P) / sqrt(obj.NPQ);
         end
         
         function thisval=Kurtosis(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 3 - 6/obj.N + 1/obj.NPQ;
         end
         
         function thisval=MGF(obj,Theta)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = (obj.P * exp(Theta) + obj.Q)^obj.N;
         end
 
@@ -226,7 +240,9 @@ classdef Binomial < dDiscrete   % NWJEFF: Not vectorized
         end
         
         function s=EstML(obj,Observations,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             meanObs = mean(Observations);
             ResetParms(obj,[obj.N meanObs/obj.N]);
             BuildMyName(obj);

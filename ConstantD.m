@@ -34,17 +34,22 @@ classdef ConstantD < dDiscrete
             obj.UpperBound =  obj.value;
             obj.Initialized = true;
 
-            % MakeTables:
-            obj.NValues = 1;
-            obj.DiscreteX = obj.value;
-            obj.DiscretePDF = 1;
-            obj.DiscreteCDF = 1;
+            obj.MakeTables;
+            SetBinEdges(obj);
 
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
         end
         
+        function []=MakeTables(obj)
+            obj.NValues = 1;
+            obj.DiscreteX = obj.value;
+            obj.DiscretePDF = 1;
+            obj.DiscreteCDF = 1;
+            obj.StoredTablesInitialized = true;
+        end
+
         function Reals = ParmsToReals(obj,Parms,~)
             Reals = Parms(1);
         end
@@ -79,6 +84,14 @@ classdef ConstantD < dDiscrete
             else
                 thisval = 0;
             end
+        end
+        
+        function thisval=Hazard(obj,X)
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
+            thisval = zeros(size(X));
+            thisval(X==obj.value) = 1;
         end
         
     end  % methods

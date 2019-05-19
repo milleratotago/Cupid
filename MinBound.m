@@ -27,7 +27,7 @@ classdef MinBound < dContinuous % dEither
                     if (obj.BasisRV1.DistType=='c') && (obj.BasisRV2.DistType=='c')
                         obj.DistType = 'c';
                     else
-                        assert(false,'MinBound can only handle continuous Basis distributions (so far)');
+                        error('MinBound can only handle continuous Basis distributions (so far)');
                     end
                     obj.NDistParms = obj.BasisRV1.NDistParms + obj.BasisRV2.NDistParms;
                     obj.DefaultParmCodes = [obj.BasisRV1.DefaultParmCodes obj.BasisRV2.DefaultParmCodes];

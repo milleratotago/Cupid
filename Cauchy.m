@@ -62,7 +62,9 @@ classdef Cauchy < dContinuous
         end
         
         function thispdf=PDF(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thispdf=zeros(size(X));
             InBounds = (X>=obj.LowerBound) & (X<=obj.UpperBound);
             SqrDev = ( (X(InBounds) - obj.location) / obj.scale ).^2;
@@ -70,7 +72,9 @@ classdef Cauchy < dContinuous
         end
         
         function thiscdf=CDF(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thiscdf=zeros(size(X));
             InBounds = (X>=obj.LowerBound) & (X<=obj.UpperBound);
             ATanDev = atan( (X(InBounds) - obj.location) / obj.scale );
@@ -80,7 +84,9 @@ classdef Cauchy < dContinuous
         
         function thisval=InverseCDF(obj,P)
             % from Mathematica
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             assert(min(P)>=0&&max(P)<=1,'InverseCDF requires 0<=P<=1');
             Ang = pi * (P - 0.5);
             %SinAng = sin(Ang);       % Note: Tan(x) = Sin(x) / Cos(x)

@@ -92,19 +92,25 @@ classdef Chi < dContinuous
         end
         
         function thisval=Mean(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             % JKB Vol 1 Eqn 18.14
             thisval = sqrt(2) * gamma((obj.df+1)/2) / obj.GammaHalfdf;
         end
         
         function thisval=Variance(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             % JKB Vol 1 Eqn 18.14
             thisval = obj.df - 2 * ( gamma((obj.df+1)/2) / obj.GammaHalfdf )^2;
         end
         
         function thisval=RawMoment(obj,I)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             % JKB Vol 1 Eqn 18.13
             thisval = 2^(I/2) * gamma((obj.df+I)/2) / obj.GammaHalfdf;
         end

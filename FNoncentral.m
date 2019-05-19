@@ -205,7 +205,9 @@ classdef FNoncentral < dContinuous
         end
         
         function thisval=Mean(obj) % JKB 2nd ed vol 2 p 481
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if obj.dfdenom > 2
                 thisval = obj.dfdenom * (obj.dfnum + obj.noncen) / (obj.dfnum * (obj.dfdenom-2) );
             else
@@ -214,7 +216,9 @@ classdef FNoncentral < dContinuous
         end
         
         function thisval=Variance(obj)   % JKB 2nd ed vol 2 p 481:
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if obj.dfdenom <= 4
                 thisval = inf;  %  'Requested infinite variance of FObj.Noncentral distribution.'
             else

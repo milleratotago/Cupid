@@ -104,7 +104,9 @@ classdef Gamma < dContinuous
         end
         
         function thisval=MGF(obj,Theta)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if Theta < obj.Rate
                 thisval = (1 - Theta/obj.Rate)^(-obj.N);
             else
@@ -115,7 +117,9 @@ classdef Gamma < dContinuous
         end
         
         function thisval=RawMoment(obj,I)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             Sum1 = 0;
             Sum2 = 0;
             for J = 2:obj.N + I - 1
@@ -131,7 +135,7 @@ classdef Gamma < dContinuous
         
         % Maybe this ConditionalRawMoment can be added?
         %       function thisval=ConditionalRawMoment(obj,FromX, ToX,I)
-        %           assert(obj.Initialized,UninitializedError(obj));
+        %           assert(Initialized,UninitializedError(obj));
         %           RateToNegI = log(obj.Rate);
         %           RateToNegI = exp(-RateToNegI*I);
         %           LowerFac = 1;
@@ -151,7 +155,7 @@ classdef Gamma < dContinuous
         %               NewRate = 1 / obj.Rate;
         %           end
         %           % NOTE: NEED TO USE A DERIVED GammaRV here:
-        %           assert(obj.Initialized,UninitializedError(obj));
+        %           assert(Initialized,UninitializedError(obj));
         %           GammaNplusI.ResetParms([obj.N+I NewRate]);
         %           ProbRatioNum = GammaNplusI.CDF(FromX);
         %           ProbRatioNum = GammaNplusI.CDF(ToX) - ProbRatioNum;
@@ -161,7 +165,9 @@ classdef Gamma < dContinuous
         %       end
         
         function thisval=Random(obj,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             Sum = random('exp',1,varargin{:});
             for I = 2:obj.N
                 Sum = Sum + random('exp',1,varargin{:});
@@ -170,22 +176,30 @@ classdef Gamma < dContinuous
         end
         
         function thisval=Mean(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = obj.N / obj.Rate;
         end
         
         function thisval=Variance(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = obj.N / obj.Rate^2;
         end
         
         function thisval=RelSkewness(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 2 / sqrt(obj.N);
         end
         
         function thisval=Kurtosis(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 3 + 6.0 / obj.N;
         end
         

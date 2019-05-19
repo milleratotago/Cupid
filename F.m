@@ -119,7 +119,9 @@ classdef F < dContinuous
         end
         
         function thisval=Mean(obj) % JKB, Vol 2, p 326
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if obj.dfdenom > 2
                 thisval = obj.dfdenom / (obj.dfdenom - 2);
             else
@@ -128,14 +130,18 @@ classdef F < dContinuous
         end
         
         function thisval=InverseCDF(obj,P)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             assert(min(P)>=0&&max(P)<=1,'InverseCDF requires 0<=P<=1');
             BetaX = InverseCDF(obj.BetaGenerator,P);
             thisval = obj.dfdenom / obj.dfnum * BetaX ./ (1 - BetaX);
         end
         
         function thisval=Variance(obj)   % Wikipedia & JKB, Vol 2, p 326
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if obj.dfdenom <= 4
                 thisval = inf;  %  'Requested infinite variance of F distribution.'
             else
@@ -144,7 +150,9 @@ classdef F < dContinuous
         end
         
         function thisval=Skewness(obj)   % Wikipedia
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if obj.dfdenom <= 6
                 thisval = inf;  %  'Requested infinite skewness of F distribution.'
             else
@@ -154,7 +162,9 @@ classdef F < dContinuous
         end
         
         %        function thisval=Kurtosis(obj)   % Dec 2016 Wikipedia gives this function for excess kurtosis, but I think it is wrong.
-        %            assert(obj.Initialized,UninitializedError(obj));
+%             if ~obj.Initialized
+%                 error(UninitializedError(obj));
+%             end
         %            if obj.dfdenom <= 8
         %                thisval = inf;  %  'Requested infinite kurtosis of F distribution.'
         %            else
@@ -164,7 +174,9 @@ classdef F < dContinuous
         %        end
         
         function thisval=RawMoment(obj,I)   % JKB, Vol 2, p 325
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if I == 0
                 thisval = 1;
             elseif I == 1
@@ -187,7 +199,9 @@ classdef F < dContinuous
         end
         
         function thisval=Random(obj,varargin)  % From Beta: Devroye p 430
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             X = Random(obj.BetaGenerator,varargin{:});
             thisval = obj.dfdenom / obj.dfnum * X ./ (1 - X);
         end

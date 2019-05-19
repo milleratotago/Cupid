@@ -38,7 +38,9 @@ classdef dTransDuo < dEither   % NWJEFF: Need a demo of using this generically f
         end
         
         function BuildMyName(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             obj.StringName = [obj.FamilyName '(' obj.BasisRV1.StringName ',' obj.BasisRV2.StringName ')'];
         end
         
@@ -104,7 +106,9 @@ classdef dTransDuo < dEither   % NWJEFF: Need a demo of using this generically f
         end
         
         function thisval=Random(obj,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = obj.FofDuo(obj.BasisRV1.Random(varargin{:}),obj.BasisRV2.Random(varargin{:}));
         end
         

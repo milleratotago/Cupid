@@ -47,13 +47,17 @@ classdef ConstantC < dContinuous
         end
         
         function thispdf=PDF(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thispdf = zeros(size(X));
             thispdf(X==obj.value) = 1;
         end
         
         function thiscdf=CDF(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thiscdf = zeros(size(X));
             thiscdf(X>=obj.value) = 1;
         end
@@ -88,6 +92,14 @@ classdef ConstantC < dContinuous
             else
                 thisval = 0;
             end
+        end
+        
+        function thisval=Hazard(obj,X)
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
+            thisval = zeros(size(X));
+            thisval(X==obj.value) = 1;
         end
         
     end  % methods

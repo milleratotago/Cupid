@@ -184,8 +184,12 @@ POSSIBILITY OF SUCH DAMAGE.
         end
         
         function []=ReInit(obj)
-            assert(obj.df>=obj.mindf,['StudRng df must be >= ' num2str(obj.mindf) '.']);
-            assert(obj.r >=obj.minr, ['StudRng r must be >= '  num2str(obj.minr)  '.']);
+            if obj.df < obj.mindf
+                error(['StudRng df must be >= ' num2str(obj.mindf) '.']);
+            end
+            if obj.r < obj.minr
+                error( ['StudRng r must be >= '  num2str(obj.minr)  '.']);
+            end
             obj.Initialized = true;
             obj.LowerBound = 0.001;
             obj.UpperBound = 1000;

@@ -134,7 +134,9 @@ classdef ChiSqNoncentral < dContinuous
         end
         
         function thisval=Random(obj,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             try
                 % Sum of df copies of random normal(MeanOfEachNormal,1) rvs:
                 randnors = randn(varargin{:},obj.df) + obj.MeanOfEachNormal;

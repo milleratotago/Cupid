@@ -148,7 +148,9 @@ classdef dMATLABc < dContinuous
         end
         
         function thispdf=PDF(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             [thispdf, InBounds, Done] = MaybeSplinePDF(obj,X);
             if Done
                 return;
@@ -157,7 +159,9 @@ classdef dMATLABc < dContinuous
         end
         
         function thiscdf=CDF(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             [thiscdf, InBounds, Done] = MaybeSplineCDF(obj,X);
             if Done
                 return;
@@ -166,27 +170,37 @@ classdef dMATLABc < dContinuous
         end
         
         function thisval=InverseCDF(obj,P)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = obj.pd.icdf(P);
         end
         
         function thisval=Random(obj,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = obj.pd.random(varargin{:});
         end
         
         function thisval=Mean(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = obj.pd.mean;
         end
         
         function thisval=Variance(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = obj.pd.var;
         end
         
         function thisval=SD(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = obj.pd.std;
         end
         

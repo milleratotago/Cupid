@@ -31,8 +31,12 @@ classdef ExGauMn < ExGauss
             if ~(obj.sigma>0)
                 disp('error');
             end
-            CheckSigma(obj);
-            assert(obj.exmean>=eps,['ExGauMn exmean is ' num2str(obj.exmean) ' but must be > 0.']);
+            if obj.sigma<obj.MinSigma
+                error([obj.FamilyName ' sigma is ' num2str(obj.sigma) ' but must be > obj.MinSigma = ' num2str(obj.MinSigma) '.']);
+            end
+            if obj.exmean<eps
+                error(['ExGauMn exmean is ' num2str(obj.exmean) ' but must be > 0.']);
+            end
             ReInit(obj);
         end
         

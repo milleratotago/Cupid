@@ -93,7 +93,9 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
         end
         
         function thisval=IthValue(obj,I)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if ~obj.StoredTablesInitialized
                 MakeTables(obj);
             end
@@ -104,7 +106,9 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
         end
         
         function thisval=LegalValue(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if ~obj.StoredTablesInitialized
                 MakeTables(obj);
             end
@@ -116,7 +120,9 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
         end
         
         function thisval=NearestLegal(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if ~obj.StoredTablesInitialized
                 MakeTables(obj);
             end
@@ -129,7 +135,9 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
         end
         
         function thispdf=PDF(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if ~obj.StoredTablesInitialized
                 MakeTables(obj);
             end
@@ -143,7 +151,9 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
         end
         
         function thiscdf=CDF(obj,X)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if ~obj.StoredTablesInitialized
                 MakeTables(obj);
             end
@@ -163,7 +173,9 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
         end
         
         function thisval=InverseCDF(obj,P)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if ~obj.StoredTablesInitialized
                 MakeTables(obj);
             end
@@ -180,7 +192,9 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
             %           if ~(min(P)>=0)&&(max(P)<=obj.DiscreteCDFmax(end))
             %               disp('Combined fail');
             %           end
-            assert((min(P)>=0)&&(max(P)<=obj.DiscreteCDFmax(end)),['InverseCDF requires 0<=P<=1 but found min(P) and max(P) of ' num2str(min(P)) ' and ' num2str(max(P))]);
+            if (min(P)<0) || (max(P)>obj.DiscreteCDFmax(end))
+                error(['InverseCDF requires 0<=P<=1 but found min(P) and max(P) of ' num2str(min(P)) ' and ' num2str(max(P))]);
+            end
             thisval=zeros(size(P));
             for iel=1:numel(thisval)
                 i_of_p = find(obj.DiscreteCDFmax>=P(iel),1);
@@ -189,7 +203,9 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
         end
         
         function thisval=Random(obj,varargin)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if ~obj.StoredTablesInitialized
                 MakeTables(obj);
             end
@@ -204,7 +220,9 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
         function [FromI,ToI]=IRange(obj,FromX,ToX)
             % Return the range of indices 1=smallest, etc, including
             % all values from FromX to ToX for a discrete random variable.
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if ~obj.StoredTablesInitialized
                 MakeTables(obj);
             end
@@ -231,7 +249,9 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
             % Returns the sum from FromX to ToX of X^N * PDF.   Note that the
             %  function value for N == 0 should be one and this property can
             %  be used as a check of the accuracy of the computation of PDF.
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if ~obj.StoredTablesInitialized
                 MakeTables(obj);
             end
@@ -246,7 +266,9 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
             % Returns the sum from FromX to ToX of (X-C)^N * PDF
             % Note that the function value for N == 0 should be one and this property can
             % be used as a check of the accuracy of the computation of PDF.
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if ~obj.StoredTablesInitialized
                 MakeTables(obj);
             end
@@ -258,7 +280,9 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
         end
         
         function thisval=ConditionalMoment(obj,FromX,ToX,Around,N)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if ~obj.StoredTablesInitialized
                 MakeTables(obj);
             end
@@ -285,7 +309,9 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
         end
         
         function thisval=IntegralCDF(obj,FromX,ToX,N)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 0;
             if FromX > ToX
                 return;
@@ -299,7 +325,9 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
         end
         
         function thisval=MGFrng(obj,Theta,FromX,ToX)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             thisval = 0;
             if FromX > ToX
                 return;

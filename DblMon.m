@@ -128,7 +128,9 @@ classdef DblMon < dContinuous
         end
         
         function thisval=Mean(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if obj.epsilon <= 2
                 %                 thisval = NaN; % Theoretically correct but not for truncated version implemented here.
                 thisval = Mean@dContinuous(obj);
@@ -138,7 +140,9 @@ classdef DblMon < dContinuous
         end
         
         function thisval=Variance(obj)
-            assert(obj.Initialized,UninitializedError(obj));
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
             if obj.epsilon <= 3
                 %                 thisval = NaN; % Theoretically correct but not for truncated version implemented here.
                 thisval = Variance@dContinuous(obj);
