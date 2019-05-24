@@ -94,6 +94,7 @@ function Run(CaseNs)
             rpt{end+1} = SingleTest('UniformCW');
             rpt{end+1} = SingleTest('UniGap');
             rpt{end+1} = SingleTest('Wald2');
+            rpt{end+1} = SingleTest('Wald2MSD');
             rpt{end+1} = SingleTest('Weibull');
             sectiontime = toc(sectiontime) / 60;
             WriteMarker([MarkerRoot '1CntFas'],rpt,sectiontime);

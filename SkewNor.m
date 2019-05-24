@@ -1,7 +1,5 @@
 classdef SkewNor < dContinuous
     % SkewNor(Location,Scale,Shape):  See the introduction at http:%azzalini.stat.unipd.it/SN/Intro/intro.html.
-    % NewJeff: According to https://au.mathworks.com/matlabcentral/answers/33953-skew-normal-and-owen-s-t-function#comment_695158
-    %   it is possible to calculate the cdf of a skew normal distribution using Owen's T function.
     
     properties(SetAccess = protected)
         Loc, Scale, Shape,
@@ -85,6 +83,20 @@ classdef SkewNor < dContinuous
             %                    thispdf(i) = 2 / obj.Scale * obj.Standard_Normal.PDF(Z) * obj.Standard_Normal.CDF(obj.Shape*Z);
             %                end
             %            end
+        end
+        
+        function thiscdf=CDF(obj,X)
+            % Using Owen's T function. See https://en.wikipedia.org/wiki/Skew_normal_distribution
+            [thiscdf, InBounds, Done] = MaybeSplineCDF(obj,X);
+            if Done
+                return;
+            end
+            Z = (X(InBounds) - obj.Loc) / obj.Scale;
+            norcdf = obj.Standard_Normal.CDF(Z);
+            wantpos = find(InBounds>0);
+            for i=1:numel(Z)
+                thiscdf(wantpos(i)) = norcdf(i) - 2*TfnOwen(Z(i),obj.Shape);
+            end
         end
         
         function thisval=Mean(obj)

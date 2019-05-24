@@ -1,4 +1,4 @@
-classdef Wald2MSD < Wald  % NEWJEFF: Not documented or unit-tested
+classdef Wald2MSD < Wald
     % 2-parameter version of Wald distribution (mu,sigma,barrierA) with sigma=1
     % The two parameters of this version of the distribution are its mean and SD.
     
