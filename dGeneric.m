@@ -743,6 +743,12 @@ classdef dGeneric < handle  % Calls by reference
                 thiserrval = -LnLikelihood(obj,Observations);
             end
         end
+
+        function [] = DistRename(obj,sNewName)
+            % Reset the distribution name to any string sNewName.
+            obj.StringName = sNewName;
+            obj.NameBuilding = false;  % turn this off so that the name will not be built automatically
+        end
         
         function [SE, Cov] = MLSE(obj,X,varargin)  % See DemoMLSE for examples.
             % Use Fisher Information to estimate the standard errors & covariance matrix

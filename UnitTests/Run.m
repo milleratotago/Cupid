@@ -197,6 +197,7 @@ function Run(CaseNs)
             rpt{end+1} = SingleTest('rNoncentral');
             rpt{end+1} = SingleTest('Recinormal');
             rpt{end+1} = SingleTest('SkewNor');
+            rpt{end+1} = SingleTest('StochCasc2T');
             rpt{end+1} = SingleTest('StudRng');
             rpt{end+1} = SingleTest('tNoncentral');
             rpt{end+1} = SingleTest('tPowerEst');
