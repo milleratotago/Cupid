@@ -34,7 +34,7 @@ classdef utLognormal < utContinuous;
             testCase.KurtRelTol = max( testCase.KurtRelTol, 0.03*parmsigma^2);
 
             testCase.SkipMGFs = true;
-            testCase.SkipMomentEst = true;
+            testCase.SkipMomentEst = true;    % NEWJEFF: Not sure why this is here.  Under some situations it is possible to estimate with the method of moments.
 
             utGenericMethodSetup(testCase);   % Initialize many standard computations
 

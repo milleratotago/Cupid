@@ -835,21 +835,24 @@ classdef dGeneric < handle  % Calls by reference
         end % function MLSE
         
         function totalerr=MomentError(obj,TargetVals)
+            % Ignore moments where TargetVals(I) is nan
             if ~obj.Initialized
                 error(UninitializedError(obj));
             end
             NToFit = numel(TargetVals);
             totalerr = 0;
             for I=1:NToFit
-                switch I
-                    case 1
-                        MomI = Mean(obj);
-                    case 2
-                        MomI = Variance(obj);
-                    otherwise
-                        MomI = CenMoment(obj,I);
-                end
-                totalerr = totalerr + (MomI  - TargetVals(I))^2;
+                if ~isnan(TargetVals(I))  % Ignore moment if target value is nan.
+                    switch I
+                        case 1
+                            MomI = Mean(obj);
+                        case 2
+                            MomI = Variance(obj);
+                        otherwise
+                            MomI = CenMoment(obj,I);
+                    end
+                    totalerr = totalerr + (MomI  - TargetVals(I))^2;
+                end % ~isnan
             end
         end
         

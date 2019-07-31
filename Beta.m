@@ -134,19 +134,23 @@ classdef Beta < dContinuous
         end
         
         function thisval=Random(obj,varargin)
-            % Cheng's algorithm BA, Devroye p 438.
-            thisval=zeros(varargin{:});
-            for i=1:numel(thisval)
-                StillLooking = true;
-                while StillLooking
-                    U1 = rand;  % Standard_Uniform.Random
-                    U2 = rand;
-                    V = log( U1/(1 - U1) ) / obj.Lambda;
-                    Y = exp(V) * obj.A;
-                    StillLooking = obj.SumAB * log(obj.SumAB / (obj.B + Y) ) + obj.U * V - obj.Log4 < log(U1^2*U2);
-                end
-                thisval(i) = Y / (obj.B + Y);
-            end
+            % Algorithm based on comment of John D'Errico in
+            % https://au.mathworks.com/matlabcentral/answers/467623-generate-beta-random-number-without-statistics-toolbox
+            U = rand(varargin{:});  % NEWJEFF: Untested.
+            thisval = betaincinv(U,obj.A,obj.B);
+            % old version based on Cheng's algorithm BA, Devroye p 438.
+            % thisval=zeros(varargin{:});
+            % for i=1:numel(thisval)
+            %     StillLooking = true;
+            %     while StillLooking
+            %         U1 = rand;  % Standard_Uniform.Random
+            %         U2 = rand;
+            %         V = log( U1/(1 - U1) ) / obj.Lambda;
+            %         Y = exp(V) * obj.A;
+            %         StillLooking = obj.SumAB * log(obj.SumAB / (obj.B + Y) ) + obj.U * V - obj.Log4 < log(U1^2*U2);
+            %     end
+            %     thisval(i) = Y / (obj.B + Y);
+            % end
         end
         
         function [s,EndingVals,fval,exitflag,output]=EstMom(obj,TargetVals,varargin)

@@ -178,9 +178,9 @@ classdef Lognormal < dContinuous
             end
         end
         
-        function []=EstMom(obj,TargetVals,varargin)
-            warning('The Lognormal distribution cannot be estimated from its moments.');
-        end
+%        function []=EstMom(obj,TargetVals,varargin)
+%            warning('The Lognormal distribution cannot be estimated from its moments.');
+%        end
         
     end  % methods
     

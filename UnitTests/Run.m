@@ -127,6 +127,8 @@ function Run(CaseNs)
             rpt{end+1} = SingleTest('ExpTrans');
             rpt{end+1} = SingleTest('InverseTrans');
             rpt{end+1} = SingleTest('LinearTrans');
+            rpt{end+1} = SingleTest('LikeRatioC');
+            rpt{end+1} = SingleTest('LnLikeRatioC');
             rpt{end+1} = SingleTest('LogisticTrans');
             rpt{end+1} = SingleTest('LogitTrans');
             rpt{end+1} = SingleTest('LogTrans');
@@ -160,6 +162,8 @@ function Run(CaseNs)
             rpt{end+1} = SingleTest('ArcsinTransDisc');
             rpt{end+1} = SingleTest('ExpTransDisc');
             rpt{end+1} = SingleTest('InverseTransDisc');
+            rpt{end+1} = SingleTest('LikeRatioD');
+            rpt{end+1} = SingleTest('LnLikeRatioD');
             rpt{end+1} = SingleTest('LinearTransDisc');
             rpt{end+1} = SingleTest('LogisticTransDisc');
             rpt{end+1} = SingleTest('LogitTransDisc');
