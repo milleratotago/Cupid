@@ -121,6 +121,7 @@ Here are most of the types of derived distributions that have been implemented s
 * Ratio (ratio of 2 RVs)
 * TruncatedX (truncated version of 1 RV)
 
+
 [4]  Functions and Operations Available for Any Distribution
 ------------------------------------------------------------
 
@@ -135,6 +136,7 @@ Here are most of the values that can be computed for any distribution, standard 
 * Moments: Raw and central; unconditional and conditional
 * Hazard function
 * Moment generating function
+* Chi-square and Kolmogorov-Smirnov one-sample tests
 * Maximum likelihood parameter estimates & standard errors based on Fisher information
 * Parameter estimates based on method of moments
 * Parameter estimates based on minimum chi-square for bin frequencies
@@ -142,13 +144,22 @@ Here are most of the values that can be computed for any distribution, standard 
 * Parameter estimates to produce a desired probability within a certain range
 * Parameter estimates for probit models with yes/no and m-AFC tasks
 
+
 [5]  Additional requirements
 ------------------------------------------------------------
 
 The special-purpose multivariate random number generator class RandGen also requires the
 ExtractNameVal package from https://github.com/milleratotago/ExtractNameVal.
 
-Copyright (C) 2018 Jeffrey Owen Miller
+[6] Installation
+------------------------------------------------------------
+
+The easiest way to install Cupid is to download the MATLAB toolbox file Cupid.mltbx
+and then let MATLAB itself manage the installation.
+In a Windows environment, simply double-click the toolbox file, and a MATLAB will
+start and guide you through the installation.
+
+Copyright (C) 2018-2019 Jeffrey Owen Miller
   
       This program is free software: you can redistribute it and/or modify
       it under the terms of the GNU General Public License as published by

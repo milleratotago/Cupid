@@ -342,6 +342,34 @@ classdef dContinuous < dGeneric   % Calls by reference
             BinProb = diff([0 BinProb]);
         end
         
+        function Dmax = ksDmax(obj,x)
+            % This fn is useful in computing the Kolmogorov-Smirnov test.
+            % It computes the empirical CDF of the vector of observations in x, and it returns the
+            % maximum difference between this empirical CDF and the theoretical CDF.
+            sx = sort(x);
+            n = numel(sx);
+            Fnx = ( (1:n) / n )';  % Empirical Fn(x)
+            Fx = obj.CDF(sx);
+            dif = abs(Fnx - Fx);
+            Dmax = max(dif);   % test statistic
+        end
+        
+        function [p2tailed, Dmax] = kstest(obj,x,varargin)
+            % Compute the Kolmogorov-Smirnov test to check whether the observations in x
+            % are consistent with the current theoretical distribution in obj.
+            % The optional varargin can be a KolmSmir distribution object.
+            % If you will use the same KolmSmir distribution repeatedly then
+            % you can speed up the code by pre-specifying it and passing it in.
+            if numel(varargin) == 1
+                ksdist = varargin{1};
+            else
+                N = numel(x);
+                ksdist = KolmSmir(N);
+            end
+            Dmax = obj.ksDmax(x);
+            p2tailed = 1 - ksdist.CDF(Dmax);
+        end
+        
     end  % methods
     
 end  % class dContinRV

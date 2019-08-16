@@ -71,6 +71,7 @@ function Run(CaseNs)
             rpt{end+1} = SingleTest('HyperbolicTan');
             rpt{end+1} = SingleTest('JohnsonSB');
             rpt{end+1} = SingleTest('JohnsonSU');
+            rpt{end+1} = SingleTest('KolmSmir');
             rpt{end+1} = SingleTest('Laplace');
             rpt{end+1} = SingleTest('Logistic');
             rpt{end+1} = SingleTest('Lognormal');
