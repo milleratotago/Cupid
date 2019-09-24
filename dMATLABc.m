@@ -34,7 +34,11 @@ classdef dMATLABc < dContinuous
             obj.pd = passpd;
             % Next line removes hyphens & spaces from e.g., Birnbaum-Saunders DistributionName
             obj.FamilyName = regexprep(passpd.DistributionName,'[- ]','');
-            obj.NDistParms = obj.pd.NumParameters;
+            if isprop(obj.pd,'NumParameters')
+                obj.NDistParms = obj.pd.NumParameters;
+            else
+                obj.NDistParms = 0;  % e.g., kernel density distributions have no parameters.
+            end
             obj.DefaultParmCodes = repmat('r',1,obj.NDistParms);
 
             switch numel(varargin)
