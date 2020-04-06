@@ -1,6 +1,6 @@
 classdef LikeRatioC < LikeRatioCbase
-    % Distribution of likelihood ratio values
-    % that would be obtained when testing between two hypothesized distributions, H0Dist and H1Dist.
+    % Distribution of likelihood ratio values that would be obtained
+    % when testing between two hypothesized distributions, H0Dist and H1Dist.
     % The data come from a distribution DataDist.
     % Restriction: Larger values of the basis distribution must always relatively favor H1 over H0.
 

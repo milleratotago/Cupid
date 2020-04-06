@@ -374,9 +374,12 @@ classdef utGeneric < matlab.unittest.TestCase
             end
             PassedChisqTest = false;
             NTries = 0;
-            [BinMax, BinProb] = testCase.Dist.MakeBinSet(1/testCase.ChiSqNBins);
+            if testCase.Dist.DistType=='c'
+                [BinMax, BinProb] = testCase.Dist.MakeBinSet(1/testCase.ChiSqNBins);
+            end
 % NWJEFF: Including this caused problems with LinearTrans(Binomial(53,0.44),-2.3,55)--obschisq histcounts found too many observations in smallish bins.
 %         Omitting it caused problems with all utBinomial, I guess because histcounts found not enough observations in smallish bins
+% I think I fixed this by adding ObsChiSq to dDiscrete
 %             if testCase.Dist.DistType == 'd'  
 %                 BinMax = BinMax + eps(BinMax);
 %             end
@@ -385,7 +388,13 @@ classdef utGeneric < matlab.unittest.TestCase
                 RandVals = testCase.Dist.Random(testCase.ChiSqNRands,1);
                 testCase.verifyGreaterThanOrEqual(RandVals,testCase.MinRand,'Generated random number(s) below the lower bound.');
                 testCase.verifyLessThanOrEqual(RandVals,testCase.MaxRand,'Generated random number(s) greater than the upper bound.');
-                [~, obschisqp] = obschisq(RandVals,BinMax,BinProb);
+                if testCase.Dist.DistType=='c'
+                    [~, obschisqp] = obschisq(RandVals,BinMax,BinProb);
+                elseif testCase.Dist.DistType=='d'
+                    [~, obschisqp] = testCase.Dist.ObsChiSq(RandVals);
+                else
+                    error('CheckRandom has not been implemented for mixed discrete/continuous distributions.');
+                end
                 PassedChisqTest = obschisqp > testCase.ChiSqCriticalp;
             end
             testCase.verifyTrue(PassedChisqTest,'Random numbers failed the chi-square test.');

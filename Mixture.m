@@ -321,6 +321,8 @@ classdef Mixture < dEither
         end
         
         function [thisval, thisdist] = Random(obj,varargin)
+            % thisval contains the random numbers, and thisdist contains the number of the distribution
+            % from which each random number came.
             assert(obj.Initialized,UninitializedError(obj));
             thisval = zeros(varargin{:});
             thisdist = zeros(varargin{:},'uint16');

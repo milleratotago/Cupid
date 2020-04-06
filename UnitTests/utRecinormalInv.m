@@ -1,8 +1,8 @@
-classdef utRecinormal < utContinuous;
+classdef utRecinormalInv < utContinuous;
     
     properties (ClassSetupParameter)
-        parm1mu       = struct( 'p_05',.05 , 'p_005',.005 , 'p_0065',.0065);
-        parm2sigma    = struct( 'p_002',.002 , 'p_001',.001 , 'p_00022',.00022);
+        parm1mu       = struct( 'p_05' ,1/0.05  , 'p_005',1/0.005 , 'p_0065' ,1/0.0065);
+        parm2sigma    = struct( 'p_002',1/0.002 , 'p_001',1/0.001 , 'p_00022',1/0.00022);
     end
     
     properties
@@ -11,7 +11,7 @@ classdef utRecinormal < utContinuous;
 
     methods
         
-        function testCase=utRecinormal(varargin)  % Constructor
+        function testCase=utRecinormalInv(varargin)  % Constructor
             testCase=testCase@utContinuous(varargin{:});
         end
         
@@ -20,8 +20,8 @@ classdef utRecinormal < utContinuous;
     methods (TestClassSetup, ParameterCombination='sequential')
         
         function ClassSetup(testCase,parm1mu,parm2sigma)
-            % Computations specific to the Recinormal distribution.
-            testCase.Dist = Recinormal(parm1mu,parm2sigma);
+            % Computations specific to the RecinormalInv distribution.
+            testCase.Dist = RecinormalInv(parm1mu,parm2sigma);
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 
             SetupXs(testCase,40,2000);
@@ -33,12 +33,14 @@ classdef utRecinormal < utContinuous;
             testCase.MGFh = 1.0E-8; % MGF gets big very fast so this must be quite small.
 %           testCase.MLParmTolSE = 0.5;   % ML parameter estimation is not great
 
+            testCase.SkipAllEst = true;  % Too slow because it has to estimates underlying mu and sigma for each finalmu, finalsigma
+
             utGenericMethodSetup(testCase);   % Initialize many standard computations
             
         end
         
     end  % TestClassSetup
     
-end  % utRecinormal
+end  % utRecinormalInv
 
 

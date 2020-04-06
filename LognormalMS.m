@@ -37,8 +37,12 @@ classdef LognormalMS < Lognormal
         end
         
         function []=ReInit(obj)
-            assert(obj.postmu>0,'LognormalMS postmu must be > 0.');
-            assert(obj.postsigma>0,'LognormalMS postsigma must be > 0.');
+            if obj.postmu<=0
+                error('LognormalMS postmu must be > 0.');
+            end
+            if obj.postsigma<=0
+                error('LognormalMS postsigma must be > 0.');
+            end
             obj.sigma = sqrt( log( obj.postsigma^2 / obj.postmu^2 + 1) );
             obj.mu = log( obj.postmu/exp(0.5*obj.sigma^2) );
             obj.Initialized = true;
@@ -50,11 +54,11 @@ classdef LognormalMS < Lognormal
         end
         
         function Reals = ParmsToReals(obj,Parms,~)
-            Reals = [NumTrans.GT2Real(eps,Parms(1)) NumTrans.GT2Real(eps,Parms(2))];
+            Reals = [NumTrans.GT2Real(5*eps,Parms(1)) NumTrans.GT2Real(5*eps,Parms(2))];
         end
         
         function Parms = RealsToParms(obj,Reals,~)
-            Parms = [NumTrans.Real2GT(eps,Reals(1)) NumTrans.Real2GT(eps,Reals(2))];
+            Parms = [NumTrans.Real2GT(5*eps,Reals(1)) NumTrans.Real2GT(5*eps,Reals(2))];
         end
         
         function s = EstMom(obj,TargetVals,varargin)

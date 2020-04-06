@@ -78,16 +78,6 @@ classdef ExtrVal1 < dContinuous
             XX = (obj.alpha - X(InBounds)) / obj.beta;
             XX = exp(XX);
             thiscdf(InBounds) = exp(-XX);
-            % for i=1:numel(X)
-            %     if X(i) <= obj.LowerBound
-            %     elseif X(i) >= obj.UpperBound
-            %         thiscdf(i) = 1;
-            %     else
-            %         XX = (obj.alpha - X(i)) / obj.beta;
-            %         XX = exp(XX);
-            %         thiscdf(i) = exp(-XX);
-            %     end
-            % end
         end
         
         function thisval=InverseCDF(obj,P)

@@ -1,6 +1,6 @@
 classdef dTransDuo < dEither   % NWJEFF: Need a demo of using this generically for researcher's own novel function.
     % dTransDuo(BasisRV1,BasisRV2) is an abstract class to create a random variable that is
-    % a function of two independent basis random variables, BasisRV1+BasisRV2.
+    % a function of two independent basis random variables, BasisRV1 & BasisRV2.
     
     properties(SetAccess = protected)
         BasisRV1, BasisRV2

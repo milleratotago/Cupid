@@ -7,6 +7,12 @@ classdef Normal < dContinuous
         mu         % distribution mean
         sigma      % distribution standard deviation
         ZExtreme   % Z score truncation point of the distribution
+        
+        % The next 3 variables are used in connection with storing CDFs to speed up CDF computations.
+        % Call the procedure ConstructZCDFTable to activate this option.
+        HaveStoredZCDFLookupTable
+        MinTableZ, MaxTableZ, StepTableZ
+        ZTableCDFs, ZTableLen
     end
     
     methods
@@ -17,6 +23,7 @@ classdef Normal < dContinuous
             obj.DefaultParmCodes = 'rr';
             obj.NDistParms = 2;
             obj.ZExtreme = 25;
+            obj.HaveStoredZCDFLookupTable = false;
             switch nargin
                 case 0
                 case 2
@@ -94,7 +101,25 @@ classdef Normal < dContinuous
             thispdf(InBounds) = normpdf(X(InBounds),obj.mu,obj.sigma);
         end
         
+        function [] = ConstructZCDFTable(obj,minZ,maxZ,StepZ)
+            obj.HaveStoredZCDFLookupTable = true;
+            obj.MinTableZ = minZ;
+            obj.MaxTableZ = maxZ;
+            obj.StepTableZ = StepZ;
+            Zs = (minZ:StepZ:maxZ)';
+            obj.ZTableLen = numel(Zs);
+            obj.ZTableCDFs = normcdf(Zs);
+        end
+        
         function thiscdf=CDF(obj,X)
+            if obj.HaveStoredZCDFLookupTable
+                Z = (X - obj.mu) / obj.sigma;
+                idxZ = round( (Z - obj.MinTableZ)/obj.StepTableZ );
+                idxZ(idxZ<1) = 1;
+                idxZ(idxZ>obj.ZTableLen) = obj.ZTableLen;
+                thiscdf = obj.ZTableCDFs(idxZ);
+                return;
+            end
             [thiscdf, InBounds, Done] = MaybeSplineCDF(obj,X);
             if Done
                 return;

@@ -28,10 +28,18 @@ classdef ExWaldMn < ExWald
             obj.sigma = newparmvalues(2);
             obj.barrierA = newparmvalues(3);
             obj.expmean = newparmvalues(4);
-            assert(obj.mu>0,'ExWaldMn mu must be > 0.');
-            assert(obj.sigma>0,'ExWaldMn sigma must be > 0.');
-            assert(obj.barrierA>0,'ExWaldMn barrierA must be > 0.');
-            assert(obj.expmean>0,'ExWaldMn expmean must be > 0.');
+            if obj.mu<=0
+                error('ExWaldMn mu must be > 0.');
+            end
+            if obj.sigma<=0
+                error('ExWaldMn sigma must be > 0.');
+            end
+            if obj.barrierA<=0
+                error('ExWaldMn barrierA must be > 0.');
+            end
+            if obj.expmean<=0
+                error('ExWaldMn exponential mean must be > 0.');
+            end
             obj.rate = 1/obj.expmean;
             ReInit(obj);
         end

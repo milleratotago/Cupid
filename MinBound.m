@@ -1,6 +1,6 @@
 classdef MinBound < dContinuous % dEither
     % MinBound(BasisRV1,BasisRV2) creates a random variable corresponding to the minimum of two
-    % nonindependent racer distributions based on the function
+    % nonindependent racer distributions F1 & F2 based on the function
     %          Fm(t) = F1(t) + F2(t)
     % where F1 and F2 are the finishing times of the two racers and Fm is this minimum distribution.
     
@@ -80,6 +80,10 @@ classdef MinBound < dContinuous % dEither
         end
         
         function thiscdf=CDF(obj,X)
+            if obj.DistType=='d'
+                thiscdf = CDF@dDiscrete(obj,X);
+                return;
+            end
             [thiscdf, InBounds, Done] = MaybeSplineCDF(obj,X);
             if Done
                 return;
@@ -92,6 +96,15 @@ classdef MinBound < dContinuous % dEither
                 thiscdf = FX1 + FX2;
                 thiscdf(thiscdf>1) = 1;
             end
+        end
+        
+        function thisval=Random(obj,varargin)
+            assert(obj.Initialized,UninitializedError(obj));
+            X = obj.BasisRV1.Random(varargin{:});
+            Xcdf = obj.BasisRV1.CDF(X);
+            Ycdf = 1 - Xcdf;
+            Y = obj.BasisRV2.InverseCDF(Ycdf);
+            thisval = min(X,Y);
         end
         
     end  % methods
@@ -129,7 +142,7 @@ end  % class MinBound
 % %   Writeln(X1:5:1,' ',X2:5:1,' ',ThisCDF:7:4,LastCDF:7:4);
 % %   Readln;
 %  Until (ThisCDF >= obj.CDFNearlyOne) or ((Ptr1 = obj.BasisRV1.NValues) and (Ptr2 = obj.BasisRV2.NValues));
-% LRV.Summarize(iList);
+% LRV.Summarize(iList);XSXZXS
 % %Writeln('Passed summarize.');
 % %With LRV Do Writeln('NValues=',NValues,', obj.LowerBound=',obj.LowerBound:8:2,', obj.UpperBound=',obj.UpperBound:8:2);
 % NValues = LRV.NValues;

@@ -5,6 +5,7 @@ classdef ExGauss < dContinuous
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
         mu, sigma, rate,
         Standard_Normal, Standard_Exponential, EExtreme, SqrtTwo
+        T3a, T4a
     end
     
     properties(SetAccess = public)
@@ -76,6 +77,9 @@ classdef ExGauss < dContinuous
             else
                 obj.UpperBound = obj.mu + obj.Standard_Normal.ZExtreme * obj.sigma + obj.EExtreme / obj.rate;
             end
+% Constants used in CDF computations:
+obj.T3a = obj.mu/obj.sigma + obj.sigma*obj.rate;
+obj.T4a = (obj.sigma*obj.rate)^2 / 2;
             obj.Initialized = true;
             if (obj.NameBuilding)
                 BuildMyName(obj);
@@ -137,6 +141,14 @@ classdef ExGauss < dContinuous
                 thiscdf(InBounds) = CDF(obj.Standard_Normal,(X(InBounds)-obj.mu-1/obj.rate)/obj.sigma);
                 return;
             end
+            T1 = CDF(obj.Standard_Normal, (X(InBounds)-obj.mu)/obj.sigma);
+            T3 = CDF(obj.Standard_Normal,X(InBounds)/obj.sigma-obj.T3a); % obj.mu/obj.sigma-obj.sigma*obj.rate);
+%            T4a = (obj.sigma*obj.rate)^2 / 2;
+            T4 = obj.rate*(obj.mu-X(InBounds)) + obj.T4a;
+            T2 = exp(T4);
+            T2(T3==0) = 0;
+            thiscdf(InBounds) = T1 - T2.*T3;
+%{
             for iel=1:numel(X)
                 if InBounds(iel)
                     T1 = CDF(obj.Standard_Normal, (X(iel)-obj.mu)/obj.sigma);
@@ -151,6 +163,7 @@ classdef ExGauss < dContinuous
                     thiscdf(iel) = T1-T2*T3;
                 end
             end
+%}
         end
         
         function thisval=Mean(obj)

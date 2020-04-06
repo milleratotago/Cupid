@@ -31,6 +31,7 @@ classdef utLikeRatioD < utDiscrete;
                 case 2
                     testCase.Dist = LikeRatioD(NegativeBinomial(5,.5),Normal(5,5),Normal(5.5,5));
                     testCase.EstParmCodes = 'frffff';
+                    testCase.Dist.XGrain = 100;  % Numerical problems with X values
 %                     testCase.SkipAllEst = true;  % ESTIMATION IS SLOW SO ONLY DO ONE
                 case 3
                     testCase.Dist = LikeRatioD(Poisson(10),Normal(8,3.2),Normal(10,3.2));

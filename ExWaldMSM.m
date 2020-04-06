@@ -1,4 +1,4 @@
-classdef ExWaldMSM < ExWald
+classdef ExWaldMSM < ExWald  % Old version superceded by simple convolution which seems much faster
     % ExWaldMSM(WaldMean, WaldSD, ExpMean): 3-parameter Ex-Wald distribution, the sum of a 2-parameter Wald, specified in terms of its mean & sd,
     % plus an exponential, specified in terms of its mean.  The Wald's sigma is 1.
     
@@ -24,6 +24,11 @@ classdef ExWaldMSM < ExWald
             obj.MinWaldMean = 0.001; % These lower limits are to prevent numerical errors
             obj.MinWaldSD   = 0.001; % in parameter searching. .01 worked for all.
             obj.MinExpMean  = 0.001;
+            obj.WaldBasis.InverseCDFTol = 0.0005;   % Tolerance on how close the CDF value must be to the target.
+            obj.WaldBasish.InverseCDFTol = 0.0005;  % Tolerance on how close the CDF value must be to the target.
+            % This would improve speed but I don't want to hard-code it in; user may call it after making the dist.
+            % obj.SearchOptions.TolFun = 1e-4;
+            % obj.SearchOptions.TolX = 1e-4;
             switch nargin
                 case 0
                 case 3

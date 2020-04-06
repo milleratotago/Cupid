@@ -136,7 +136,7 @@ classdef Beta < dContinuous
         function thisval=Random(obj,varargin)
             % Algorithm based on comment of John D'Errico in
             % https://au.mathworks.com/matlabcentral/answers/467623-generate-beta-random-number-without-statistics-toolbox
-            U = rand(varargin{:});  % NEWJEFF: Untested.
+            U = rand(varargin{:});
             thisval = betaincinv(U,obj.A,obj.B);
             % old version based on Cheng's algorithm BA, Devroye p 438.
             % thisval=zeros(varargin{:});

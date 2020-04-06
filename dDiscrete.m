@@ -245,6 +245,38 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
             end
         end
         
+        function thisval=EVFun(obj,Fun,FromX,ToX)
+            % Expected value of any function of X.
+            % This function returns the sum from FromX to ToX of any function Fun(x) * PDF(x).
+            % It uses the distribution lower & upper bounds if FromX & ToX are not provided,
+            % or if either is empty or outside the corresponding bound.
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
+            if nargin==2
+                FromX = obj.LowerBound;
+                ToX = obj.UpperBound;
+            else
+                if (numel(FromX)==0) || (FromX<obj.LowerBound)
+                    FromX = obj.LowerBound;
+                end
+                if (numel(ToX)==0) || (ToX>obj.UpperBound)
+                    ToX = obj.UpperBound;
+                end
+            end
+            if FromX >= ToX
+                thisval = 0;
+            else
+                [FromI,ToI]=IRange(obj,FromX,ToX);
+                thisval = 0;
+                for i = FromI:ToI
+                    thisFunResult = Fun(obj.DiscreteX(i));
+                    Pr = obj.DiscretePDF(i);
+                    thisval = thisval + Pr * thisFunResult;
+                end
+            end
+        end
+        
         function thisval=IntegralXToNxPDF(obj,FromX,ToX,N)
             % Returns the sum from FromX to ToX of X^N * PDF.   Note that the
             %  function value for N == 0 should be one and this property can
@@ -381,6 +413,25 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
                 BinCDF = obj.DiscreteCDF(BinIs);
                 BinProb = diff([0 BinCDF]);
             end
+        end
+
+        function [obschisq, obschisqp] = ObsChiSq(obj,Data)  % NEWJEFF: Not documented
+            % Compute observed chi-square and it's p value for a given set of data.
+            NBins = length(obj.DiscreteX);
+            % Count the observed frequency of each possible score
+            obscounts = zeros(1,NBins);
+            for i=1:NBins
+                obscounts(i) = sum( abs(Data(:)-obj.DiscreteX(i)) < obj.XGrain*eps(obj.DiscreteX(i)));
+            end
+
+            % Compute the expected count for each score:
+            TotalN = sum(obscounts);
+            predfreq = TotalN * obj.DiscretePDF;
+            % Compute chi-sq & p
+            obschisq = sum( (predfreq-obscounts).^2 ./ predfreq );
+            Theoretical = ChiSq(NBins-1);
+            obschisqp = 1 - CDF(Theoretical,obschisq);
+
         end
         
     end  % methods

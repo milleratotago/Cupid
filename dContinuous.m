@@ -149,11 +149,15 @@ classdef dContinuous < dGeneric   % Calls by reference
             if max(P)>1
                 error(['InverseCDF requires all P<1 but this call has a P of ',num2str(max(P))]);
             end
+            [thisval, ~, Done] = MaybeSplineInvCDF(obj,P);
+            if Done
+                return;
+            end
+            os=optimset('TolFun',obj.InverseCDFTol);
             thisval = zeros(size(P));
             for i=1:numel(P)
                 try
                     % fzero fails if CDF is too big for LowerBound or too small for UpperBound
-                    os=optimset('TolFun',obj.InverseCDFTol);
                     thisval(i) = fzero(@(x) CDF(obj,x)-P(i) , [obj.LowerBound obj.UpperBound], os);
                 catch InverseCDFErr
                     if CDF(obj,obj.LowerBound)>P(i)
@@ -278,7 +282,7 @@ classdef dContinuous < dGeneric   % Calls by reference
                 thisval = IntegralX_CToNxPDF(obj,FromX,ToX,ConditionalMu,I) / ConditionalP;
             end
         end
-        
+
         function thisval=IntegralCDF(obj,FromX,ToX,N)
             % integrates CDF to find raw moments.
             if ~obj.Initialized

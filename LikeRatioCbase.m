@@ -73,18 +73,23 @@ classdef LikeRatioCbase < dContinuous
         end
         
         function [] = ReInit(obj)
-            % Vary X over the range of DataDist
-            % For each X, compute LLR and CDFx
             
             % Compute the X's at which to determine LikeRatio values:
             if numel(obj.SplineCDFsXSpec) == 1
-                StepSize = (obj.DataDist.UpperBound - obj.DataDist.LowerBound) / obj.SplinePDFsXSpec;
-                Xs = obj.DataDist.LowerBound+StepSize:StepSize:obj.DataDist.UpperBound-StepSize;
+                % Vary X over the range of DataDist
+                % For each X, compute LLR and CDFx
+                % Only consider X's that are possible in all three distributions.
+                globalMax = min([obj.DataDist.UpperBound,obj.H0Dist.UpperBound,obj.H1Dist.UpperBound]);
+                globalMin = max([obj.DataDist.LowerBound,obj.H0Dist.LowerBound,obj.H1Dist.LowerBound]);
+            
+                StepSize = (globalMax - globalMin) / obj.SplinePDFsXSpec;
+                Xs = globalMin:StepSize:globalMax;
                 % Look for bounds on the Xs such that LLR is a real number.
                 WorkingLowerBound = BoundSearch(0,0.0001);
                 WorkingUpperBound = BoundSearch(1,-0.0001);
                 Xs = [WorkingLowerBound Xs WorkingUpperBound];
             else
+                % Use Xs supplied by the user.
                 Xs = obj.SplineCDFsXSpec;
             end
             
@@ -100,6 +105,8 @@ classdef LikeRatioCbase < dContinuous
            
             obj.LowerBound = min(obj.SplineCDFsXs);
             obj.UpperBound = max(obj.SplineCDFsXs);
+%             obj.LowerBound = obj.LRorLnLR(obj.DataDist.LowerBound);  % Produces NaN's
+%             obj.UpperBound = obj.LRorLnLR(obj.DataDist.UpperBound);
             obj.CDFSplineInfo = spline(uniqueLLR,obj.SplineCDFs);
             obj.UseSplineCDF = true;
             obj.HaveSplineCDFs = true;
@@ -111,10 +118,10 @@ classdef LikeRatioCbase < dContinuous
             function WorkingBound = BoundSearch(Startp,Increment)
                 Found = false;
                 while ~Found
-                   Startp = Startp + Increment;
                    WorkingBound = obj.DataDist.InverseCDF(Startp);
                    thisLLR = obj.LRorLnLR(WorkingBound);
                    Found = ~ (isnan(thisLLR) || isinf(thisLLR));
+                   Startp = Startp + Increment;
                 end
             end
 

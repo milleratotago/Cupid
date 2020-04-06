@@ -88,6 +88,7 @@ classdef dGeneric < handle  % Calls by reference
         Parms=RealsToParms(obj,Reals,ParmCodes)
         []=ResetParms(obj,newparmvalues)
         x = XsToPlot(obj)
+        thisval=EVFun(obj,thisFun,FromX,ToX)
         
     end  % Abstract methods
     
@@ -308,7 +309,8 @@ classdef dGeneric < handle  % Calls by reference
             if ~obj.Initialized
                 error(UninitializedError(obj));
             end
-            thiscdf=zeros(size(X));
+            thiscdf = zeros(size(X));
+%             thiscdf = zeros(numel(X),1);
             thiscdf(X>obj.UpperBound) = 1;
             InBounds = (X>=obj.LowerBound) & (X<=obj.UpperBound);
             if obj.UseSplineCDF
@@ -465,6 +467,13 @@ classdef dGeneric < handle  % Calls by reference
             catch
                 thisval=NaN;
             end
+        end
+        
+        function thisval=EVMAD(obj)  % NEWJEFF: NOT INCLUDED IN UNIT TESTS
+            % Expected value of absolute deviation from the median.
+            thisMedian = obj.Median;
+            thisFun = @(x) abs(x-thisMedian);
+            thisval = obj.EVFun(thisFun);
         end
         
         function thisval=LnLikelihood(obj, Observations)
@@ -717,6 +726,7 @@ classdef dGeneric < handle  % Calls by reference
         end
         
         function [s,EndingVals,fval,exitflag,output]=EstML(obj,Observations,varargin)
+            % exitflags: 1 converged, 0 N of iterations exceeded, -1 terminated by output function.
             if ~obj.Initialized
                 error(UninitializedError(obj));
             end
@@ -1159,12 +1169,15 @@ classdef dGeneric < handle  % Calls by reference
             % Parameters to specify X range or CDF(X) range
             % Parameters to select out only PDF or CDF or Hazard
             % Nice numbers for PDF ticks
+            [SkipFig, varargin] = ExtractNamei({'NoFig','SkipFig'},varargin);
             nvarargin = numel(varargin);
             nticks = 5;
             x = XsToPlot(obj);
             pdfy = PDF(obj,x);
             cdfy = CDF(obj,x);
-            figure;
+            if ~SkipFig
+                figure;
+            end
             [AX,H1,H2] = plotyy(x,pdfy,x,cdfy);
             ylim(AX(2),[-0.02 1.02]);
             xlabel('X');

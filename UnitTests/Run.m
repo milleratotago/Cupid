@@ -198,9 +198,12 @@ function Run(CaseNs)
             rpt{end+1} = SingleTest('dMATLABc');
             rpt{end+1} = SingleTest('ExpSumT');
             rpt{end+1} = SingleTest('FNoncentral');
+            rpt{end+1} = SingleTest('ghHoag');
             rpt{end+1} = SingleTest('r');
             rpt{end+1} = SingleTest('rNoncentral');
             rpt{end+1} = SingleTest('Recinormal');
+            rpt{end+1} = SingleTest('RecinormalInv');
+            rpt{end+1} = SingleTest('RecinormalMS');
             rpt{end+1} = SingleTest('SkewNor');
             rpt{end+1} = SingleTest('StochCasc2T');
             rpt{end+1} = SingleTest('StudRng');

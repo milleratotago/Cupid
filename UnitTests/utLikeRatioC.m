@@ -28,11 +28,9 @@ classdef utLikeRatioC < utContinuous;
                 case 1
                     testCase.Dist = LikeRatioC(Beta(4,4),Exponential(1),Exponential(0.5),NBins);
                     testCase.EstParmCodes = 'frff';
-%                     testCase.SkipAllEst = true;  % ESTIMATION IS SLOW SO ONLY DO ONE
                 case 2
-                    testCase.Dist = LikeRatioC(Beta(8,2),Beta(2,2),Beta(4,2),NBins);
+                    testCase.Dist = LikeRatioC(Beta(5,2),Beta(2,2),Beta(4,2),NBins);
                     testCase.EstParmCodes = 'rrffff';
-%                     testCase.SkipAllEst = true;  % ESTIMATION IS SLOW SO ONLY DO ONE
                 case 3
                     testCase.Dist = LikeRatioC(TruncatedX(RNGamma(10,.1),1,500),RNGamma(8,.1),RNGamma(9,.1),NBins);
                     testCase.EstParmCodes = 'frffffff';
@@ -54,6 +52,7 @@ classdef utLikeRatioC < utContinuous;
             if testCase.ThisCase==2
                 testCase.ParmEstRelTol(:)=.2;
                 testCase.ParmEstAbsTol(:)=.2;
+                testCase.RawMomentAbsTol(4) = 0.01;
             end
             if testCase.ThisCase==3
                 testCase.ParmEstRelTol(:)=.1;

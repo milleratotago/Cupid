@@ -24,15 +24,18 @@ classdef (Abstract) dTransMono < dEither
         NTransParms      % Number of parameters used by the transformation, e.g. 1 for AddTrans, 0 for LogTrans
         TransParmCodes   % ParmCodes string for the transformation parameters (usually 'r')
         TransReverses    % Set to true if the transformation reverses the mapping,
-        % i.e. if the smallest basis values are mapped to
-        % the largest values in the transformed distribution.
-        % For example, multiplying by a negative number
+                         % i.e. if the smallest basis values are mapped to
+                         % the largest values in the transformed distribution.
+                         % For example, multiplying by a negative number.
         PDFScaleFactorKnown
+        UseSplineTransX
+        SplineX
+        SplineTransX
     end
     
     methods(Abstract)
         TransX = PreTransToTrans(obj,PreTransX)
-        PreTransX = TransToPreTrans(obj,TransX)
+%       PreTransX = TransToPreTrans(obj,TransX)  % A default is given with fzero, but better if the descendant overrides this.
     end
     
     methods
@@ -40,6 +43,7 @@ classdef (Abstract) dTransMono < dEither
         function obj=dTransMono(FamName,varargin)
             obj@dEither(FamName);
             obj.NTransParms = 0;
+            obj.UseSplineTransX = false;
             switch nargin
                 case 1
                 case 2
@@ -159,6 +163,30 @@ classdef (Abstract) dTransMono < dEither
             obj.UpperBound = obj.DiscreteXmax(end);
         end
         
+        function PreTransX = TransToPreTrans(obj,TransX)
+            % Much better if the descendant overrides this, but this works in worst case.
+            if obj.UseSplineTransX
+                PreTransX = spline(obj.SplineTransX,obj.SplineX,TransX);
+            else
+                PreTransX = zeros(size(TransX));
+                for i=1:numel(TransX)
+                    fn = @(x) (obj.PreTransToTrans(x) - TransX(i));
+%                    try
+                        PreTransX(i) = fzero(fn,[obj.BasisRV.LowerBound obj.BasisRV.UpperBound]);
+%                    catch
+%                        disp('Problem in TransToPreTrans');
+%                        pause
+%                    end
+                end % for
+            end % else
+        end % TransToPreTrans
+        
+        function UseSplineTransXOn(obj,nPoints)
+            obj.UseSplineTransX = true;
+            obj.SplineX = linspace(obj.BasisRV.LowerBound,obj.BasisRV.UpperBound,nPoints);
+            obj.SplineTransX = obj.PreTransToTrans(obj.SplineX);
+        end
+
         function thispdf=PDF(obj,X)
             if obj.DistType=='d'
                 thispdf = PDF@dDiscrete(obj,X);

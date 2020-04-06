@@ -35,7 +35,7 @@ classdef Recinormal < dContinuous
         
         function PerturbParms(obj,ParmCodes)
             % Perturb parameter values prior to estimation attempts.
-            % Estimation is pretty sensitive so do not perturn them much.
+            % Estimation is pretty sensitive so do not perturb them much.
             newmu    = ifelse(ParmCodes(1)=='f', obj.mu,    1.01*obj.mu);
             newsigma = ifelse(ParmCodes(2)=='f', obj.sigma, 0.99*obj.sigma);
             obj.ResetParms([newmu newsigma]);
@@ -49,25 +49,27 @@ classdef Recinormal < dContinuous
         end
         
         function []=ReInit(obj)
-            assert(obj.sigma>0,'Recinormal sigma must be > 0.');
+            if obj.sigma <= 0
+                error('Recinormal sigma must be > 0.');
+            end
             obj.Initialized = false;
             obj.NormalBasis.ResetParms([obj.mu obj.sigma]);
             % CDF0 = obj.NormalBasis.CDF(0);
             if obj.NormalBasis.LowerBound>0
                 % NormalBasis is all positive without truncation.
-                obj.MinNormalCDF = 0;
-                obj.MaxNormalCDF = 1;
+                obj.MinNormalCDF = eps;
+                obj.MaxNormalCDF = 1-eps;
             elseif obj.NormalBasis.UpperBound<0
                 % NormalBasis is all negative without truncation.
-                obj.MinNormalCDF = 0;
-                obj.MaxNormalCDF = 1;
+                obj.MinNormalCDF = eps;
+                obj.MaxNormalCDF = 1-eps;
             elseif obj.NormalBasis.UpperBound>abs(obj.NormalBasis.LowerBound)
                 % NormalBasis is mostly positive but needs truncation.
                 obj.MinNormalCDF = obj.NormalBasis.CDF(sqrt(eps));
-                obj.MaxNormalCDF = 1;
+                obj.MaxNormalCDF = 1-eps;
             else
                 % NormalBasis is mostly negative but needs truncation.
-                obj.MinNormalCDF = 0;
+                obj.MinNormalCDF = eps;
                 obj.MaxNormalCDF = obj.NormalBasis.CDF(-sqrt(eps));
             end
             obj.NormalCDFDif = obj.MaxNormalCDF - obj.MinNormalCDF;
@@ -83,11 +85,11 @@ classdef Recinormal < dContinuous
         end
         
         function Reals = ParmsToReals(obj,Parms,~)
-            Reals = [Parms(1) NumTrans.GT2Real(0,Parms(2))];
+            Reals = [Parms(1) NumTrans.GT2Real(eps,Parms(2))];
         end
         
         function Parms = RealsToParms(obj,Reals,~)
-            Parms = [Reals(1) NumTrans.Real2GT(0,Reals(2))];
+            Parms = [Reals(1) NumTrans.Real2GT(eps,Reals(2))];
         end
         
         function thispdf=PDF(obj,X)

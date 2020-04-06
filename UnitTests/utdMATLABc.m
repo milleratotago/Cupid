@@ -50,10 +50,14 @@ classdef utdMATLABc < utContinuous;
                     pd = makedist('Burr','a',1,'c',9,'k',2);
                     testCase.Dist = dMATLABc(pd,'rrr',[0 0 0],[+inf +inf +inf]);
                     SetTolerances(testCase,0.010);
+                    testCase.ParmEstAbsTol = 0.025;  % Parameter estimation is not so accurate.
+                    testCase.ParmEstRelTol = 0.025;
                 case 4
                     pd = makedist('Exponential','mu',100);
                     testCase.Dist = dMATLABc(pd,'r',0,+inf);
                     SetTolerances(testCase,0.005);
+                    testCase.ParmEstAbsTol = 0.01;  % Parameter estimation is not so accurate.
+                    testCase.ParmEstRelTol = 0.01;
                 case 5
                     pd = makedist('ExtremeValue');
                     testCase.Dist = dMATLABc(pd,'rr',[-inf 0],[+inf +inf]);
@@ -93,10 +97,14 @@ classdef utdMATLABc < utContinuous;
                     pd = makedist('Lognormal');
                     testCase.Dist = dMATLABc(pd,'rr',[-inf 0],[+inf +inf]);
                     SetTolerances(testCase,0.005);
+                    testCase.ParmEstAbsTol = 0.01;  % Parameter estimation is not so accurate.
+                    testCase.ParmEstRelTol = 0.01;
                 case 14
                     pd = makedist('Nakagami');
                     testCase.Dist = dMATLABc(pd,'rr',[0 0],[+inf +inf]);
                     SetTolerances(testCase,0.007);
+                    testCase.ParmEstAbsTol = 0.01;  % Parameter estimation is not so accurate.
+                    testCase.ParmEstRelTol = 0.01;
                 case 15
                     pd = makedist('Normal','mu',0,'sigma',1);
                     testCase.Dist = dMATLABc(pd,'rr',[-inf 0],[+inf +inf]);
@@ -138,6 +146,8 @@ classdef utdMATLABc < utContinuous;
                     pd = makedist('Weibull');
                     testCase.Dist = dMATLABc(pd,'rr',[0 0],[+inf +inf]);
                     SetTolerances(testCase,0.005);
+                    testCase.ParmEstAbsTol = 0.01;  % Parameter estimation is not so accurate.
+                    testCase.ParmEstRelTol = 0.01;
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

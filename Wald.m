@@ -51,6 +51,8 @@ Wolf Schwarz says:
             obj.NDistParms = 3;
             obj.Sqrt2Pi = sqrt(2*pi);
             obj.Standard_Normal = Normal(0,1);
+            % This would improve speed but I don't want to hard-code it in; user may call it after making the dist.
+            % obj.Standard_Normal.ConstructZCDFTable(obj.Standard_Normal.LowerBound,obj.Standard_Normal.UpperBound,0.001);
             switch nargin
                 case 0
                 case 3
@@ -79,9 +81,15 @@ Wolf Schwarz says:
         end
         
         function []=ReInit(obj)
-            assert(obj.mu>0,'Wald mu must be > 0.');
-            assert(obj.sigma>0,'Wald sigma must be > 0.');
-            assert(obj.barrierA>0,'Wald barrierA must be > 0.');
+            if obj.mu<=0
+                error('Wald mu must be > 0.');
+            end
+            if obj.sigma<=0
+                error('Wald sigma must be > 0.');
+            end
+            if obj.barrierA<=0
+                error('Wald barrierA must be > 0.');
+            end
             obj.SigmaSqr = obj.sigma^2;
             obj.TwoSigmaSqr = 2*obj.SigmaSqr;
             % obj.ExpTerm is used in the computation of the CDF, but may cause numerical
@@ -96,8 +104,30 @@ Wolf Schwarz says:
             obj.LowerBound = realmin;
             obj.UpperBound = 100*obj.barrierA/obj.mu;
             obj.Initialized = true;
-            obj.LowerBound = InverseCDF(obj,obj.CDFNearlyZero);
-            obj.UpperBound = InverseCDF(obj,obj.CDFNearlyOne);
+%            obj.LowerBound = InverseCDF(obj,obj.CDFNearlyZero);   % These are too slow so use Chebyshev
+%            obj.UpperBound = InverseCDF(obj,obj.CDFNearlyOne);
+% Chebyshev's inequality: Pr( |X-mu| >= k*sigma ) <= 1/k^2
+%         equality bound: Pr( |X-mu| = k*sigma ) = 1/k^2
+%         want: Pr( mu-LowerBound = k*sigma ) = 1/k^2 = obj.CDFNearlyZero
+%         k^2 = 1 / obj.CDFNearlyZero
+          ChebykLower = sqrt(1/obj.CDFNearlyZero);
+          obj.LowerBound  = max(realmin,obj.Mean - obj.SD*ChebykLower);
+% Search for larger lower bound just slows things down and does not provide any more accuracy.
+%         x = obj.LowerBound;
+%         increasefactor = 10.0;
+%         while obj.CDF(x) < obj.CDFNearlyZero
+%             x = increasefactor * x;
+%         end
+%         obj.LowerBound = x / increasefactor;
+% Search for smaller upper bound avoids complaints about numerical errors
+          ChebykUpper = sqrt(1/ (1-obj.CDFNearlyOne));
+          obj.UpperBound  = obj.Mean + obj.SD*ChebykUpper;
+          x = obj.UpperBound;
+          decreasefactor = 0.9;
+          while obj.CDF(x) > obj.CDFNearlyOne
+              x = decreasefactor * x;
+          end
+          obj.UpperBound = x / decreasefactor;
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
@@ -127,11 +157,14 @@ Wolf Schwarz says:
             if Done
                 return;
             end
+            
+            % Non-vectorized version:
             for iel=1:numel(X)
                 if InBounds(iel)
                     MuX = obj.mu*X(iel);
                     SigmaSqrtX = obj.sigma*sqrt(X(iel));
                     StdNor1 = obj.Standard_Normal.CDF(  (MuX - obj.barrierA) / SigmaSqrtX );
+                    % StdNor1 = normcdf( (MuX - obj.barrierA) / SigmaSqrtX );
                     % Check whether to use Derenzo's (1977) approximation:
                     if (MuX + obj.barrierA) / SigmaSqrtX > 5.5
                         % The approximation does apply.
@@ -146,9 +179,39 @@ Wolf Schwarz says:
                         else
                             thiscdf(iel) = StdNor1 + StdNor2*exp(obj.ExpTerm);
                         end
-                    end
+                    end  % if (MuX + obj.barrierA) / SigmaSqrtX > 5.5
+                end  % if InBounds
+            end  % for iel
+
+%{
+            % Vectorized version but it seems slower!
+            NeedX = X(InBounds);
+            NeedCDF = zeros(size(NeedX));
+            MuX = obj.mu*NeedX;
+            SigmaSqrtX = obj.sigma*sqrt(NeedX);
+            StdNor1 = obj.Standard_Normal.CDF(  (MuX - obj.barrierA) ./ SigmaSqrtX );
+            % Check whether to use Derenzo's (1977) approximation:
+            NeedApprox = ((MuX + obj.barrierA) ./ SigmaSqrtX) > 5.5;
+            if sum(NeedApprox) > 0
+                % The approximation does apply.
+                Approx1 = SigmaSqrtX(NeedApprox) ./ ( (MuX(NeedApprox)+obj.barrierA)*obj.Sqrt2Pi );
+                Approx2 = -(MuX(NeedApprox)-obj.barrierA).^2 ./ (obj.TwoSigmaSqr*NeedX(NeedApprox)) - 0.94*obj.SigmaSqr*NeedX(NeedApprox) ./ (MuX(NeedApprox)+obj.barrierA).^2;
+                ApproxTerm = Approx1 .* exp(Approx2);
+                NeedCDF(NeedApprox) = StdNor1(NeedApprox) + ApproxTerm(:);
+            end
+            if sum(~NeedApprox) > 0
+                % The approximation does not apply.
+                StdNor2 = obj.Standard_Normal.CDF( -(MuX(~NeedApprox) + obj.barrierA) ./ SigmaSqrtX(~NeedApprox) );
+                
+                if obj.ExpTermOK
+                    NeedCDF(~NeedApprox) = StdNor1(~NeedApprox) + obj.ExpTerm * StdNor2;
+                else
+                    NeedCDF(~NeedApprox) = StdNor1(~NeedApprox) + StdNor2*exp(obj.ExpTerm);
                 end
             end
+            thiscdf(InBounds) = NeedCDF;
+%}
+            
         end
         
         function thisval=Mean(obj)

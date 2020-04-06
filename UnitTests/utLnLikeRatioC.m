@@ -28,11 +28,9 @@ classdef utLnLikeRatioC < utContinuous;
                 case 1
                     testCase.Dist = LnLikeRatioC(Beta(4,4),Exponential(1),Exponential(0.5),NBins);
                     testCase.EstParmCodes = 'frff';
-%                     testCase.SkipAllEst = true;  % ESTIMATION IS SLOW SO ONLY DO ONE
                 case 2
-                    testCase.Dist = LnLikeRatioC(Beta(8,2),Beta(2,2),Beta(4,2),NBins);
+                    testCase.Dist = LnLikeRatioC(Beta(4.3,2),Beta(2,2),Beta(4,2),NBins);
                     testCase.EstParmCodes = 'rrffff';
-%                     testCase.SkipAllEst = true;  % ESTIMATION IS SLOW SO ONLY DO ONE
                 case 3
                     testCase.Dist = LnLikeRatioC(TruncatedX(RNGamma(10,.1),1,500),RNGamma(8,.1),RNGamma(9,.1),NBins);
                     testCase.EstParmCodes = 'frffffff';
@@ -54,6 +52,9 @@ classdef utLnLikeRatioC < utContinuous;
             if testCase.ThisCase==2
                 testCase.ParmEstRelTol(:)=.2;
                 testCase.ParmEstAbsTol(:)=.2;
+                testCase.RawMomentAbsTol(1) = 0.02;  % Bad numerical problems with this one
+                testCase.CenMomentAbsTol(1) = 0.02;
+                testCase.CenMomentAbsTol(2) = 0.01;
             end
             if testCase.ThisCase==3
                 testCase.ParmEstRelTol(:)=.1;

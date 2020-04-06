@@ -3,6 +3,8 @@ classdef LikeRatioDbase < dDiscrete
     % but without any restrictions on H0Dist and H1Dist.
     % Note that there is no NBinsOrListOfX parameter, because LLR
     % can simply be computed for all of the discrete X's
+    % By default, only parameters of the Data distribution are adjusted during estimation
+    % (this makes sense to me).
 
     properties(SetAccess = protected)
         DataDist
@@ -40,6 +42,7 @@ classdef LikeRatioDbase < dDiscrete
             obj.H1End = obj.H1Start + obj.H1Dist.NDistParms - 1;
             obj.NDistParms = obj.DataDist.NDistParms + obj.H0Dist.NDistParms + obj.H1Dist.NDistParms;
             obj.DefaultParmCodes = [obj.DataDist.DefaultParmCodes obj.H0Dist.DefaultParmCodes obj.H1Dist.DefaultParmCodes];
+            obj.DefaultParmCodes(obj.H0Start:obj.H1End) = 'f'; 
             obj.ReInit;
         end
 

@@ -35,6 +35,17 @@ classdef dEither < dContinuous & dDiscrete
             end
         end
         
+        function thisval=EVFun(obj,Fun,FromX,ToX)
+            switch obj.DistType
+                case 'c'
+                    thisval=EVFun@dContinuous(obj,Fun,FromX,ToX);
+                case 'd'
+                    thisval=EVFun@dDiscrete(obj,Fun,FromX,ToX);
+                otherwise
+                    ThrowOtherwise(obj);
+            end
+        end
+        
         function thisval=InverseCDF(obj,P)
             switch obj.DistType
                 case 'c'

@@ -64,10 +64,18 @@ classdef ExWald < dContinuous
         end
         
         function []=ReInit(obj)
-            assert(obj.mu>0,'ExWald mu must be > 0.');
-            assert(obj.sigma>0,'ExWald sigma must be > 0.');
-            assert(obj.barrierA>0,'ExWald barrierA must be > 0.');
-            assert(obj.rate>0,'ExWald rate must be > 0.');
+            if obj.mu<=0
+                error('ExWald mu must be > 0.');
+            end
+            if obj.sigma<=0
+                error('ExWald sigma must be > 0.');
+            end
+            if obj.barrierA<=0
+                error('ExWald barrierA must be > 0.');
+            end
+            if obj.rate<=0
+                error('ExWald rate must be > 0.');
+            end
             obj.SigmaSqr = obj.sigma^2;
             obj.WaldBasis.ResetParms([obj.mu obj.sigma obj.barrierA]);
             obj.Discriminant = obj.mu^2 - 2*obj.rate*obj.SigmaSqr;
