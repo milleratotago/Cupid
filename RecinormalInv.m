@@ -4,35 +4,37 @@ classdef RecinormalInv < Recinormal
     % which are more convenient units for parameter estimation in some cases.
 
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
-        OneOverMu, SqrtOneOverSigma
+        OneOverMu, OneOverSigma
     end
     
     methods
         
-        function obj=RecinormalInv(OneOverMu,SqrtOneOverSigma)   % Constructor
+        function obj=RecinormalInv(OneOverMu,OneOverSigma)   % Constructor
             obj=obj@Recinormal;
             obj.FamilyName = 'RecinormalInv';
-            ResetParms(obj,[OneOverMu,SqrtOneOverSigma]);
+            obj.ParmNames{1} = 'OneOverMu';
+            obj.ParmNames{2} = 'OneOverSigma';
+            ResetParms(obj,[OneOverMu,OneOverSigma]);
         end
 
         function PerturbParms(obj,ParmCodes)
             % Perturb parameter values prior to estimation attempts.
             newmu    = ifelse(ParmCodes(1)=='f', obj.OneOverMu,    1.01*obj.OneOverMu);
-            newsigma = ifelse(ParmCodes(2)=='f', obj.SqrtOneOverSigma, 0.99*obj.SqrtOneOverSigma);
+            newsigma = ifelse(ParmCodes(2)=='f', obj.OneOverSigma, 0.99*obj.OneOverSigma);
             obj.ResetParms([newmu newsigma]);
         end
         
         function []=ResetParms(obj,newparmvalues)
             ClearBeforeResetParmsC(obj);
             obj.OneOverMu = newparmvalues(1);
-            obj.SqrtOneOverSigma = newparmvalues(2);
+            obj.OneOverSigma = newparmvalues(2);
             obj.mu = 1 / obj.OneOverMu;
-            obj.sigma = 1 / obj.SqrtOneOverSigma;
+            obj.sigma = 1 / obj.OneOverSigma;
             ReInit(obj);
         end
         
         function BuildMyName(obj)
-            obj.StringName = [obj.FamilyName '(' num2str(obj.OneOverMu) ',' num2str(obj.SqrtOneOverSigma) ')'];
+            obj.StringName = [obj.FamilyName '(' num2str(obj.OneOverMu) ',' num2str(obj.OneOverSigma) ')'];
         end
         
     end % methods

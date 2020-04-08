@@ -153,7 +153,7 @@ classdef dContinuous < dGeneric   % Calls by reference
             if Done
                 return;
             end
-            os=optimset('TolFun',obj.InverseCDFTol);
+            os = optimset('TolFun',obj.InverseCDFTol);  % NEWJEFF: This should be done globally, not every time InverseCDF is called.
             thisval = zeros(size(P));
             for i=1:numel(P)
                 try

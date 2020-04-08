@@ -19,6 +19,10 @@ classdef (Abstract) dTransMono < dEither
     %     <http://www.gnu.org/licenses/>.
     %
     
+    properties(SetAccess = public)
+        ReviseBounds
+    end
+
     properties(SetAccess = protected)
         BasisRV
         NTransParms      % Number of parameters used by the transformation, e.g. 1 for AddTrans, 0 for LogTrans
@@ -44,6 +48,7 @@ classdef (Abstract) dTransMono < dEither
             obj@dEither(FamName);
             obj.NTransParms = 0;
             obj.UseSplineTransX = false;
+            obj.ReviseBounds = true;
             switch nargin
                 case 1
                 case 2
@@ -114,9 +119,11 @@ classdef (Abstract) dTransMono < dEither
                 obj.LowerBound = obj.PreTransToTrans(obj.BasisRV.LowerBound);
                 obj.UpperBound = obj.PreTransToTrans(obj.BasisRV.UpperBound);
             end
-            % Improve bounds to avoid numerical errors
-            obj.LowerBound = InverseCDF(obj,obj.CDFNearlyZero);
-            obj.UpperBound = InverseCDF(obj,obj.CDFNearlyOne);
+            % Maybe revise bounds to avoid numerical errors
+            if obj.ReviseBounds
+                obj.LowerBound = InverseCDF(obj,obj.CDFNearlyZero);
+                obj.UpperBound = InverseCDF(obj,obj.CDFNearlyOne);
+            end
         end
         
         function BuildMyBasis(obj,s)

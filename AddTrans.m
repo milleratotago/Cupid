@@ -9,6 +9,8 @@ classdef AddTrans < dTransMono
         
         function obj=AddTrans(varargin) % BasisDist,Addend
             obj=obj@dTransMono('AddTrans');
+            obj.ReviseBounds = false;  % This skips a CDFInverse bounds search and may speed estimation.
+                                       % NEWJEFF: It could also be used in other dTransMono descendants.
             switch nargin
                 case 0
                 case 2
