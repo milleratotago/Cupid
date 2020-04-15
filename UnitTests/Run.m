@@ -231,6 +231,8 @@ function Run(CaseNs)
             rpt = cell(0,0);
             sectiontime = tic;
             rpt{end+1} = SingleTest('AttainP');
+            rpt{end+1} = SingleTest('ConditXLTY');
+            rpt{end+1} = SingleTest('ConditXGTY');
             rpt{end+1} = SingleTest('Convolution');
             rpt{end+1} = SingleTest('Difference');
             rpt{end+1} = SingleTest('InfMix');
