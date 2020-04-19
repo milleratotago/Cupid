@@ -21,14 +21,17 @@ classdef dGeneric < handle  % Calls by reference
     properties(Hidden)  % Properties seen only by class methods
     end
     
+    properties(SetAccess = public)    % These properties can only be set by the methods of this class.
+        StringName        % A name for the particular distribution with its parameters, e.g., "Normal(0,1)".
+    end
+    
     properties(SetAccess = private)    % These properties can only be set by the methods of this class.
     end
     
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
         DistType,         % 'c', 'd', or 'm' for continuous, discrete, or mixed.
         NDistParms,       % Number of free parameters for this distribution
-        FamilyName,   % A generic name for this type of distribution, e.g., "Normal".
-        StringName,       % A name for the particular distribution with its parameters, e.g., "Normal(0,1)".
+        FamilyName,       % A generic name for this type of distribution, e.g., "Normal".
         ParmNames,        % Array of strings with names of the distribution parameters, e.g. "'mu' & 'sigma''
         ParmTypes,        % Reserved for future use: One character for each parameter indicating its type: 'r'=real, 'i'=integer.
         Initialized,      % Keeps track of whether legal parameter values have been set.
