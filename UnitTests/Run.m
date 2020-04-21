@@ -197,6 +197,8 @@ function Run(CaseNs)
             rpt{end+1} = SingleTest('ChiSqNoncentral');
             rpt{end+1} = SingleTest('dMATLABc');
             rpt{end+1} = SingleTest('ExpSumT');
+            rpt{end+1} = SingleTest('ExGamma');
+            rpt{end+1} = SingleTest('ExGammaMSM');
             rpt{end+1} = SingleTest('FNoncentral');
             rpt{end+1} = SingleTest('ghHoag');
             rpt{end+1} = SingleTest('r');

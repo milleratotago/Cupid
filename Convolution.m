@@ -3,10 +3,16 @@ classdef Convolution < dTransDuo
     %  the sum of two independent basis random variables,
     %  BasisRV1+BasisRV2
     
+    properties(SetAccess = public)
+        PDFIntAbsTol, PDFIntRelTol  % NOTE: I find these have remarkably little influence on speed of EstML
+    end
+    
     methods
         
         function obj=Convolution(Basis1,Basis2)
             obj=obj@dTransDuo('Convolution',Basis1,Basis2);
+            obj.PDFIntAbsTol = 1e-10;  % MATLAB integral defaults
+            obj.PDFIntRelTol = 1e-6;   % MATLAB integral defaults
         end
 
         function FNXY = FofDuo(obj,X,Y)
@@ -33,7 +39,8 @@ classdef Convolution < dTransDuo
             end
             for iel=1:numel(X)
                 if InBounds(iel)
-                    thispdf(iel)=integral(@(x) obj.BasisRV1.PDF(obj.ReverseFofDuo(X(iel),x)).*obj.BasisRV2.PDF(x),obj.BasisRV2.LowerBound,obj.BasisRV2.UpperBound);
+                    thispdf(iel)=integral(@(x) obj.BasisRV1.PDF(obj.ReverseFofDuo(X(iel),x)).*obj.BasisRV2.PDF(x),obj.BasisRV2.LowerBound,obj.BasisRV2.UpperBound,...
+                        'AbsTol',obj.PDFIntAbsTol,'RelTol',obj.PDFIntRelTol);
                 end
             end
         end
