@@ -1,4 +1,4 @@
-classdef ExGamma < dContinuous
+classdef ExGamma < dContinuous  % NEWJEFF: Now using j_integralCalc
     % ExGamma distribution (sum of gamma and exponential) with parameters K, rateG, rateE
     % NEWJEFF: Jasiulewicz & Kordecki (2003) Eqn 9 give the PDF but ...
     % I cannot figure out their formula, and it only appears to work for integer K values.
@@ -7,6 +7,11 @@ classdef ExGamma < dContinuous
         K, rateG, rateE
         lnPDFfactor, lnCDFfactor
         log1mp, log1  % log of probabilities nearly 0 & 1 used in setting bounds.
+        
+        % For speed, this distribution uses calls to 2 private MATLAB functions
+        % that I copied into my own functions j_integralParseArgs and j_integralCalc.
+        % These functions are part of MATLAB's 'integral' 
+        jop % hold the options structure controlling integral calculation
     end
     
     properties(SetAccess = public)
@@ -28,6 +33,7 @@ classdef ExGamma < dContinuous
             obj.log1 = log(1 - obj.CDFNearlyOne);
             obj.SearchOptions.TolFun = 1e-6;
             obj.SearchOptions.TolX = 1e-6;
+            obj.jop = j_integralParseArgs;
             switch nargin
                 case 0
                 case 3
@@ -91,7 +97,8 @@ classdef ExGamma < dContinuous
             km1 = obj.K - 1;
             for iel=1:numel(X)
                 if InBounds(iel)
-                    thispdf(iel) = integral(@FnToInt,eps,X(iel));
+%                     thispdf(iel) = integral(@FnToInt,eps,X(iel));
+                    thispdf(iel) = j_integralCalc(@FnToInt,eps,X(iel),obj.jop);
                 end
             end
 
@@ -115,7 +122,8 @@ classdef ExGamma < dContinuous
             km1 = obj.K - 1;
             for iel=1:numel(X)
                 if InBounds(iel)
-                    thiscdf(iel) = integral(@FnToInt,eps,X(iel));
+%                     thiscdf(iel) = integral(@FnToInt,eps,X(iel));
+                    thiscdf(iel) = j_integralCalc(@FnToInt,eps,X(iel),obj.jop);
                 end
             end
 

@@ -15,6 +15,8 @@ function [x, y] = plotDists(Dists,PdfCdf,varargin)   % NEWJEFF: Undocumented
     ttlNPlotParms = numel(varargin);
     nPlotParmsPerDist = floor(ttlNPlotParms/nDists);
     distNames = {};
+    Coverage = 0.999;
+    tailProb = (1 - Coverage) / 2;
     hold on;
     for iDist=1:nDists
         if nPlotParmsPerDist>0
@@ -23,7 +25,9 @@ function [x, y] = plotDists(Dists,PdfCdf,varargin)   % NEWJEFF: Undocumented
             plotParms = {};
         end
         thisDist = Dists{iDist};
-        x(iDist,:) = linspace(thisDist.LowerBound,thisDist.UpperBound,nPoints);
+        thisMin = thisDist.InverseCDF(tailProb);
+        thisMax = thisDist.InverseCDF(1 - tailProb);
+        x(iDist,:) = linspace(thisMin,thisMax,nPoints);
         if PdfCdf == 1
             y(iDist,:) = thisDist.PDF(x(iDist,:));
         elseif PdfCdf == 2

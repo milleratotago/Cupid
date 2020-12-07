@@ -1,23 +1,25 @@
 classdef dGeneric < handle  % Calls by reference
     % dGeneric Generic random variable class.
-
-% Copyright (C) 2018 Jeffrey Owen Miller
-% 
-%     This program is free software: you can redistribute it and/or modify
-%     it under the terms of the GNU General Public License as published by
-%     the Free Software Foundation, either version 3 of the License, or
-%     any later version.
-% 
-%     This program is distributed in the hope that it will be useful,
-%     but WITHOUT ANY WARRANTY; without even the implied warranty of
-%     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-%     GNU General Public License for more details.
-% 
-%     You should have received a copy of the GNU General Public License
-%     along with this program (00License.txt). If not, see 
-%     <http://www.gnu.org/licenses/>.
-%
     
+    % Copyright (C) 2018 Jeffrey Owen Miller
+    %
+    %     This program is free software: you can redistribute it and/or modify
+    %     it under the terms of the GNU General Public License as published by
+    %     the Free Software Foundation, either version 3 of the License, or
+    %     any later version.
+    %
+    %     This program is distributed in the hope that it will be useful,
+    %     but WITHOUT ANY WARRANTY; without even the implied warranty of
+    %     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    %     GNU General Public License for more details.
+    %
+    %     You should have received a copy of the GNU General Public License
+    %     along with this program (00License.txt). If not, see
+    %     <http://www.gnu.org/licenses/>.
+    %
+    
+    % NewJeff: Code duplication warning! I should be able to combine EstML & EstMLcensored, plus MLSE & MLSEcensored.
+        
     properties(Hidden)  % Properties seen only by class methods
     end
     
@@ -82,7 +84,7 @@ classdef dGeneric < handle  % Calls by reference
         SkipImpossibleWarn % Flag to skip warning about computing likelihood of impossible data value.
     end
     
-    methods(Abstract)
+    methods(Abstract)  % NEWJEFF: Add ParmValues
         
         thispdf=PDF(obj,X)  % Separate versions for continuous vs discrete RVs.
         thiscdf=CDF(obj,X)
@@ -156,19 +158,19 @@ classdef dGeneric < handle  % Calls by reference
             end
             ResetParms(obj,CurrentParms);
         end
- 
-% This function is unnecessary. Only public fields can be reset, and
-% they can be reset directly by assignment statements.       
-%        function [] = ResetFields(obj, varargin)
-%            % Arguments are (sField,NewVal) pairs.
-%            NPairs = (nargin-1)/2;  % Remember nargin includes "obj"
-%            for iPair=1:NPairs
-%                sField = varargin{2*iPair-1};
-%                NewVal = varargin{2*iPair};
-%                obj.(sField) = NewVal;
-%            end
-%            % ResetParms(obj,CurrentParms);
-%        end
+        
+        % This function is unnecessary. Only public fields can be reset, and
+        % they can be reset directly by assignment statements.
+        %        function [] = ResetFields(obj, varargin)
+        %            % Arguments are (sField,NewVal) pairs.
+        %            NPairs = (nargin-1)/2;  % Remember nargin includes "obj"
+        %            for iPair=1:NPairs
+        %                sField = varargin{2*iPair-1};
+        %                NewVal = varargin{2*iPair};
+        %                obj.(sField) = NewVal;
+        %            end
+        %            % ResetParms(obj,CurrentParms);
+        %        end
         
         function RandomParms(obj)
             % Set the distribution to random parameter values.
@@ -293,7 +295,7 @@ classdef dGeneric < handle  % Calls by reference
         end
         
         % **************** Basic functions for all random variables:
-
+        
         function [thispdf, InBounds, Done] = MaybeSplinePDF(obj,X)
             if ~obj.Initialized
                 error(UninitializedError(obj));
@@ -313,7 +315,7 @@ classdef dGeneric < handle  % Calls by reference
                 error(UninitializedError(obj));
             end
             thiscdf = zeros(size(X));
-%             thiscdf = zeros(numel(X),1);
+            %             thiscdf = zeros(numel(X),1);
             thiscdf(X>obj.UpperBound) = 1;
             InBounds = (X>=obj.LowerBound) & (X<=obj.UpperBound);
             if obj.UseSplineCDF
@@ -340,16 +342,16 @@ classdef dGeneric < handle  % Calls by reference
         end
         
         function thisval=CenMomentFromRawMoment(obj,I)
-           % E( (X-u)^I ) == \sum_{k=0}^I (k) * (-1)^k * E(X^(I-k)) * u^k *)
-           Mu = obj.Mean;
-           thisval = 0;
-           Sign = -1;
-           for k=0:I
-              Sign = -Sign;
-              thisval = thisval + Sign * nchoosek(I,k) * obj.RawMoment(I-k) * Mu^k;
-           end;
+            % E( (X-u)^I ) == \sum_{k=0}^I (k) * (-1)^k * E(X^(I-k)) * u^k *)
+            Mu = obj.Mean;
+            thisval = 0;
+            Sign = -1;
+            for k=0:I
+                Sign = -Sign;
+                thisval = thisval + Sign * nchoosek(I,k) * obj.RawMoment(I-k) * Mu^k;
+            end;
         end
-
+        
         function thisval=Median(obj)
             if ~obj.Initialized
                 error(UninitializedError(obj));
@@ -729,6 +731,7 @@ classdef dGeneric < handle  % Calls by reference
         end
         
         function [s,EndingVals,fval,exitflag,output]=EstML(obj,Observations,varargin)
+            % Estimate distribution parameters by maximum likelihood [i.e., minimize -log(likelihood)]
             % exitflags: 1 converged, 0 N of iterations exceeded, -1 terminated by output function.
             if ~obj.Initialized
                 error(UninitializedError(obj));
@@ -757,6 +760,54 @@ classdef dGeneric < handle  % Calls by reference
             end
         end
 
+        function [s,EndingVals,fval,exitflag,output]=EstMLcensored(obj,Observations,Bounds,nsTooExtreme,varargin)  % NEWJEFF: This & MLSEcensored barely tested & no unit tests
+            % Estimate distribution parameters by maximum likelihood [i.e., minimize -log(likelihood)]
+            % in a situation where the observations have been censored at the bounds
+            % -- i.e., minimum/maximum acceptable observations at Bounds(1) and Bounds(2), respectively.
+            % nsTooExtreme(1) and (2) indicate the numbers of observations that were censored as being
+            %  below the minimum bound or above the maximum bound, respectively.
+            % exitflags: 1 converged, 0 N of iterations exceeded, -1 terminated by output function.
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
+            if numel(varargin)<1
+                ParmCodes = obj.DefaultParmCodes;
+            else
+                ParmCodes = varargin{1};
+            end
+            RTPFn = @obj.RealsToParms;
+            PTRFn = @obj.ParmsToReals;
+            ErrFn = @MyErrFunc;
+            StartingVals = ParmValues(obj);
+            obj.PushAndStopNameBuilding;
+            HoldWarn = obj.SkipImpossibleWarn;
+            obj.SkipImpossibleWarn = true;  % Do not warn about impossible values when parameter searching.
+            [EndingVals,fval,exitflag,output] = fminsearcharb(ErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
+            obj.SkipImpossibleWarn = HoldWarn;
+            obj.ResetParms(EndingVals);
+            obj.PopNameBuilding;
+            BuildMyName(obj);
+            s=obj.StringName;
+            function thiserrval=MyErrFunc(X)
+                ResetParms(obj,X)
+                thiserrval = -LnLikelihoodCensored(obj,Observations,Bounds,nsTooExtreme);
+            end
+        end
+        
+        function logL = LnLikelihoodCensored(obj, X, Bounds, nsTooExtreme)  % NEWJEFF: NOT CHECKED
+            % For a distribution obj with a given set of parameters,
+            % compute the likelihood of a given censored data set.
+            % Bounds(1:2) indicate the low/high limits for truncation / censoring.
+            % X is the vector of observed values within those limits.
+            % nLow and nHi are the number of values that were excluded/censored
+            % for being too low or too high.
+            PrLow = obj.CDF(Bounds(1));
+            PrHi = 1 - obj.CDF(Bounds(2));
+            xPDF = obj.PDF(X);
+            sumLogxPDF = sum(log(xPDF));
+            logL = nsTooExtreme(1)*log(PrLow) + nsTooExtreme(2)*log(PrHi) + sumLogxPDF;
+        end
+        
         function [] = DistRename(obj,sNewName)
             % Reset the distribution name to any string sNewName.
             obj.StringName = sNewName;
@@ -779,7 +830,7 @@ classdef dGeneric < handle  % Calls by reference
             else
                 ParmCodes = varargin{1};
             end
-
+            
             NParms = obj.NDistParms;
             OrigParms = obj.ParmValues;
             F0 = LnLikelihood(obj,X);   % Ln likelihood at the current parameters
@@ -847,6 +898,90 @@ classdef dGeneric < handle  % Calls by reference
             
         end % function MLSE
         
+        function [SE, Cov] = MLSEcensored(obj,X,Bounds,nsTooExtreme,varargin)  % See DemoMLSE for examples.
+            % Use Fisher Information to estimate the standard errors & covariance matrix
+            %  of the current parameter estimates with respect to the values in X.
+            % This function should only be called after EstMLcensored(X) has been used to get ML
+            %  estimates for the parameters based on the data in X.
+            % This function only returns values for the parameters with ParmCodes=='r';
+            %  nan's are returned for the parameters with other ParmCodes (e.g., 'f','i').
+            % Notes:
+            %   MLSEcensored changes parm values directly, so it may violate parameter constraints (e.g., produce normal sigma below zero).
+            %   SEs may have twice as many terms as expected if some solutions have imaginary components.
+            
+            if numel(varargin)<1
+                ParmCodes = obj.DefaultParmCodes;
+            else
+                ParmCodes = varargin{1};
+            end
+            
+            NParms = obj.NDistParms;
+            OrigParms = obj.ParmValues;
+            F0 = LnLikelihoodCensored(obj,X, Bounds, nsTooExtreme);   % Ln likelihood at the current parameters
+            RealParms = ParmCodes=='r';
+            RealParmAddrs = find(RealParms>0);
+            NRealParms = sum(RealParms);
+            FI = zeros(NRealParms);  % Allocate space for the k*k Fisher information matrix.
+            HoldWarn = obj.SkipImpossibleWarn;
+            obj.SkipImpossibleWarn = true;  % Turn off warnings about impossible data values
+            for iParm=1:NRealParms
+                UpParms = OrigParms;
+                iParmAddr = RealParmAddrs(iParm);
+                UpParms(iParmAddr) = OrigParms(iParmAddr)+obj.MLSEh;
+                obj.ResetParms(UpParms);
+                Fup = LnLikelihoodCensored(obj,X, Bounds, nsTooExtreme);
+                DownParms = OrigParms;
+                DownParms(iParmAddr) = OrigParms(iParmAddr)-obj.MLSEh;
+                obj.ResetParms(DownParms);
+                Fdown = LnLikelihoodCensored(obj,X, Bounds, nsTooExtreme);
+                FI(iParm,iParm) = -(Fup - 2*F0 + Fdown) / obj.MLSEh^2;
+                for jParm=iParm+1:NRealParms
+                    jParmAddr = RealParmAddrs(jParm);
+                    Fup2    = Shift2([iParmAddr jParmAddr],[ obj.MLSEh  obj.MLSEh]);
+                    Fdown2  = Shift2([iParmAddr jParmAddr],[-obj.MLSEh -obj.MLSEh]);
+                    Fupdown = Shift2([iParmAddr jParmAddr],[ obj.MLSEh -obj.MLSEh]);
+                    Fdownup = Shift2([iParmAddr jParmAddr],[-obj.MLSEh  obj.MLSEh]);
+                    FI(iParm,jParm) = -(Fup2 + Fdown2 - Fupdown - Fdownup ) / (4*obj.MLSEh^2);
+                end
+            end
+            obj.SkipImpossibleWarn = HoldWarn;
+            FI = FI + triu(FI,1)';  % Copy upper triangular into lower triangular.
+            % Set up output matrices in case try block fails
+            Cov = nan(NParms);
+            SE = nan(1,NParms);
+            thisrcond = rcond(FI);
+            if thisrcond < obj.Smallrcond
+                warning(['Nearly singular information matrix (i.e., rcond = ' num2str(thisrcond) ' for ' obj.FamilyName '.  Parameter estimates and information matrix follow:']);
+                aOrigParms = OrigParms
+                aFI = FI
+            end
+            % This may generate a warning, because FI may not be invertable.
+            CovReal = inv(FI);  % Covariance is the inverse of the information matrix.
+            SEReal = sqrt(diag(CovReal))';
+            for iParm=1:NRealParms
+                iParmAddr = RealParmAddrs(iParm);
+                SE(iParmAddr) = SEReal(iParm);
+                for jParm=iParm:NRealParms
+                    jParmAddr = RealParmAddrs(jParm);
+                    Cov(iParmAddr,jParmAddr) = CovReal(iParm,jParm);
+                    Cov(jParmAddr,iParmAddr) = CovReal(iParm,jParm);
+                end
+            end
+            obj.ResetParms(OrigParms);
+            
+            function FNew = Shift2(ParmLoc, ShiftVal)
+                % Recompute LnLikelihoodCensored of X with shifted values of two parameters.
+                % The numbers of the 2 to-be-shifted parameters are in ParmLoc,
+                % and the 2 shifts are in ShiftVal.
+                NewParms = OrigParms;
+                NewParms(ParmLoc(1)) = NewParms(ParmLoc(1)) + ShiftVal(1);
+                NewParms(ParmLoc(2)) = NewParms(ParmLoc(2)) + ShiftVal(2);
+                obj.ResetParms(NewParms);
+                FNew = LnLikelihoodCensored(obj,X, Bounds, nsTooExtreme);
+            end
+            
+        end % function MLSECensored
+        
         function totalerr=MomentError(obj,TargetVals)
             % Ignore moments where TargetVals(I) is nan
             if ~obj.Initialized
@@ -912,7 +1047,7 @@ classdef dGeneric < handle  % Calls by reference
             obj.ResetParms([newmu newsigma]);
             s = obj.StringName;
         end
-
+        
         function ObsMoments = MomentsFromScores(obj,Observations)
             ObsMoments(1) = mean(Observations);
             if obj.NDistParms > 1
@@ -1033,7 +1168,7 @@ classdef dGeneric < handle  % Calls by reference
                     TargetCDF(3) = (NRands - 0.5) / NRands;
             end
         end
-
+        
         function [s,EndingVals,fval,exitflag,output]=EstPctBounds(obj,LowerBound,UpperBound,TargetProb,varargin)
             % Adjust parameter(s) so that the desired TargetProb % of the distribution
             % falls between the specified bounds.
@@ -1326,8 +1461,8 @@ classdef dGeneric < handle  % Calls by reference
                     throw(ME);
             end
         end
-    
+        
     end  % methods
-
+    
 end  % class dGeneric
 
