@@ -794,13 +794,14 @@ classdef dGeneric < handle  % Calls by reference
             end
         end
         
-        function logL = LnLikelihoodCensored(obj, X, Bounds, nsTooExtreme)  % NEWJEFF: NOT CHECKED
+        function logL = LnLikelihoodCensored(obj, X, Bounds, nsTooExtreme)
             % For a distribution obj with a given set of parameters,
             % compute the likelihood of a given censored data set.
             % Bounds(1:2) indicate the low/high limits for truncation / censoring.
             % X is the vector of observed values within those limits.
             % nLow and nHi are the number of values that were excluded/censored
             % for being too low or too high.
+            % This function implements Eqn 77, Ulrich & Miller (1994).
             PrLow = obj.CDF(Bounds(1));
             PrHi = 1 - obj.CDF(Bounds(2));
             xPDF = obj.PDF(X);
