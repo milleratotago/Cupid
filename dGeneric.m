@@ -19,7 +19,7 @@ classdef dGeneric < handle  % Calls by reference
     %
     
     % NewJeff: Code duplication warning! I should be able to combine EstML & EstMLcensored, plus MLSE & MLSEcensored.
-        
+    
     properties(Hidden)  % Properties seen only by class methods
     end
     
@@ -759,7 +759,7 @@ classdef dGeneric < handle  % Calls by reference
                 thiserrval = -LnLikelihood(obj,Observations);
             end
         end
-
+        
         function [s,EndingVals,fval,exitflag,output]=EstMLcensored(obj,Observations,Bounds,nsTooExtreme,varargin)  % NEWJEFF: This & MLSEcensored barely tested & no unit tests
             % Estimate distribution parameters by maximum likelihood [i.e., minimize -log(likelihood)]
             % in a situation where the observations have been censored at the bounds
@@ -1303,6 +1303,45 @@ classdef dGeneric < handle  % Calls by reference
             end
         end
         
+        function [s,EndingVals,fval,exitflag,output,allstarts]=EstManyStarts(obj,EstFn,fnParms,starting_points)
+            % This function is used to search for parameter estimates using multiple different starting points.
+            % See DemoEstManyStarts for examples.
+            % The function can be used with any of the estimation procedures, i.e.,
+            %  EstML, EstMLcensored, EstMom, EstChiSq, etc, passed in EstFn (see Demo for examples).
+            % Since these functions take different parameters, their required parameters must be
+            %  passed in the cell array fnParms.  fnParms may also include any optional parameter(s)
+            %  of EstML, EstMom, etc (i.e., ParmCodes).
+            % The different starting points are passed in the row x col array starting_points.
+            %  Each row of this array corresponds to one starting point, and the different columns
+            %  correspond to the different distribution parameters.  For example,
+            %  starting_points(i,j) is the starting value for the j'th distribution parameter
+            %  at the i'th search starting point.
+            % Normally, you will want the best parameter estimates found (i.e., lowest fval) across
+            %  all different starts, and this information is returned in s...output.
+            % In case you want it, the complete information is returned in allstarts.
+            nRows = size(starting_points,1);
+            s = cell(nRows,1);
+            EndingVals = cell(nRows,1);
+            fval = nan(nRows,1);
+            exitflag = nan(nRows,1);
+            output = cell(nRows,1);
+            for iRow = 1:nRows
+                obj.ResetParms(starting_points(iRow,:));
+                [s{iRow},EndingVals{iRow},fval(iRow),exitflag(iRow),output{iRow}] = EstFn(fnParms{:});
+            end
+            allstarts.s = s;
+            allstarts.EndingVals = EndingVals;
+            allstarts.fval = fval;
+            allstarts.exitflag = exitflag;
+            allstarts.output = output;
+            [~, minpos] = min(fval);
+            s = s{minpos};
+            EndingVals = EndingVals{minpos};
+            fval = fval(minpos);
+            exitflag = exitflag(minpos);
+            output = output{minpos};
+        end
+        
         function PlotDens(obj,varargin)  % NWJEFF: More work needed:
             % Extend to bounds if the tails are not too stretched.
             % Parameters to specify X range or CDF(X) range
@@ -1445,8 +1484,8 @@ classdef dGeneric < handle  % Calls by reference
             if ~obj.HaveSplineInvCDFs
                 UseSplineInvCDFOn(obj,obj.SplineInvCDFsXSpec)
             end
-            thisInvCDF=zeros(size(P));
             assert(sum(P<0)+sum(P>1)==0,'Error: All Ps must be between 0 & 1');
+%            thisInvCDF=zeros(size(P));
             thisInvCDF = ppval(obj.InvCDFSplineInfo,P);
         end
         
