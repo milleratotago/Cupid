@@ -86,10 +86,13 @@ classdef utGeneric < matlab.unittest.TestCase
         
         % Flags to skip certain tests
         SkipMGFs
-        SkipMLEst
-        SkipMomentEst
-        SkipAllEst
-        SkipAllProbitEst
+        SkipEstML
+        SkipEstPercentile
+        SkipEstChiSq
+        SkipEstPctBounds
+        SkipEstMoment
+        SkipEstAll
+        SkipEstProbitAll
     end
     
     methods
@@ -117,10 +120,10 @@ classdef utGeneric < matlab.unittest.TestCase
             testCase.ProbitmAFC = 2;
             
             testCase.SkipMGFs = false;
-            testCase.SkipMLEst = false;
-            testCase.SkipMomentEst = false;
-            testCase.SkipAllEst = false;
-            testCase.SkipAllProbitEst = false;
+            testCase.SkipEstML = false;
+            testCase.SkipEstMoment = false;
+            testCase.SkipEstAll = false;
+            testCase.SkipEstProbitAll = false;
         end
         
         function SetTolerances(testCase,DefaultTolerance)
@@ -415,8 +418,8 @@ classdef utGeneric < matlab.unittest.TestCase
         function MLEstTest(testCase)
             % The data to be fit are the original testCase.xMLE values.
 
-            global GlobalSkipAllEst;
-            if GlobalSkipAllEst || testCase.SkipMLEst || testCase.SkipAllEst
+            global GlobalSkipEstAll;
+            if GlobalSkipEstAll || testCase.SkipEstAll || testCase.SkipEstML
                 return
             end
             
@@ -458,8 +461,8 @@ classdef utGeneric < matlab.unittest.TestCase
         end
         
         function MomEstTest(testCase)
-            global GlobalSkipAllEst;
-            if GlobalSkipAllEst || testCase.SkipMomentEst || testCase.SkipAllEst
+            global GlobalSkipEstAll;
+            if GlobalSkipEstAll || testCase.SkipEstAll || testCase.SkipEstMoment
                 return
             end
             
@@ -492,8 +495,8 @@ classdef utGeneric < matlab.unittest.TestCase
         function PercentileEstTest(testCase)
             % The data to be fit are the original testCase.xvalues & their CDF values.
             
-            global GlobalSkipAllEst;
-            if GlobalSkipAllEst || testCase.SkipAllEst
+            global GlobalSkipEstAll;
+            if GlobalSkipEstAll || testCase.SkipEstAll || testCase.SkipEstPercentile
                 return
             end
             
@@ -529,8 +532,8 @@ classdef utGeneric < matlab.unittest.TestCase
         function PctBoundsEstTest(testCase)
             % The data to be fit are two percentile points of the true distribution.
             
-            global GlobalSkipAllEst;
-            if GlobalSkipAllEst || testCase.SkipAllEst
+            global GlobalSkipEstAll;
+            if GlobalSkipEstAll || testCase.SkipEstAll || testCase.SkipEstPctBounds
                 return
             end
             
@@ -566,8 +569,8 @@ classdef utGeneric < matlab.unittest.TestCase
         function ChiSqEstTest(testCase)
             % The data to be fit are a set of bins determined by the original distribution, and the associated bin probabilities.
             
-            global GlobalSkipAllEst;
-            if GlobalSkipAllEst || testCase.SkipAllEst
+            global GlobalSkipEstAll;
+            if GlobalSkipEstAll || testCase.SkipEstAll || testCase.SkipEstChiSq
                 return
             end
             
@@ -595,8 +598,8 @@ classdef utGeneric < matlab.unittest.TestCase
         function ProbitYNMaxLikEstTest(testCase)
             % The data to be fit are a set of bins defined by the original distribution, and the value of 1-CDF for each of those bins.
             
-            global GlobalSkipAllEst;
-            if GlobalSkipAllEst || testCase.SkipAllEst || testCase.SkipAllProbitEst || TooFewForProbit(testCase,true)
+            global GlobalSkipEstAll;
+            if GlobalSkipEstAll || testCase.SkipEstAll || testCase.SkipEstProbitAll || TooFewForProbit(testCase,true)
                 return
             end
 
@@ -622,8 +625,8 @@ classdef utGeneric < matlab.unittest.TestCase
         function ProbitYNChiSqEstTest(testCase)
             % The data to be fit are a set of bins defined by the original distribution, and the value of 1-CDF for each of those bins.
             
-            global GlobalSkipAllEst;
-            if GlobalSkipAllEst || testCase.SkipAllEst || testCase.SkipAllProbitEst || TooFewForProbit(testCase,false)
+            global GlobalSkipEstAll;
+            if GlobalSkipEstAll || testCase.SkipEstAll || testCase.SkipEstProbitAll || TooFewForProbit(testCase,false)
                 return
             end
             
@@ -649,8 +652,8 @@ classdef utGeneric < matlab.unittest.TestCase
         function ProbitmAFCMaxLikEstTest(testCase)
             % The data to be fit are a set of bins defined by the original distribution, and the value of 1-CDF for each of those bins.
             
-            global GlobalSkipAllEst;
-            if  GlobalSkipAllEst || testCase.SkipAllEst || testCase.SkipAllProbitEst || TooFewForProbit(testCase,false)
+            global GlobalSkipEstAll;
+            if  GlobalSkipEstAll || testCase.SkipEstAll || testCase.SkipEstProbitAll || TooFewForProbit(testCase,false)
                 return
             end
             
@@ -676,8 +679,8 @@ classdef utGeneric < matlab.unittest.TestCase
         function ProbitmAFCChiSqEstTest(testCase)
             % The data to be fit are a set of bins defined by the original distribution, and the value of 1-CDF for each of those bins.
             
-            global GlobalSkipAllEst;
-            if  GlobalSkipAllEst || testCase.SkipAllEst || testCase.SkipAllProbitEst || TooFewForProbit(testCase,false)
+            global GlobalSkipEstAll;
+            if  GlobalSkipEstAll || testCase.SkipEstAll || testCase.SkipEstProbitAll || TooFewForProbit(testCase,false)
                 return
             end
             

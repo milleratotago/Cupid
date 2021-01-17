@@ -26,7 +26,7 @@ classdef utMultTrans < utContinuous;
             switch parmCase
               case 1
                 testCase.Dist = MultTrans(Uniform(0,1),10);
-%               testCase.SkipAllEst = true;
+%               testCase.SkipEstAll = true;
                 testCase.EstParmCodes = 'rrf';  % Don't adjust both multiplier and bounds since they can trade off.
                 testCase.Expected.Mean = (testCase.Dist.LowerBound + testCase.Dist.UpperBound)/2;
               case 2
@@ -35,7 +35,7 @@ classdef utMultTrans < utContinuous;
               case 3
                 testCase.Dist = MultTrans(Exponential(0.1),10);
                 testCase.EstParmCodes = 'rf';  % Don't adjust both rate and multiplier since they can trade off.
-                testCase.SkipMLEst = true;  % The exponential produces a better ML at a different rate.
+                testCase.SkipEstML = true;  % The exponential produces a better ML at a different rate.
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

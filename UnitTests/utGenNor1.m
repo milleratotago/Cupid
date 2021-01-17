@@ -26,7 +26,7 @@ classdef utGenNor1 < utContinuous;
             testCase.Dist = GenNor1(parmmu,parmalpha,parmbeta);
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 
-            testCase.SkipMomentEst = true;  % Moments do not provide enough info to constrain parameters
+            testCase.SkipEstMoment = true;  % Moments do not provide enough info to constrain parameters
             SetupXs(testCase,100,2000);
             
             % Compute whatever values known are known from other sources:

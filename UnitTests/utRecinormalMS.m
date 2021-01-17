@@ -33,7 +33,7 @@ classdef utRecinormalMS < utContinuous;
             testCase.MGFh = 1.0E-8; % MGF gets big very fast so this must be quite small.
 %           testCase.MLParmTolSE = 0.5;   % ML parameter estimation is not great
 
-            testCase.SkipAllEst = true;  % Too slow because it has to estimates underlying mu and sigma for each finalmu, finalsigma
+            testCase.SkipEstAll = true;  % Too slow because it has to estimates underlying mu and sigma for each finalmu, finalsigma
 
             utGenericMethodSetup(testCase);   % Initialize many standard computations
             

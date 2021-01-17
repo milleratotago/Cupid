@@ -31,7 +31,7 @@ classdef utTruncatedXhiDisc < utDiscrete;
                 case 2
                     testCase.Dist = TruncatedXhi(BinomialMixed([(1:10)/11]),5);
 %                     testCase.EstParmCodes = 'ffffffffffr';  % P's cannot be varied but they are counted as parameters
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
                 case 3
                     testCase.Dist = TruncatedXhi(Geometric(0.7),5);
                     testCase.EstParmCodes = 'rf';
@@ -41,7 +41,7 @@ classdef utTruncatedXhiDisc < utDiscrete;
                 case 5
                     testCase.Dist = TruncatedXhi(UniformInt(1,25),20);  % This case checked in ComparePDF
 %                     testCase.EstParmCodes = 'fff';
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

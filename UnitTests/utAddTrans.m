@@ -33,7 +33,7 @@ classdef utAddTrans < utContinuous;
                     testCase.EstParmCodes = 'rrf';  % Don't adjust both constant and mean since they can trade off.
                 case 3
                     testCase.Dist = AddTrans(Exponential(0.1),55);
-                    testCase.SkipMLEst = true;  % The exponential produces a better ML at a different rate.
+                    testCase.SkipEstML = true;  % The exponential produces a better ML at a different rate.
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

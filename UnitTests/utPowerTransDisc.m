@@ -31,7 +31,7 @@ classdef utPowerTransDisc < utDiscrete;
                 case 2
                     testCase.Dist = PowerTrans(BinomialMixed([(1:10)/11]),1);
 %                     testCase.EstParmCodes = 'ffffffffffr';  % P's cannot be varied but they are counted as parameters
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
                 case 3
                     testCase.Dist = PowerTrans(Geometric(0.7),1.3);
                     testCase.EstParmCodes = 'rf';
@@ -41,7 +41,7 @@ classdef utPowerTransDisc < utDiscrete;
                 case 5
                     testCase.Dist = PowerTrans(UniformInt(1,25),1.52);
 %                     testCase.EstParmCodes = 'ffr';
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

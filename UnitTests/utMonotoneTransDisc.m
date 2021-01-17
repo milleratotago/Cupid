@@ -29,8 +29,8 @@ classdef utMonotoneTransDisc < utDiscrete;
                     finv = @(x) (x-2)/2;
                     testCase.Dist = MonotoneTrans(UniformInt(0,10),f,finv);
                     testCase.Dist.XGrain = 1000;
-                    testCase.SkipMomentEst = true;    % Not good at estimating these int parms
-                    testCase.SkipAllProbitEst = true;
+                    testCase.SkipEstMoment = true;    % Not good at estimating these int parms
+                    testCase.SkipEstProbitAll = true;
                 case 2
                     f = @(x) x/2+3;
                     finv = @(x) (x-3)*2;

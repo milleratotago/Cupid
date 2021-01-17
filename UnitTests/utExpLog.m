@@ -32,7 +32,7 @@ classdef utExpLog < utContinuous;
             switch parmCase
                 case 1
                     testCase.Dist = ExpTrans(LogTrans(testCase.BasisRVs{1}));
-                    %               testCase.SkipAllEst = true;
+                    %               testCase.SkipEstAll = true;
                 case 2
                     testCase.Dist = ExpTrans(LogTrans(testCase.BasisRVs{2}));
                 case 3

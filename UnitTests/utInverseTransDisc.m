@@ -30,7 +30,7 @@ classdef utInverseTransDisc < utDiscrete;
                 case 2
                     testCase.Dist = InverseTrans(LinearTrans(BinomialMixed([(1:10)/15]),0.07,0.05));
 %                     testCase.EstParmCodes = 'ffffffffffr';  % P's cannot be varied but they are counted as parameters
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
                 case 3
                     testCase.Dist = InverseTrans(AddTrans(Geometric(0.1),5));
                     testCase.EstParmCodes = 'rf';
@@ -40,7 +40,7 @@ classdef utInverseTransDisc < utDiscrete;
                 case 5
                     testCase.Dist = InverseTrans(UniformInt(1,10));
 %                    testCase.EstParmCodes = 'fi';
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

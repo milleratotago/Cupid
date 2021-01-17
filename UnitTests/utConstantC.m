@@ -33,7 +33,7 @@ classdef utConstantC < utContinuous;
             SetTolerances(testCase,0.005);
 
 %            testCase.SkipMGFs = true;
-            testCase.SkipAllEst = true;
+            testCase.SkipEstAll = true;
 
             utGenericMethodSetup(testCase);   % Initialize many standard computations
 

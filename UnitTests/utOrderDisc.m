@@ -23,7 +23,7 @@ classdef utOrderDisc < utDiscrete
         function ClassSetup(testCase,parmCase)
             % Computations specific to the Order distribution.
             testCase.ThisCase  = parmCase;
-%             testCase.SkipAllEst = true;  % Parameter estimation is slow
+%             testCase.SkipEstAll = true;  % Parameter estimation is slow
             switch parmCase
                 case 1
                     testCase.Dist = Order(3,UniformInt(1,10),Poisson(10),Binomial(20,.5));

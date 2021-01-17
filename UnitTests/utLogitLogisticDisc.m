@@ -36,7 +36,7 @@ classdef utLogitLogisticDisc < utDiscrete;
                 case 2
                     testCase.Dist = LogitTrans(LogisticTrans(testCase.BasisRVs{2}));
 %                     testCase.EstParmCodes = 'r';
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
                 case 3
                     testCase.Dist = LogitTrans(LogisticTrans(testCase.BasisRVs{3}));
                     testCase.EstParmCodes = 'r';

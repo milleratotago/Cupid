@@ -38,7 +38,7 @@ classdef uttPowerEst < utContinuous;
             %             testCase.Dist.SearchOptions.MaxFunEvals = 30000;
             %             testCase.Dist.SearchOptions.MaxIter = 20000;
             
-            testCase.SkipAllEst = true;  % Parameter estimation is too slow
+            testCase.SkipEstAll = true;  % Parameter estimation is too slow
             testCase.Dist.UseSplineCDFOn(200);
             testCase.Dist.UseSplinePDFOn(200);
 

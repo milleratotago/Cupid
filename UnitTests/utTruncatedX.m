@@ -26,7 +26,7 @@ classdef utTruncatedX < utContinuous;
             switch parmCase
               case 1
                 testCase.Dist = TruncatedX(Uniform(100,110),102,107);  % Uniform assumed by ComparePDFs
-                testCase.SkipAllEst = true;  % The uniform bounds don't matter as long as they are outside the cutoffs.
+                testCase.SkipEstAll = true;  % The uniform bounds don't matter as long as they are outside the cutoffs.
                 testCase.Expected.Mean = (testCase.Dist.LowerBound + testCase.Dist.UpperBound)/2;
               case 2
                 testCase.Dist = TruncatedX(Normal(0,1),-1,1);
@@ -34,7 +34,7 @@ classdef utTruncatedX < utContinuous;
               case 3
                 testCase.Dist = TruncatedX(Exponential(0.1),1,20);
                 testCase.EstParmCodes = 'rff';
-%                 testCase.SkipMLEst = true;  % The exponential produces a better ML at a different rate.
+%                 testCase.SkipEstML = true;  % The exponential produces a better ML at a different rate.
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
             testCase.Dist.SearchOptions.MaxFunEvals = 30000;

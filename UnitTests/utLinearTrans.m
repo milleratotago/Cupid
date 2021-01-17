@@ -27,7 +27,7 @@ classdef utLinearTrans < utContinuous;
                 case 1
                     testCase.Dist = LinearTrans(Uniform(0,1),-2,10);
                     testCase.EstParmCodes = 'rrff';  % Don't adjust both constants and bounds since they can trade off.
-                    %               testCase.SkipAllEst = true;
+                    %               testCase.SkipEstAll = true;
                     testCase.Expected.Mean = (testCase.Dist.LowerBound + testCase.Dist.UpperBound)/2;
                 case 2
                     testCase.Dist = LinearTrans(Normal(0,1),10,3.5);
@@ -35,7 +35,7 @@ classdef utLinearTrans < utContinuous;
                 case 3
                     testCase.Dist = LinearTrans(Exponential(0.1),2,5);
                     testCase.EstParmCodes = 'rff';  % Don't adjust both constants and rate since they can trade off.
-                    testCase.SkipMLEst = true;  % The exponential produces a better ML at a different rate.
+                    testCase.SkipEstML = true;  % The exponential produces a better ML at a different rate.
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

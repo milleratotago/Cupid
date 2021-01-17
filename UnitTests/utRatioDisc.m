@@ -27,7 +27,7 @@ classdef utRatioDisc < utDiscrete;
                 case 1
                     testCase.Dist = Ratio(UniformInt(1,5),UniformInt(10,20));
                     % testCase.EstParmCodes = 'rfff';
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
                 case 2
                     testCase.Dist = Ratio(Binomial(10,.5),Geometric(.63));
                     testCase.EstParmCodes = 'ffr';

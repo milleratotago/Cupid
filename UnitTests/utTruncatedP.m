@@ -26,14 +26,14 @@ classdef utTruncatedP < utContinuous;
             switch parmCase
               case 1
                 testCase.Dist = TruncatedP(Uniform(0,1),.2,.7);
-                testCase.SkipAllEst = true;  % The uniform bounds don't matter as long as they are outside the cutoffs.
+                testCase.SkipEstAll = true;  % The uniform bounds don't matter as long as they are outside the cutoffs.
                 testCase.Expected.Mean = (testCase.Dist.LowerBound + testCase.Dist.UpperBound)/2;
               case 2
                 testCase.Dist = TruncatedP(Normal(0,1),0.11,0.93);
                 testCase.EstParmCodes = 'rrff';
               case 3
                 testCase.Dist = TruncatedP(Exponential(0.1),.1,0.99999);
-                testCase.SkipMLEst = true;  % The exponential produces a better ML at a different rate.
+                testCase.SkipEstML = true;  % The exponential produces a better ML at a different rate.
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

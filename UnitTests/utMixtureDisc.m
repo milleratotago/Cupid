@@ -27,7 +27,7 @@ classdef utMixtureDisc < utDiscrete;
                 case 1
                     testCase.Dist = Mixture(0.3,UniformInt(1,5),UniformInt(10,20));
                     % testCase.EstParmCodes = 'rfff';
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
                 case 2
                     testCase.Dist = Mixture(0.7,Poisson(2.3),0.1,Binomial(10,.5),UniformInt(10,20));
                     testCase.EstParmCodes = 'frfffff';

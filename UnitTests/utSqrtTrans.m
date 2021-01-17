@@ -26,12 +26,12 @@ classdef utSqrtTrans < utContinuous;
             switch parmCase
                 case 1
                     testCase.Dist = SqrtTrans(Uniform(1,2));
-                    % testCase.SkipAllEst = true;
+                    % testCase.SkipEstAll = true;
                 case 2
                     testCase.Dist = SqrtTrans(RNGamma(5,1/10));
                 case 3
                     testCase.Dist = SqrtTrans(Exponential(0.1));
-                    % testCase.SkipMLEst = true;
+                    % testCase.SkipEstML = true;
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

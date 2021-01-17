@@ -40,9 +40,9 @@ classdef utTruncatedPDisc < utDiscrete;
                 case 5
                     testCase.Dist = TruncatedP(UniformInt(1,25),.24,.80);  % Uniform assumed by ComparePDFs
 %                     testCase.EstParmCodes = 'ffff';
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
             end
-            testCase.SkipAllEst = true;  % NWJEFF: Estimation may not really make sense because the P's aren't actually fixed
+            testCase.SkipEstAll = true;  % NWJEFF: Estimation may not really make sense because the P's aren't actually fixed
                                          % at the specified values, due to the graininess of the CDF function. In any case,
                                          % it does not recover the original parameter values.
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)

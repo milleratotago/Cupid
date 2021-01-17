@@ -36,7 +36,7 @@ classdef utExpLogDisc < utDiscrete;
                 case 2
                     testCase.Dist = ExpTrans(LogTrans(testCase.BasisRVs{2}));
 %                     testCase.EstParmCodes = 'r';
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
                 case 3
                     testCase.Dist = ExpTrans(LogTrans(testCase.BasisRVs{3}));
                     testCase.EstParmCodes = 'r';

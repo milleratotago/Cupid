@@ -26,7 +26,7 @@ classdef utTruncatedXhi < utContinuous;
             switch parmCase
               case 1
                 testCase.Dist = TruncatedXhi(Uniform(0,1),.8);
-                testCase.SkipAllEst = true;  % The uniform bounds don't matter as long as they are outside the cutoffs.
+                testCase.SkipEstAll = true;  % The uniform bounds don't matter as long as they are outside the cutoffs.
                 testCase.Expected.Mean = (testCase.Dist.LowerBound + testCase.Dist.UpperBound)/2;
               case 2
                 testCase.Dist = TruncatedXhi(Normal(0,1),1);
@@ -34,7 +34,7 @@ classdef utTruncatedXhi < utContinuous;
               case 3
                 testCase.Dist = TruncatedXhi(Exponential(0.1),21);
                 testCase.EstParmCodes = 'rf';
-                % testCase.SkipMLEst = true;  % The exponential produces a better ML at a different rate.
+                % testCase.SkipEstML = true;  % The exponential produces a better ML at a different rate.
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
             testCase.Dist.SearchOptions.MaxFunEvals = 30000;

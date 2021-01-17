@@ -27,14 +27,14 @@ classdef utPowerTrans < utContinuous;
                 case 1
                     testCase.Dist = PowerTrans(Uniform(1,2),1.5);
                     testCase.EstParmCodes = 'rrr';
-                    % testCase.SkipAllEst = true;
+                    % testCase.SkipEstAll = true;
                 case 2
                     testCase.Dist = PowerTrans(Normal(100,1),2);
                     testCase.EstParmCodes = 'rrf';
                 case 3
                     testCase.Dist = PowerTrans(Exponential(0.1),0.55);
                     testCase.EstParmCodes = 'rr';
-                    testCase.SkipMLEst = true;  % The exponential produces a better ML at a different rate.
+                    testCase.SkipEstML = true;  % The exponential produces a better ML at a different rate.
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

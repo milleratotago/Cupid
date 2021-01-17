@@ -1337,6 +1337,10 @@ classdef dGeneric < handle  % Calls by reference
             [~, minpos] = min(fval);
             s = s{minpos};
             EndingVals = EndingVals{minpos};
+%             if isnan(fval(minpos))
+%                 pause;
+%                 a = disp('min is nan');
+%             end
             fval = fval(minpos);
             exitflag = exitflag(minpos);
             output = output{minpos};

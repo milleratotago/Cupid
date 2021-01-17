@@ -55,7 +55,7 @@ classdef utt < utContinuous;
                 testCase.RawIntRelTol(4) = 0.015;
                 testCase.RawIntRelTol(5) = 0.04;
             end
-            testCase.SkipMLEst = true;  % I can't find X values for which the MLE is the current df.
+            testCase.SkipEstML = true;  % I can't find X values for which the MLE is the current df.
             testCase.MLParmTolSE = nan;  % SE not computed with integer parameters.
  
             utGenericMethodSetup(testCase);   % Initialize many standard computations

@@ -31,7 +31,7 @@ classdef utArcsinTransDisc < utDiscrete;
                 case 2
                     testCase.Dist = ArcsinTrans(LinearTrans(BinomialMixed([(1:10)/11]),0.8,.1));
                     testCase.EstParmCodes = 'ffffffffffrf';  % P's cannot be varied but they are counted as parameters
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
                 case 3
                     testCase.Dist = ArcsinTrans(MultTrans(Geometric(0.1),.001));
                     testCase.EstParmCodes = 'fr';

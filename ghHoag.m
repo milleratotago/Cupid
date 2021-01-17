@@ -2,8 +2,18 @@ classdef ghHoag < dTransMono  % Lots of numerical problems with some parameter v
     % ghHoag(A, B, g, h): From Hoaglin (1985) chapter, "Summarizing Shape Numerically: The g-and-h Distributions"
     % A & B>0 are location (median) and scale
     % g>0 controls amount & direction of skew: g=0 is symmetric but leads to numerical errors so a cluge ensures abs(g)>eps
+    %   typical values of g range between 0 and 1
     % h>0 controls heaviness of tails: h=0 is normal
+    %   typical values of h range between 0 and 0.5
     % "A negative value of h is not impossible, but special treatment may be required because the monotonicity of Yh(z) fails for z^2 > -1/h."
+    % "With g = 1 and h = 0, the distribution has the same shape as a lognormal distribution" Rousselet & Wilcox (2020)
+    
+    % Note: Unable to find reverse transformation for TransToPreTrans function:
+    %   syms Z A B g h Trans
+    %   transeqn = Trans == A + B * ( exp(g*Z) - 1 ) / g * exp(h*Z^2/2);
+    %   solution = solve(transeqn,Z,'Real',true)
+    %   > Warning: Unable to find explicit solution.
+    % Thus, this distribution uses dTransMono.fzeroOpts.
     
     properties(SetAccess = protected)
         A, B, g, h
@@ -23,6 +33,7 @@ classdef ghHoag < dTransMono  % Lots of numerical problems with some parameter v
             obj.maxg = 2;
             obj.minh = -1;
             obj.maxh = 1;
+            obj.fzeroOpts = optimset;
             obj.ResetParms([A B g h]);
             obj.AddParms(4,'rrrr');
             obj.PDFScaleFactorKnown = false;
@@ -34,9 +45,9 @@ classdef ghHoag < dTransMono  % Lots of numerical problems with some parameter v
         end
         
         function []=ResetParms(obj,newparmvalues)
-            obj.A = newparmvalues(1);
-            obj.B = newparmvalues(2);
-            obj.g = newparmvalues(3);
+            obj.A = newparmvalues(end-3);
+            obj.B = newparmvalues(end-2);
+            obj.g = newparmvalues(end-1);
             if abs(obj.g) < obj.ming
                 if obj.g < 0
                     obj.g = -obj.ming;
@@ -44,7 +55,7 @@ classdef ghHoag < dTransMono  % Lots of numerical problems with some parameter v
                     obj.g = obj.ming;
                 end
             end
-            obj.h = newparmvalues(4);
+            obj.h = newparmvalues(end);
             ClearBeforeResetParms(obj);
             ReInit(obj);
         end
@@ -63,8 +74,8 @@ classdef ghHoag < dTransMono  % Lots of numerical problems with some parameter v
         end
         
         function TransX = PreTransToTrans(obj,PreTransX)
-            % p. 486, eqn 30b
-            Y = (exp(obj.g*PreTransX)-1) / obj.g .* exp(obj.h*PreTransX.^2/2);
+            % Hoaglin (1985) p. 486, eqn 30b
+            Y = ( exp(obj.g*PreTransX) - 1 ) / obj.g .* exp(obj.h*PreTransX.^2/2);
             TransX = obj.A + obj.B * Y;
             if TransX > realmax
                 TransX = realmax;
@@ -72,7 +83,7 @@ classdef ghHoag < dTransMono  % Lots of numerical problems with some parameter v
                 TransX = -realmax;
             end
         end
-        
+
         function TransReals = TransParmsToReals(obj,Parms,~)
             TransReals = [Parms(end-3) Parms(end-2) NumTrans.Bounded2Real(obj.ming,obj.maxg,Parms(end-1)) NumTrans.Bounded2Real(obj.minh,obj.maxh,Parms(end))];
         end

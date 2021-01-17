@@ -21,6 +21,7 @@ classdef (Abstract) dTransMono < dEither
     
     properties(SetAccess = public)
         ReviseBounds
+        fzeroOpts       % optimset result for fzero; only applies when default TransToPreTrans is used to find PreTransX
     end
 
     properties(SetAccess = protected)
@@ -49,6 +50,7 @@ classdef (Abstract) dTransMono < dEither
             obj.NTransParms = 0;
             obj.UseSplineTransX = false;
             obj.ReviseBounds = true;
+            obj.fzeroOpts = optimset;
             switch nargin
                 case 1
                 case 2
@@ -171,7 +173,9 @@ classdef (Abstract) dTransMono < dEither
         end
         
         function PreTransX = TransToPreTrans(obj,TransX)
-            % Much better if the descendant overrides this, but this works in worst case.
+            % Find the value of the pre-trans RV corresponding to the given
+            % value of the Trans RV.  It is much better
+            % if the descendant overrides this, but this works in worst case.
             if obj.UseSplineTransX
                 PreTransX = spline(obj.SplineTransX,obj.SplineX,TransX);
             else
@@ -179,7 +183,7 @@ classdef (Abstract) dTransMono < dEither
                 for i=1:numel(TransX)
                     fn = @(x) (obj.PreTransToTrans(x) - TransX(i));
 %                    try
-                        PreTransX(i) = fzero(fn,[obj.BasisRV.LowerBound obj.BasisRV.UpperBound]);
+                        PreTransX(i) = fzero(fn,[obj.BasisRV.LowerBound obj.BasisRV.UpperBound],obj.fzeroOpts);
 %                    catch
 %                        disp('Problem in TransToPreTrans');
 %                        pause

@@ -1,7 +1,7 @@
 function [rpt, failedTests] = SingleTest(sThisClass)  % NewJeff: Auto save failed tests?
     
     global WantPlots
-    global GlobalSkipAllEst
+    global GlobalSkipEstAll
     
     %% **** START OF OPTIONS ****
     if numel(WantPlots) == 0
@@ -9,9 +9,9 @@ function [rpt, failedTests] = SingleTest(sThisClass)  % NewJeff: Auto save faile
         % WantPlots = false;
     end
     
-    if numel(GlobalSkipAllEst)==0
-        GlobalSkipAllEst = false;
-        % GlobalSkipAllEst = true;
+    if numel(GlobalSkipEstAll)==0
+        GlobalSkipEstAll = false;
+        % GlobalSkipEstAll = true;
     end
     
     Parallel = false;

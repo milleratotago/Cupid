@@ -25,8 +25,8 @@ classdef utProdUni01 < utContinuous;
 
             SetupXs(testCase,40,200);
             
-%            testCase.SkipMomentEst = true;  % Moments do not give much info about df's
-%            testCase.SkipMLEst = true;  % I can't find X values for which the MLE is the current dfs.
+%            testCase.SkipEstMoment = true;  % Moments do not give much info about df's
+%            testCase.SkipEstML = true;  % I can't find X values for which the MLE is the current dfs.
             % Set up some X values for which MLE should return (very close to) the true parameters:
             % Skipped because I can'F find X values for which the MLE is the current df.
 %             npoints = 2000; % 20000;

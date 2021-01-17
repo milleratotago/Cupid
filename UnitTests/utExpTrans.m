@@ -26,12 +26,12 @@ classdef utExpTrans < utContinuous;
             switch parmCase
                 case 1
                     testCase.Dist = ExpTrans(Uniform(1,2));
-                    % testCase.SkipAllEst = true;
+                    % testCase.SkipEstAll = true;
                 case 2
                     testCase.Dist = ExpTrans(Normal(1,1));
                 case 3
                     testCase.Dist = ExpTrans(Exponential(5));
-                    % testCase.SkipMLEst = true;
+                    % testCase.SkipEstML = true;
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
             

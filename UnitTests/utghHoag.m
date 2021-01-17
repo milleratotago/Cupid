@@ -36,8 +36,13 @@ classdef utghHoag < utContinuous;
 %            testCase.RawMomentAbsTol(4) = max( [0.005, 0.001*abs(testCase.Dist.Mean), 0.001*abs(testCase.Dist.SD) ] );
 %             testCase.ParmEstAbsTol = ones(1,testCase.Dist.NDistParms) * 0.001;
 %             testCase.ParmEstRelTol = ones(1,testCase.Dist.NDistParms) * 0.005;
-%            testCase.MLParmTolSE = 0.25;   % ML parameter estimation is not great
-             testCase.SkipAllEst = true;
+             testCase.MLParmTolSE = 0.05;   % ML parameter estimation is not great
+%            testCase.SkipEstAll = true;
+             testCase.SkipEstMoment = true;
+             testCase.SkipEstProbitAll = true;
+             testCase.SkipEstPercentile = true;
+             testCase.SkipEstChiSq = true;
+             testCase.SkipEstPctBounds = true;
 
             utGenericMethodSetup(testCase);   % Initialize many standard computations
 

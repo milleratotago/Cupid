@@ -24,7 +24,7 @@ classdef utList < utDiscrete;
             % Computations specific to this distribution.
             testCase.ThisCase  = parmCase;
             testCase.EstParmCodes = '';
-            testCase.SkipAllEst = true;
+            testCase.SkipEstAll = true;
             switch parmCase
                 case 1
                     Xs = [2 4 8 100];

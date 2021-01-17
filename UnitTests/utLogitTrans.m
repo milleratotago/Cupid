@@ -26,7 +26,7 @@ classdef utLogitTrans < utContinuous;
             switch parmCase
                 case 1
                     testCase.Dist = LogitTrans(UniformCW(0.5,0.5));
-                    %               testCase.SkipAllEst = true;
+                    %               testCase.SkipEstAll = true;
                 case 2
                     testCase.Dist = LogitTrans(Beta(21,2));
                 case 3

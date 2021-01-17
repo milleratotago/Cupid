@@ -31,7 +31,7 @@ classdef utLogisticTransDisc < utDiscrete;
                 case 2
                     testCase.Dist = LogisticTrans(BinomialMixed([(1:10)/11]));
                     testCase.EstParmCodes = 'ffffffffff';  % P's cannot be varied but they are counted as parameters
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
                 case 3
                     testCase.Dist = LogisticTrans(Geometric(0.6));
                     testCase.EstParmCodes = 'r';
@@ -41,7 +41,7 @@ classdef utLogisticTransDisc < utDiscrete;
                 case 5
                     testCase.Dist = LogisticTrans(UniformInt(0,10));
                     testCase.EstParmCodes = 'ff';
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

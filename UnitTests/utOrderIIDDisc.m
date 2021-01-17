@@ -26,7 +26,7 @@ classdef utOrderIIDDisc < utDiscrete
             switch parmCase
                 case 1
                     testCase.Dist = OrderIID(1,3,UniformInt(0,12));
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
                 case 2
                     testCase.Dist = OrderIID(2,5,Geometric(.1));
                 case 3

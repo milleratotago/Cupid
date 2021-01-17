@@ -31,7 +31,7 @@ classdef utJohnsonSU < utContinuous;
             
             SetupXs(testCase,40,200);
             
-            testCase.SkipAllEst = true;  % Estimation is unsatisfactory.  Estimates parameters are often quite inaccurate.
+            testCase.SkipEstAll = true;  % Estimation is unsatisfactory.  Estimates parameters are often quite inaccurate.
             % Set up some X values for which MLE should return approximately the true parameters:
             % npoints = 5000;
             % testCase.xMLE = testCase.Dist.InverseCDF( (1:2:(2*npoints-1)) / (2*npoints) );

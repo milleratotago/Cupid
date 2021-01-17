@@ -29,7 +29,7 @@ classdef utLinearTransDisc < utDiscrete;
                     testCase.EstParmCodes = 'frff';
                 case 2
                     testCase.Dist = LinearTrans(BinomialMixed([(1:10)/11]),0.75,-5.5);
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
 %                     testCase.EstParmCodes = 'ffffffffffrr';  % P's cannot be varied but they are counted as parameters
                 case 3
                     testCase.Dist = LinearTrans(Geometric(0.1),-2.3,5.5);
@@ -39,7 +39,7 @@ classdef utLinearTransDisc < utDiscrete;
                     testCase.EstParmCodes = 'rff';  % Don't adjust both constant and mean since they can trade off.
                 case 5
                     testCase.Dist = LinearTrans(UniformInt(0,100),1.5,10);
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
 %                     testCase.EstParmCodes = 'ffrf';  % Constant to nearest integer because Xs are integers.
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)

@@ -34,7 +34,7 @@ classdef utWeibull < utContinuous;
             testCase.ParmEstAbsTol = ones(1,testCase.Dist.NDistParms) * 0.10;
             testCase.ParmEstRelTol = ones(1,testCase.Dist.NDistParms) * 0.05;
 
-            testCase.SkipMomentEst = true;  % Moment estimation is pretty hopeless for Weibull
+            testCase.SkipEstMoment = true;  % Moment estimation is pretty hopeless for Weibull
 
             utGenericMethodSetup(testCase);   % Initialize many standard computations
 

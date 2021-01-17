@@ -30,7 +30,7 @@ classdef utTriangularG < utContinuous;
             
             % Parameter estimation often fails due to parameter crossing when the
             % interval is narrow or the peak is close to a boundary.
-            testCase.SkipAllEst = true;
+            testCase.SkipEstAll = true;
 
             % Compute whatever values known are known from other sources:
             testCase.Expected.Minimum = parmlow;

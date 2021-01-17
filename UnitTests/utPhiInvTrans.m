@@ -27,14 +27,14 @@ classdef utPhiInvTrans < utContinuous;
                 case 1
                     testCase.Dist = PhiInvTrans(Beta(8,1));
                     testCase.EstParmCodes = 'rr';
-                    % testCase.SkipAllEst = true;
+                    % testCase.SkipEstAll = true;
                 case 2
                     testCase.Dist = PhiInvTrans(Uniform(.1,.9));
                     testCase.EstParmCodes = 'rr';
                 case 3
                     testCase.Dist = PhiInvTrans(Beta(2,8));
                     testCase.EstParmCodes = 'rr';
-                    % testCase.SkipMLEst = true;
+                    % testCase.SkipEstML = true;
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

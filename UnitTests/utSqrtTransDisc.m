@@ -32,7 +32,7 @@ classdef utSqrtTransDisc < utDiscrete;
 %                    testCase.Dist = SqrtTrans(LinearTrans(BinomialMixed([(1:10)/11]),0.8,.1));
                     testCase.Dist = SqrtTrans(BinomialMixed([(1:5)/11]));
                     testCase.EstParmCodes = 'fffff';  % P's cannot be varied but they are counted as parameters
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
                 case 3
                     testCase.Dist = SqrtTrans(Geometric(0.1));
                     testCase.EstParmCodes = 'r';
@@ -42,7 +42,7 @@ classdef utSqrtTransDisc < utDiscrete;
                 case 5
                     testCase.Dist = SqrtTrans(UniformInt(0,100));
                     testCase.EstParmCodes = 'ff';
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

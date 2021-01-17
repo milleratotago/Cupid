@@ -47,7 +47,7 @@ classdef utBinomialMixed < utDiscrete;
             % Adjust tolerances as appropriate for this distribution & parameters:
             SetTolerances(testCase,0.005);
 
-            testCase.SkipAllEst = true;
+            testCase.SkipEstAll = true;
             
             utGenericMethodSetup(testCase);   % Initialize many standard computations
 

@@ -38,7 +38,7 @@ classdef utLognormalMS < utContinuous;
             testCase.KurtRelTol = max( testCase.KurtRelTol, 0.03*parmpostsigma^2);
 
             testCase.SkipMGFs = true;
-            testCase.SkipMomentEst = true;
+            testCase.SkipEstMoment = true;
 
             utGenericMethodSetup(testCase);   % Initialize many standard computations
 

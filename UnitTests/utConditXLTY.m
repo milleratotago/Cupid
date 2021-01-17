@@ -27,11 +27,11 @@ classdef utConditXLTY < utContinuous;
                 case 1
                     testCase.Dist = ConditXLTY(Triangular(1,2),Uniform(0.5,1.5));
                     testCase.EstParmCodes = 'fffr';
-%                    testCase.SkipAllEst = true;
+%                    testCase.SkipEstAll = true;
                 case 2
                     testCase.Dist = ConditXLTY(Beta(18,5),Beta(21,2));
                     testCase.EstParmCodes = 'fffr';
-%                    testCase.SkipAllEst = true;
+%                    testCase.SkipEstAll = true;
                 case 3
                     testCase.Dist = ConditXLTY(RNGamma(10,.1),Uniform(1,200));
                     testCase.EstParmCodes = 'frff';

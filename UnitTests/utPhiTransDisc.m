@@ -31,7 +31,7 @@ classdef utPhiTransDisc < utDiscrete;
                 case 2
                     testCase.Dist = PhiTrans(LinearTrans(BinomialMixed([(1:10)/15]),1,-5));
 %                     testCase.EstParmCodes = 'ffffffffffr';  % P's cannot be varied but they are counted as parameters
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
                 case 3
                     testCase.Dist = PhiTrans(LinearTrans(Geometric(0.5),1/10,-15));
                     testCase.EstParmCodes = 'rff';
@@ -42,7 +42,7 @@ classdef utPhiTransDisc < utDiscrete;
                 case 5
                     testCase.Dist = PhiTrans(LinearTrans(UniformInt(0,100),.005,-2.01));
 %                     testCase.EstParmCodes = 'ffrf';
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

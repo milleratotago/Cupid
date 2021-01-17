@@ -31,7 +31,7 @@ classdef utExWaldMSM < utContinuous;
 
             testCase.EstParmCodes = 'rfr';
             testCase.Dist.UseSplinePDFOn(200);
-            testCase.SkipMomentEst = true;  % Moments do not provide enough info to constrain parameters
+            testCase.SkipEstMoment = true;  % Moments do not provide enough info to constrain parameters
             
             SetupXs(testCase,40,1000);
             

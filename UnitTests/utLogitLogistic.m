@@ -32,7 +32,7 @@ classdef utLogitLogistic < utContinuous;
             switch parmCase
                 case 1
                     testCase.Dist = LogitTrans(LogisticTrans(testCase.BasisRVs{1}));
-                    %               testCase.SkipAllEst = true;
+                    %               testCase.SkipEstAll = true;
                 case 2
                     testCase.Dist = LogitTrans(LogisticTrans(testCase.BasisRVs{2}));
                 case 3

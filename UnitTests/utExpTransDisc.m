@@ -32,7 +32,7 @@ classdef utExpTransDisc < utDiscrete;
 %                    testCase.Dist = ExpTrans(LinearTrans(BinomialMixed([(1:10)/11]),0.8,.1));
                     testCase.Dist = ExpTrans(BinomialMixed([(1:5)/11]));
                     testCase.EstParmCodes = 'fffffrf';  % P's cannot be varied but they are counted as parameters
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
                 case 3
                     testCase.Dist = ExpTrans(MultTrans(Geometric(0.1),.03));
                     testCase.EstParmCodes = 'rf';

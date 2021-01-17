@@ -31,7 +31,7 @@ classdef utTruncatedXlowDisc < utDiscrete;
                 case 2
                     testCase.Dist = TruncatedXlow(BinomialMixed([(1:10)/11]),2);
 %                     testCase.EstParmCodes = 'ffffffffffr';  % P's cannot be varied but they are counted as parameters
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
                 case 3
                     testCase.Dist = TruncatedXlow(Geometric(0.27),2);
                     testCase.EstParmCodes = 'rf';
@@ -41,7 +41,7 @@ classdef utTruncatedXlowDisc < utDiscrete;
                 case 5
                     testCase.Dist = TruncatedXlow(UniformInt(1,25),4);
 %                     testCase.EstParmCodes = 'fff';
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

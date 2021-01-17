@@ -29,7 +29,7 @@ classdef utAddTransDisc < utDiscrete;
                     testCase.EstParmCodes = 'frf';
                 case 2
                     testCase.Dist = AddTrans(BinomialMixed([(1:10)/11]),0.75);
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
 %                     testCase.EstParmCodes = 'ffffffffffr';  % P's cannot be varied but they are counted as parameters
                 case 3
                     testCase.Dist = AddTrans(Geometric(0.1),-2.3);
@@ -39,7 +39,7 @@ classdef utAddTransDisc < utDiscrete;
                     testCase.EstParmCodes = 'rf';  % Don't adjust both constant and mean since they can trade off.
                 case 5
                     testCase.Dist = AddTrans(UniformInt(0,100),1.65);
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
 %                     testCase.EstParmCodes = 'ffr';
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)

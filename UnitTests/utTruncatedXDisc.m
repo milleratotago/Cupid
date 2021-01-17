@@ -31,18 +31,18 @@ classdef utTruncatedXDisc < utDiscrete;
                 case 2
                     testCase.Dist = TruncatedX(BinomialMixed([(1:10)/11]),2,8);
 %                     testCase.EstParmCodes = 'ffffffffffr';  % P's cannot be varied but they are counted as parameters
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
                 case 3
                     testCase.Dist = TruncatedX(Geometric(0.17),2,10);
                     testCase.EstParmCodes = 'rff';
-                    testCase.SkipMomentEst = true;  % Moments do not constrain parameters
+                    testCase.SkipEstMoment = true;  % Moments do not constrain parameters
                 case 4
                     testCase.Dist = TruncatedX(Poisson(23.5),15,40);
                     testCase.EstParmCodes = 'rff';
                 case 5
                     testCase.Dist = TruncatedX(UniformInt(1,25),4,20);
 %                     testCase.EstParmCodes = 'ffff';
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

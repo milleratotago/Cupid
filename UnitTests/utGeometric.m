@@ -31,7 +31,7 @@ classdef utGeometric < utDiscrete;
             SetTolerances(testCase,0.01);  % Expect some problems due to truncation of discrete distribution
 
             if parmp>.6  % not enough probability in different bins to do Probit estimation
-                testCase.SkipAllProbitEst = true;
+                testCase.SkipEstProbitAll = true;
             end
             utGenericMethodSetup(testCase);   % Initialize many standard computations
 

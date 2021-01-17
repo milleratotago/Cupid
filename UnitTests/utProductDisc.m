@@ -27,7 +27,7 @@ classdef utProductDisc < utDiscrete;
                 case 1
                     testCase.Dist = Product(UniformInt(1,5),UniformInt(10,20));
                     % testCase.EstParmCodes = 'rfff';
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
                 case 2
                     testCase.Dist = Product(Poisson(2.3),Binomial(10,.5));
                     testCase.EstParmCodes = 'ffr';

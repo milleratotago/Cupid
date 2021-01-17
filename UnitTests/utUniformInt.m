@@ -37,7 +37,7 @@ classdef utUniformInt < utDiscrete;
             SetTolerances(testCase,0.005);
             % testCase.KurtRelTol = 0.01;  % Kurtosis not so accurate
             
-            testCase.SkipAllEst = true;  % error when fminsearch suggests low/high crossover
+            testCase.SkipEstAll = true;  % error when fminsearch suggests low/high crossover
 
             utGenericMethodSetup(testCase);   % Initialize many standard computations
 

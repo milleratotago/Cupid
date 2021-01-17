@@ -26,12 +26,12 @@ classdef utInverseTrans < utContinuous;
             switch parmCase
                 case 1
                     testCase.Dist = InverseTrans(Uniform(1,2));
-                    % testCase.SkipAllEst = true;
+                    % testCase.SkipEstAll = true;
                 case 2
                     testCase.Dist = InverseTrans(Normal(50,1));
                 case 3
                     testCase.Dist = InverseTrans(Beta(25,25));
-                    % testCase.SkipMLEst = true;
+                    % testCase.SkipEstML = true;
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 

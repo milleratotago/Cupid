@@ -23,7 +23,7 @@ classdef utOrderIID < utContinuous;
         function ClassSetup(testCase,parmCase)
             % Computations specific to the OrderIID distribution.
             testCase.ThisCase  = parmCase;
-%             testCase.SkipAllEst = true;  % 6 minutes skipping these, not parallel.
+%             testCase.SkipEstAll = true;  % 6 minutes skipping these, not parallel.
             switch parmCase
                 case 1
                     testCase.Dist = OrderIID(1,3,Uniform(0,2));

@@ -36,7 +36,7 @@ classdef utMonotoneTrans < utContinuous;
                     f = @(x) 2*x+2;
                     finv = @(x) (x-2)/2;
                     testCase.Dist = MonotoneTrans(Exponential(0.1),f,finv);
-                    testCase.SkipMLEst = true;  % The exponential produces a better ML at a different rate.
+                    testCase.SkipEstML = true;  % The exponential produces a better ML at a different rate.
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 %            testCase.Dist.SearchOptions.MaxFunEvals = 30000;

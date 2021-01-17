@@ -31,7 +31,7 @@ classdef utPhiInvTransDisc < utDiscrete;
                 case 2
                     testCase.Dist = PhiInvTrans(LinearTrans(BinomialMixed([(1:10)/15]),0.07,0.05));
 %                     testCase.EstParmCodes = 'ffffffffffr';  % P's cannot be varied but they are counted as parameters
-                    testCase.SkipAllEst = true;
+                    testCase.SkipEstAll = true;
                 case 3
                     testCase.Dist = PhiInvTrans(MultTrans(Geometric(0.1),1e-8));
                     testCase.EstParmCodes = 'rf';

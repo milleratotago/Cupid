@@ -23,7 +23,7 @@ classdef utOrder < utContinuous;
         function ClassSetup(testCase,parmCase)
             % Computations specific to the Order distribution.
             testCase.ThisCase  = parmCase;
-%             testCase.SkipAllEst = true;  % Parameter estimation is slow
+%             testCase.SkipEstAll = true;  % Parameter estimation is slow
             switch parmCase
                 case 1
 %                     testCase.Dist = Order(3,Uniform(0,2),Normal(0,2),Uniform(1,3));  % Very slow

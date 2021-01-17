@@ -80,7 +80,7 @@ classdef utdMATLABc < utContinuous;
                     pd = makedist('HalfNormal');
                     testCase.Dist = dMATLABc(pd,'fr',[-inf 0],[+inf +inf]);
                     SetTolerances(testCase,0.005);
-                    % testCase.SkipAllEst = true;  % When bounds are adjusted some data values are impossible.
+                    % testCase.SkipEstAll = true;  % When bounds are adjusted some data values are impossible.
                 case 10
                     pd = makedist('InverseGaussian');
                     testCase.Dist = dMATLABc(pd,'rr',[0 0],[+inf +inf]);
@@ -115,7 +115,7 @@ classdef utdMATLABc < utContinuous;
                     pd = makedist('PiecewiseLinear','x',x,'Fx',Fx);
                     testCase.Dist = dMATLABc(pd); % ,'rr',[0 0],[+inf +inf]);
                     SetTolerances(testCase,0.005);
-                    testCase.SkipAllEst = true;  % There are no parameters
+                    testCase.SkipEstAll = true;  % There are no parameters
                 case 17
                     pd = makedist('Rayleigh');
                     testCase.Dist = dMATLABc(pd,'r',0,+inf);
@@ -136,12 +136,12 @@ classdef utdMATLABc < utContinuous;
                     pd = makedist('Triangular'); % NEWJEFF: Ignoring parameter constraints: lower limit, peak, upper limit
                     testCase.Dist = dMATLABc(pd,'rrr',[-inf -inf -inf],[+inf +inf +inf]);
                     SetTolerances(testCase,0.002);
-                    testCase.SkipMLEst = true;  % When bounds are adjusted some data values are impossible.
+                    testCase.SkipEstML = true;  % When bounds are adjusted some data values are impossible.
                 case 22
                     pd = makedist('Uniform');  % NEWJEFF: Ignoring parameter constraints
                     testCase.Dist = dMATLABc(pd,'rr',[-inf -inf],[+inf +inf]);
                     SetTolerances(testCase,0.002);
-                    testCase.SkipMLEst = true;  % When bounds are adjusted some data values are impossible.
+                    testCase.SkipEstML = true;  % When bounds are adjusted some data values are impossible.
                 case 23
                     pd = makedist('Weibull');
                     testCase.Dist = dMATLABc(pd,'rr',[0 0],[+inf +inf]);

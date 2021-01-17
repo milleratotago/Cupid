@@ -23,7 +23,7 @@ classdef utProduct < utContinuous;
         function ClassSetup(testCase,parmCase)
             % Computations specific to the Product distribution.
             testCase.ThisCase  = parmCase;
-            testCase.SkipAllEst = true;  % ESTIMATION IS TOO SLOW
+            testCase.SkipEstAll = true;  % ESTIMATION IS TOO SLOW
             switch parmCase
                 case 1
                     testCase.Dist = Product(RNGamma(10,.1),RNGamma(10,10)); % Lognormal(1,.1),Uniform(1,2));

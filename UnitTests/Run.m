@@ -2,21 +2,21 @@ function Run(CaseNs)
     % Function to run a set of tests indicated by a vector of Ns 1-8.
     
     global WantPlots
-    global GlobalSkipAllEst
+    global GlobalSkipEstAll
 
     % **************** OPTIONS START HERE ****************
     % Note: Further speed options are available in utGeneric.m
     % at the points marked *** CONTROL SPEED HERE ***
     
     WantPlots = false;
-    GlobalSkipAllEst = false;
+    GlobalSkipEstAll = false;
     % WantBeep = true;
     WantBeep = false;
     
     % **************** OPTIONS END HERE ****************
 
     MarkerRoot = '00Results/00';
-    if GlobalSkipAllEst
+    if GlobalSkipEstAll
         MarkerRoot = [MarkerRoot 'GSE'];
     end
         

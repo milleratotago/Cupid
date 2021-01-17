@@ -24,7 +24,7 @@ classdef utStudRng < utContinuous;
             testCase.Dist = StudRng(parmDF,parmR);
             testCase.Dist.UseSplineCDFOn(501);   % In the interest of speed
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
-            testCase.SkipAllEst = true;  % Skip in interests of speed
+            testCase.SkipEstAll = true;  % Skip in interests of speed
 
             SetupXs(testCase,40,200);
             

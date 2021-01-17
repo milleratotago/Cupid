@@ -26,7 +26,7 @@ classdef utArcsinTrans < utContinuous;
             switch parmCase
                 case 1
                     testCase.Dist = ArcsinTrans(UniformCW(0.5,0.5));
-                    % testCase.SkipAllEst = true;
+                    % testCase.SkipEstAll = true;
                 case 2
                     testCase.Dist = ArcsinTrans(Beta(21,2));
                 case 3

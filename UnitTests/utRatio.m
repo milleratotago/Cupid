@@ -27,11 +27,11 @@ classdef utRatio < utContinuous;
                 case 1
                     testCase.Dist = Ratio(Triangular(1,2),Uniform(0.5,1.5));
                     testCase.EstParmCodes = 'fffr';
-                    testCase.SkipAllEst = true;  % ESTIMATION IS SLOW SO ONLY DO ONE
+                    testCase.SkipEstAll = true;  % ESTIMATION IS SLOW SO ONLY DO ONE
                 case 2
                     testCase.Dist = Ratio(Beta(18,5),Beta(21,2));
                     testCase.EstParmCodes = 'fffr';
-                    testCase.SkipAllEst = true;  % ESTIMATION IS SLOW SO ONLY DO ONE
+                    testCase.SkipEstAll = true;  % ESTIMATION IS SLOW SO ONLY DO ONE
                 case 3
                     testCase.Dist = Ratio(RNGamma(10,.1),Uniform(1,2));
                     testCase.EstParmCodes = 'frff';
