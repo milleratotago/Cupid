@@ -1,10 +1,10 @@
 classdef utghHoag < utContinuous;
     
     properties (ClassSetupParameter)
-        parmA = struct( 'n10',-10   , 'n1',-1     , 'p0',0     , 'p5',5      , 'p25',25   , 'p2_5',2.5  );
-        parmB = struct( 'p_5',.5    , 'p_1',.1    , 'p1',1     , 'p2',2      , 'p10',10   , 'p8'  ,8    );
-        parmg = struct( 'p_1' ,.1   , 'n_02',-.02 , 'p_07',.07 , 'n_03',-.03 , 'p_08',.08 , 'n_04',-.04 );
-        parmh = struct( 'p_0' ,.0   , 'p_1',.1    , 'p_2',.02  , 'p_05',.05  , 'p_07',.07 , 'p_08',.08  );
+        parmA = struct( 'n10',-10    , 'n1',-1     , 'p0',0     , 'p5',5      , 'p25',25   , 'p2_5',2.5  );
+        parmB = struct( 'p_5',.5     , 'p_1',.1    , 'p1',1     , 'p2',2      , 'p10',10   , 'p8'  ,8    );
+        parmg = struct( 'p_1' ,.1    , 'n_02',-.02 , 'p_07',.07 , 'n_03',-.03 , 'p_08',.08 , 'n_04',-.04 );
+        parmh = struct( 'p_001',.001 , 'p_1',.1    , 'p_2',.2  , 'p_05',.05  , 'p_07',.07 , 'p_08',.08  );
     end
     
     properties
@@ -25,7 +25,8 @@ classdef utghHoag < utContinuous;
             % Computations specific to the ghHoag distribution.
             testCase.Dist = ghHoag(parmA,parmB,parmg,parmh);
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
-            testCase.Dist.UseSplineTransXOn(1000);
+            testCase.Dist.SplineXnPoints = 250;
+            testCase.Dist.UseSplineTransXOn;
  
             SetupXs(testCase,40,2000);
             
@@ -34,8 +35,8 @@ classdef utghHoag < utContinuous;
             % Adjust tolerances as appropriate for this distribution & parameters:
             SetTolerances(testCase,0.005);
 %            testCase.RawMomentAbsTol(4) = max( [0.005, 0.001*abs(testCase.Dist.Mean), 0.001*abs(testCase.Dist.SD) ] );
-%             testCase.ParmEstAbsTol = ones(1,testCase.Dist.NDistParms) * 0.001;
-%             testCase.ParmEstRelTol = ones(1,testCase.Dist.NDistParms) * 0.005;
+             testCase.ParmEstAbsTol = ones(1,testCase.Dist.NDistParms) * 0.001;
+            testCase.ParmEstRelTol = ones(1,testCase.Dist.NDistParms) * 0.025;
              testCase.MLParmTolSE = 0.05;   % ML parameter estimation is not great
 %            testCase.SkipEstAll = true;
              testCase.SkipEstMoment = true;

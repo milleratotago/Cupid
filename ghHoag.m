@@ -1,8 +1,8 @@
 classdef ghHoag < dTransMono  % Lots of numerical problems with some parameter values--see unit tests.
     % ghHoag(A, B, g, h): From Hoaglin (1985) chapter, "Summarizing Shape Numerically: The g-and-h Distributions"
     % A & B>0 are location (median) and scale
-    % g>0 controls amount & direction of skew: g=0 is symmetric but leads to numerical errors so a cluge ensures abs(g)>eps
-    %   typical values of g range between 0 and 1
+    % g controls amount & direction of skew: g=0 is symmetric but leads to numerical errors so a cluge ensures abs(g)>eps
+    %   typical values of g range between -1 and 1
     % h>0 controls heaviness of tails: h=0 is normal
     %   typical values of h range between 0 and 0.5
     % "A negative value of h is not impossible, but special treatment may be required because the monotonicity of Yh(z) fails for z^2 > -1/h."
@@ -14,12 +14,21 @@ classdef ghHoag < dTransMono  % Lots of numerical problems with some parameter v
     %   solution = solve(transeqn,Z,'Real',true)
     %   > Warning: Unable to find explicit solution.
     % Thus, this distribution uses dTransMono.fzeroOpts.
+    % I also tried to get an approximation for an improved starting point by dropping the minus 1:
+    %     approx =  -(obj.g + (obj.g^2 + 2*obj.h*log(-(obj.g*(obj.A - TransX(i)))/obj.B))^(1/2))/obj.h;
+    % alternative approximation:
+    %     approx =  -(obj.g - (obj.g^2 + 2*obj.h*log(-(obj.g*(obj.A - TransX(i)))/obj.B))^(1/2))/obj.h;
+    
+    properties(Constant)
+        minabsg = 0.0001; % min absolute value of g to avoid numerical errors if g too close to 0
+        ming = -4;
+        maxg =  4;
+        minh =  0;
+        maxh = 16;
+    end
     
     properties(SetAccess = protected)
         A, B, g, h
-        ming  % min absolute value of g to avoid numerical errors if g==0
-        maxg
-        minh, maxh
     end
     
     methods
@@ -29,10 +38,6 @@ classdef ghHoag < dTransMono  % Lots of numerical problems with some parameter v
             fixedNormal = Normal(0,1,zExtreme);
             fixedNormal.DefaultParmCodes = 'ff';
             obj=obj@dTransMono('ghHoag',fixedNormal);
-            obj.ming = 0.00001;
-            obj.maxg = 2;
-            obj.minh = -1;
-            obj.maxh = 1;
             obj.fzeroOpts = optimset;
             obj.ResetParms([A B g h]);
             obj.AddParms(4,'rrrr');
@@ -48,11 +53,11 @@ classdef ghHoag < dTransMono  % Lots of numerical problems with some parameter v
             obj.A = newparmvalues(end-3);
             obj.B = newparmvalues(end-2);
             obj.g = newparmvalues(end-1);
-            if abs(obj.g) < obj.ming
+            if abs(obj.g) < obj.minabsg
                 if obj.g < 0
-                    obj.g = -obj.ming;
+                    obj.g = -obj.minabsg;
                 else
-                    obj.g = obj.ming;
+                    obj.g = obj.minabsg;
                 end
             end
             obj.h = newparmvalues(end);
@@ -84,6 +89,24 @@ classdef ghHoag < dTransMono  % Lots of numerical problems with some parameter v
             end
         end
 
+        function PreTransX = TransToPreTrans(obj,TransX)
+            if obj.UseSplineTransX
+                PreTransX = spline(obj.SplineTransX,obj.SplineX,TransX);
+            else
+                PreTransX = zeros(size(TransX));
+                for i=1:numel(TransX)
+                    fn = @(x) (obj.PreTransToTrans(x) - TransX(i));
+                    approx = 0;
+%                   try
+                        PreTransX(i) = fzero(fn,approx,obj.fzeroOpts);
+%                   catch
+%                      disp('fzero failed in TransToPreTrans');
+%                      pause
+%                   end % try
+                end % for
+            end % else
+        end
+        
         function TransReals = TransParmsToReals(obj,Parms,~)
             TransReals = [Parms(end-3) Parms(end-2) NumTrans.Bounded2Real(obj.ming,obj.maxg,Parms(end-1)) NumTrans.Bounded2Real(obj.minh,obj.maxh,Parms(end))];
         end

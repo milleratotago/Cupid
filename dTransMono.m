@@ -22,6 +22,7 @@ classdef (Abstract) dTransMono < dEither
     properties(SetAccess = public)
         ReviseBounds
         fzeroOpts       % optimset result for fzero; only applies when default TransToPreTrans is used to find PreTransX
+        SplineXnPoints
     end
 
     properties(SetAccess = protected)
@@ -49,6 +50,7 @@ classdef (Abstract) dTransMono < dEither
             obj@dEither(FamName);
             obj.NTransParms = 0;
             obj.UseSplineTransX = false;
+            obj.SplineXnPoints = 200;
             obj.ReviseBounds = true;
             obj.fzeroOpts = optimset;
             switch nargin
@@ -102,6 +104,9 @@ classdef (Abstract) dTransMono < dEither
         
          function []=ReInit(obj)
             obj.Initialized = true;
+            if obj.UseSplineTransX
+               obj.UseSplineTransXOn;
+            end
             switch obj.DistType
                 case 'd'
                     obj.MakeTables;
@@ -180,10 +185,12 @@ classdef (Abstract) dTransMono < dEither
                 PreTransX = spline(obj.SplineTransX,obj.SplineX,TransX);
             else
                 PreTransX = zeros(size(TransX));
+%                Expansion = 0.01 * (obj.BasisRV.UpperBound - obj.BasisRV.LowerBound);
                 for i=1:numel(TransX)
                     fn = @(x) (obj.PreTransToTrans(x) - TransX(i));
 %                    try
                         PreTransX(i) = fzero(fn,[obj.BasisRV.LowerBound obj.BasisRV.UpperBound],obj.fzeroOpts);
+%                        PreTransX(i) = fzero(fn,[obj.BasisRV.LowerBound-Expansion obj.BasisRV.UpperBound+Expansion],obj.fzeroOpts);
 %                    catch
 %                        disp('Problem in TransToPreTrans');
 %                        pause
@@ -192,9 +199,9 @@ classdef (Abstract) dTransMono < dEither
             end % else
         end % TransToPreTrans
         
-        function UseSplineTransXOn(obj,nPoints)
+        function UseSplineTransXOn(obj)
             obj.UseSplineTransX = true;
-            obj.SplineX = linspace(obj.BasisRV.LowerBound,obj.BasisRV.UpperBound,nPoints);
+            obj.SplineX = linspace(obj.BasisRV.LowerBound,obj.BasisRV.UpperBound,obj.SplineXnPoints);
             obj.SplineTransX = obj.PreTransToTrans(obj.SplineX);
         end
 
