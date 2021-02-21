@@ -1,5 +1,28 @@
 classdef Weibull < dContinuous
     % Weibull(scale>0,power>0,origin)
+    % See Evans, Kretschmann, & Green (2019 USDA) for info on estimation & moments (EKG).
+
+    % NEWJEFF: Wikipedia & EKG give formulas for moments.  These agree with Cupid
+    % computations for mean and variance but not for CenMoment(3).
+    % Here is some code I wrote to compare, based on EKG:
+    %
+    % function moms = WeibMom(a, b, c)  % shape, scale, location
+    %     moms = zeros(3,1);
+    %     moms(1) = c + b*gammJ(1,a);  % around 0
+    % %     moms(2) = c^2 + b^2*gammJ(2,a) + 2*c*b*gammJ(1,a);  % around 0
+    % %     moms(3) = c^3 + b^3*gammJ(3,a) + 3*c*b^2*gammJ(2,a) + 3*c^2*b*gammJ(1,a);  % around 0
+    %     moms(2) = b^2 * ( gammJ(2,a) - gammJ(1,a)^2 );  % central
+    %     moms(3) = b^3 * ( gammJ(3,a) + 3*gammJ(1,a)*gammJ(2,a) + 2*gammJ(1,a)^3 );  % central
+    % end
+    % 
+    % function gam = gammJ(j,a)
+    %     gam = gamma(1+j/a);
+    % end
+
+
+    % WARNING: Percentile-based parameter estimation seems very poor unless
+    % the starting parameter values are quite good.  It seems to work well
+    % to start with an EstMom and then follow that with EstPercentile.
     
     % It would be nice to have a way to put an upper limit on the OriginParm
     % for estimation problems to make sure that all known observations exist

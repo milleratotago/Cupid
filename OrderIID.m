@@ -100,6 +100,28 @@ classdef OrderIID < dEither
             SetBinEdges(obj);
         end
 
+        function thisPDF=PDF(obj,X)
+            if obj.DistType=='d'
+                thisPDF = PDF@dDiscrete(obj,X);
+                return;
+            end
+            [thisPDF, InBounds, Done] = MaybeSplinePDF(obj,X);
+            if Done
+                return;
+            end
+            for iel=1:numel(X)
+                if InBounds(iel)
+                    % From Wikipedia
+                    Fx = CDF(obj.BasisRV,X(iel));
+                    fx = PDF(obj.BasisRV,X(iel));
+                    LnFx = log(Fx);
+                    Ln1_Fx = log(1 - Fx);
+                    N = nchoosek(obj.SampleSize,obj.Order) * obj.Order;
+                    thisPDF(iel) = N * fx * Fx^(obj.Order-1) * (1 - Fx)^(obj.SampleSize-obj.Order);
+                end
+            end
+        end
+        
         function thiscdf=CDF(obj,X)
             if obj.DistType=='d'
                 thiscdf = CDF@dDiscrete(obj,X);

@@ -120,7 +120,11 @@ classdef utGeneric < matlab.unittest.TestCase
             testCase.ProbitmAFC = 2;
             
             testCase.SkipMGFs = false;
+
             testCase.SkipEstML = false;
+            testCase.SkipEstPercentile = false;
+            testCase.SkipEstChiSq = false;
+            testCase.SkipEstPctBounds = false;
             testCase.SkipEstMoment = false;
             testCase.SkipEstAll = false;
             testCase.SkipEstProbitAll = false;
