@@ -125,6 +125,7 @@ function Run(CaseNs)
             sectiontime = tic;
             rpt{end+1} = SingleTest('AddTrans');
             rpt{end+1} = SingleTest('ArcsinTrans');
+            rpt{end+1} = SingleTest('ConvUnif');
             rpt{end+1} = SingleTest('ExpTrans');
             rpt{end+1} = SingleTest('InverseTrans');
             rpt{end+1} = SingleTest('LinearTrans');
