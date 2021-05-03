@@ -419,7 +419,7 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
             % Compute observed chi-square and it's p value for a given set of data.
             NBins = length(obj.DiscreteX);
             % Count the observed frequency of each possible score
-            obscounts = zeros(1,NBins);
+            obscounts = zeros(NBins,1);
             for i=1:NBins
                 obscounts(i) = sum( abs(Data(:)-obj.DiscreteX(i)) < obj.XGrain*eps(obj.DiscreteX(i)));
             end
@@ -427,6 +427,7 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
             % Compute the expected count for each score:
             TotalN = sum(obscounts);
             predfreq = TotalN * obj.DiscretePDF;
+            predfreq = predfreq(:);  % make sure it is a column vector like obscounts.
             % Compute chi-sq & p
             obschisq = sum( (predfreq-obscounts).^2 ./ predfreq );
             Theoretical = ChiSq(NBins-1);
