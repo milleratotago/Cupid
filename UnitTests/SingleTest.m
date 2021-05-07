@@ -1,4 +1,5 @@
 function [rpt, failedTests] = SingleTest(sThisClass)  % NewJeff: Auto save failed tests?
+    % Example: SingleTest('Beta');
     
     global WantPlots
     global GlobalSkipEstAll

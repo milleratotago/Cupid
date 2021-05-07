@@ -3,7 +3,8 @@ classdef ExGauss < dContinuous
     % Note that there is a minimum sigma to avoid numerical problems in parameter estimation when sigma is allowed to approach 0.
     
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
-        mu, sigma, rate,
+        mu, sigma, rate
+        tau  % 1/rate
         Standard_Normal, Standard_Exponential, EExtreme, SqrtTwo
         T3a, T4a
     end
@@ -13,7 +14,7 @@ classdef ExGauss < dContinuous
         UseNormalApprox
         MinSigma
     end
-
+    
     methods
         
         function obj=ExGauss(varargin)
@@ -70,6 +71,7 @@ classdef ExGauss < dContinuous
             if obj.rate<=0
                 error('ExGauss rate must be > 0.');
             end
+            obj.tau = 1 / obj.rate;
             obj.UseNormalApprox = obj.sigma*obj.rate^2 > obj.UseNormalApproxCutoff;
             obj.LowerBound = obj.mu - obj.Standard_Normal.ZExtreme * obj.sigma;
             if obj.UseNormalApprox
@@ -77,9 +79,9 @@ classdef ExGauss < dContinuous
             else
                 obj.UpperBound = obj.mu + obj.Standard_Normal.ZExtreme * obj.sigma + obj.EExtreme / obj.rate;
             end
-% Constants used in CDF computations:
-obj.T3a = obj.mu/obj.sigma + obj.sigma*obj.rate;
-obj.T4a = (obj.sigma*obj.rate)^2 / 2;
+            % Constants used in CDF computations:
+            obj.T3a = obj.mu/obj.sigma + obj.sigma*obj.rate;
+            obj.T4a = (obj.sigma*obj.rate)^2 / 2;
             obj.Initialized = true;
             if (obj.NameBuilding)
                 BuildMyName(obj);
@@ -99,10 +101,19 @@ obj.T4a = (obj.sigma*obj.rate)^2 / 2;
             if Done
                 return;
             end
-            t1 = -X(InBounds)*obj.rate + obj.mu*obj.rate + 0.5*(obj.sigma*obj.rate)^2;
-            t2 = (X(InBounds) - obj.mu - obj.sigma^2*obj.rate) / obj.sigma;
-            thispdf(InBounds) = obj.rate*exp( t1 + log(normcdf(t2)) );  % Better numerical properties.
-%           thispdf(InBounds) = obj.rate*exp(t1).*normcdf(t2);
+            t1 = zeros(size(X));
+            t2 = zeros(size(X));
+            t1(InBounds) = -X(InBounds)*obj.rate + obj.mu*obj.rate + 0.5*(obj.sigma*obj.rate)^2;
+            t2(InBounds) = (X(InBounds) - obj.mu - obj.sigma^2*obj.rate) / obj.sigma;
+            thispdf(InBounds) = obj.rate*exp( t1(InBounds) + log(normcdf(t2(InBounds))) );  % Better numerical properties.
+            % The above is the theoretical definition of the ex-Gaussian pdf,
+            % but there are numerical problems if t1 > 708 or so, because then exp(t1) overflows.
+            % That happens when tau is small relative to sigma (so (sigma*rate)^2 is large).
+            % In that case, though, the exG density is very close to a normal with mean mu+tau & variance sigma^2+tau^2,
+            % so we can just use that corresponding normal pdf in those cases to avoid numerical problems:
+            t1bad = (t1 > 708) & InBounds;  % vector indicating too-large t1's for which we should use the normal approximation.
+            thispdf(t1bad) = normpdf(X(t1bad),obj.mu+obj.tau,sqrt(obj.sigma^2+obj.tau^2));
+            %           thispdf(InBounds) = obj.rate*exp(t1).*normcdf(t2);
             %            return
             %            % Old pre-vectorized version below with possibly more checking for numerical problems when Sigma*Rate is large.
             %            % Luce (1986, p. 36) has a version of the PDF, but not quite this one.
@@ -143,12 +154,12 @@ obj.T4a = (obj.sigma*obj.rate)^2 / 2;
             end
             T1 = CDF(obj.Standard_Normal, (X(InBounds)-obj.mu)/obj.sigma);
             T3 = CDF(obj.Standard_Normal,X(InBounds)/obj.sigma-obj.T3a); % obj.mu/obj.sigma-obj.sigma*obj.rate);
-%            T4a = (obj.sigma*obj.rate)^2 / 2;
+            %            T4a = (obj.sigma*obj.rate)^2 / 2;
             T4 = obj.rate*(obj.mu-X(InBounds)) + obj.T4a;
             T2 = exp(T4);
             T2(T3==0) = 0;
             thiscdf(InBounds) = T1 - T2.*T3;
-%{
+            %{
             for iel=1:numel(X)
                 if InBounds(iel)
                     T1 = CDF(obj.Standard_Normal, (X(iel)-obj.mu)/obj.sigma);
@@ -163,7 +174,7 @@ obj.T4a = (obj.sigma*obj.rate)^2 / 2;
                     thiscdf(iel) = T1-T2*T3;
                 end
             end
-%}
+            %}
         end
         
         function thisval=Mean(obj)

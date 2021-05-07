@@ -94,6 +94,7 @@ function Run(CaseNs)
             rpt{end+1} = SingleTest('Uniform');
             rpt{end+1} = SingleTest('UniformCW');
             rpt{end+1} = SingleTest('UniGap');
+            rpt{end+1} = SingleTest('Uquad');
             rpt{end+1} = SingleTest('Wald2');
             rpt{end+1} = SingleTest('Wald2MSD');
             rpt{end+1} = SingleTest('Weibull');
@@ -109,6 +110,7 @@ function Run(CaseNs)
             rpt{end+1} = SingleTest('BinomialZ');
             rpt{end+1} = SingleTest('BinomialMixed');
             rpt{end+1} = SingleTest('Geometric');
+            rpt{end+1} = SingleTest('Hypergeometric');
             rpt{end+1} = SingleTest('List');
             rpt{end+1} = SingleTest('NegativeBinomial');
             rpt{end+1} = SingleTest('Poisson');
