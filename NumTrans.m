@@ -43,9 +43,9 @@ classdef NumTrans < handle
         function trans = Real2Bounded(minimum,maximum,real)
             % Convert an arbitrary real number to a number within certain bounds.
             trans = (maximum - minimum) ./ (exp(-real*NumTrans.Slope) + 1) + minimum;
-%             if isnan(trans)
-%                 trans = minimum;
-%             end
+            if isnan(trans)
+                fprintf('Real2Bounded error at min = %f, max = %f, real = %f\n',minimum,maximum,real);
+            end
         end
         
         function real = Bounded2Real(minimum,maximum,trans)
