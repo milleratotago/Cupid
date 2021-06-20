@@ -1,7 +1,7 @@
 classdef Normal < dContinuous
-    
     % Normal(mu,sigma[,ZExtreme]):  Normal random variable with mean "mu" and standard dev "sigma"
     % Optional 3rd parameter is ZExtreme
+    % NEWJEFF: EstML is known
     
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
         mu         % distribution mean
