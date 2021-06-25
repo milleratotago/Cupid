@@ -14,7 +14,7 @@ function [x, y] = plotDists(Dists,PdfCdf,varargin)   % NEWJEFF: Undocumented
     y = nan(nDists,nPoints);
     ttlNPlotParms = numel(varargin);
     nPlotParmsPerDist = floor(ttlNPlotParms/nDists);
-    distNames = {};
+    distNames = cell(nDists,1);
     Coverage = 0.999;
     tailProb = (1 - Coverage) / 2;
     hold on;
@@ -34,7 +34,7 @@ function [x, y] = plotDists(Dists,PdfCdf,varargin)   % NEWJEFF: Undocumented
             y(iDist,:) = thisDist.CDF(x(iDist,:));
         end
         plot(x(iDist,:),y(iDist,:),plotParms{:});
-        distNames = [distNames {thisDist.StringName}];
+        distNames{iDist} = thisDist.StringName;
     end
     legend(distNames);
 end

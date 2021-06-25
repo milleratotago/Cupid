@@ -40,7 +40,7 @@ classdef Exponential < dContinuous
         end
         
         function []=ReInit(obj)
-            obj.LowerBound = 0;
+            obj.LowerBound = eps;  % Convenient to regard this as a strictly positive RV
             obj.UpperBound =  16 / obj.rate;
             obj.Initialized = true;
             if (obj.NameBuilding)

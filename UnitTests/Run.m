@@ -239,6 +239,8 @@ function Run(CaseNs)
             rpt{end+1} = SingleTest('AttainP');
             rpt{end+1} = SingleTest('ConditXLTY');
             rpt{end+1} = SingleTest('ConditXGTY');
+            rpt{end+1} = SingleTest('ContamShift');
+            rpt{end+1} = SingleTest('ContamStretch');
             rpt{end+1} = SingleTest('Convolution');
             rpt{end+1} = SingleTest('Difference');
             rpt{end+1} = SingleTest('InfMix');

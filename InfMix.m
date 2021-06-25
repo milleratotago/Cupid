@@ -270,6 +270,17 @@ end  % object InfMix
 
 %{
 
+%NEWJEFF: The following attempt at estimation did not work:
+alpha = 4;  % shape parameter of X
+mu = 4;     % mean of X's mean
+beta = 3;   % shape of X's mean
+K = InfMix(RNGamma(alpha,3),RNGamma(beta,2),2);
+K.PlotDens;
+X = K.Random(100,1);
+K.EstML(X)
+% After a very long time, it simply returned with the original parameters.
+
+
 %*********InfMix Distributions:*******************************
 The following object implements InfMix random variables.  They are derived
 from a ParentDist distribution, but the MixParm'th parameter of the ParentDist
