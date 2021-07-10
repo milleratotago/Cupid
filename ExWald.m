@@ -149,13 +149,8 @@ classdef ExWald < dContinuous
             h = CDF(obj.WaldBasis,X(InBounds));
             ThisPDF = PDF(obj,X(InBounds));
             thiscdf(InBounds) = h - (1 / obj.rate) * ThisPDF;
-            % for i=1:numel(X)
-            %     if InBounds(i)
-            %         h = CDF(obj.WaldBasis,X(i));
-            %         ThisPDF = PDF(obj,X(i));
-            %         thiscdf(i) = h - (1 / obj.rate) * ThisPDF;
-            %     end
-            % end
+            % Numerical problems can produce CDF<0 so replace those with a very small number.
+            thiscdf(thiscdf<=0) = eps(0);
         end
         
         function thisval=Mean(obj)

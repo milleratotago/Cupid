@@ -59,6 +59,7 @@ function Run(CaseNs)
             rpt{end+1} = SingleTest('ExpSum');
             rpt{end+1} = SingleTest('ExtrVal1');
             rpt{end+1} = SingleTest('ExtrVal2');
+            rpt{end+1} = SingleTest('ExtrVal2L');
             rpt{end+1} = SingleTest('ExtrValGen');
             rpt{end+1} = SingleTest('ExWald');
             rpt{end+1} = SingleTest('ExWaldMn');
@@ -75,6 +76,7 @@ function Run(CaseNs)
             rpt{end+1} = SingleTest('KolmSmir');
             rpt{end+1} = SingleTest('Laplace');
             rpt{end+1} = SingleTest('Logistic');
+            rpt{end+1} = SingleTest('Loglogistic');
             rpt{end+1} = SingleTest('Lognormal');
             rpt{end+1} = SingleTest('LognormalMCV');
             rpt{end+1} = SingleTest('LognormalMS');

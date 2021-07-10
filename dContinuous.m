@@ -143,11 +143,13 @@ classdef dContinuous < dGeneric   % Calls by reference
             if ~obj.Initialized
                 error(UninitializedError(obj));
             end
-            if min(P)<0
-                error(['InverseCDF requires all P>0 but this call has a P of ',num2str(min(P))]);
+            if min(P)<=0
+                warning(['InverseCDF expects all P>0 but this call has a P of ',num2str(min(P))]);
+                P(P<=0) = eps(0);
             end
-            if max(P)>1
-                error(['InverseCDF requires all P<1 but this call has a P of ',num2str(max(P))]);
+            if max(P)>=1
+                warning(['InverseCDF expects all P<1 but this call has a P of ',num2str(max(P))]);
+                P(P>=1) = 1 - eps(1);
             end
             [thisval, ~, Done] = MaybeSplineInvCDF(obj,P);
             if Done

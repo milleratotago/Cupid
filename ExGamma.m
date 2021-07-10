@@ -1,7 +1,7 @@
 classdef ExGamma < dContinuous  % NEWJEFF: Now using j_integralCalc
     % ExGamma distribution (sum of gamma and exponential) with parameters K, rateG, rateE
-    % NEWJEFF: Jasiulewicz & Kordecki (2003) Eqn 9 give the PDF but ...
-    % I cannot figure out their formula, and it only appears to work for integer K values.
+    % NEWJEFF: Jasiulewicz & Kordecki (2003) Eqn 9 give the PDF but I ...
+    %  cannot figure out their formula, and it only appears to work for integer K values.
 
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
         K, rateG, rateE
@@ -10,7 +10,17 @@ classdef ExGamma < dContinuous  % NEWJEFF: Now using j_integralCalc
         
         % For speed, this distribution uses calls to 2 private MATLAB functions
         % that I copied into my own functions j_integralParseArgs and j_integralCalc.
-        % These functions are part of MATLAB's 'integral' 
+        % These functions are part of MATLAB's private 'integral' functionality so
+        % I cannot distribute them.  But you can make them yourself as follows:
+        %
+        % The file j_integralCalc.m is the output of 'type integralCalc' in R2016b 2020-04-22
+        %
+        % The file j_integralParseArgs.m is the output of 'type integralParseArgs' in R2016b 2020-04-22
+        % except that the call to Gauss7Kronrod15 was changed to j_Gauss7Kronrod15
+        %
+        % The file j_Gauss7Kronrod15.m is the output of 'type Gauss7Kronrod15' in R2016b 2020-04-22
+
+
         jop % hold the options structure controlling integral calculation
     end
     

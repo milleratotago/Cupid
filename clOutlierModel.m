@@ -10,6 +10,9 @@ classdef clOutlierModel < handle
         Shift   = 1;  % Contamination RV adds to true score
         Stretch = 2;  % Contamination RV multiplies times true score
         Replace = 3;  % Contamination RV replaces true score
+        
+        TypeLabel = {'Shift', 'Stretch', 'Replace'};  % Labels used for file naming, etc.
+        
     end
     
     properties

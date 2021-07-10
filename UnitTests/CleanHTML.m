@@ -1,6 +1,5 @@
 function [] = CleanHTML( sFName )
-    %UNTITLED2 Summary of this function goes here
-    %   Detailed explanation goes here
+    % Function to clean output of diary command.
     
     fid = fopen(sFName, 'r');
     c1 = fscanf(fid,'%c');
@@ -9,6 +8,8 @@ function [] = CleanHTML( sFName )
     c1 = strrep(c1,'<strong>','');
     c1 = strrep(c1,'</strong>','');
     c1 = strrep(c1,'','');
+    c1 = strrep(c1,'<a href="matlab:helpPopup table" style="font-weight:bold">','');
+    c1 = strrep(c1,'</a>','');
 
 
     fid = fopen(sFName,'w');
