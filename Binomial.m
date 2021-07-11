@@ -10,9 +10,9 @@ classdef Binomial < dDiscrete   % NWJEFF: Not vectorized
         Q, NP, NQ, NPQ,
         % The next variable stores the type of approximation (if any) in use.
         Approx,     % 0 = Compute directly / Do not approximate
-                    % 1 = Normal approx
-                    % 2 = Poisson approx for x
-                    % 3 = Poisson approx for N-x
+        % 1 = Normal approx
+        % 2 = Poisson approx for x
+        % 3 = Poisson approx for N-x
         Standard_Normal, PoissonBasis
     end
     
@@ -21,6 +21,18 @@ classdef Binomial < dDiscrete   % NWJEFF: Not vectorized
         % If BinomialExact is false, the next three cutoffs are used to decide when and how to approximate.
         LargeNCutoff, LargeCellCutoff
         ZExtreme  % Extreme Z value used in normal approximation
+    end
+    
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            Reals = [NumTrans.GT2Real(1,Parms(1)) NumTrans.Bounded2Real(0,1,Parms(2))];
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = [NumTrans.Real2GT(1,Reals(1)) NumTrans.Real2Bounded(0,1,Reals(2))];
+        end
+        
     end
     
     methods
@@ -96,14 +108,6 @@ classdef Binomial < dDiscrete   % NWJEFF: Not vectorized
             end
         end
         
-        function Reals = ParmsToReals(obj,Parms,~)
-            Reals = [NumTrans.GT2Real(1,Parms(1)) NumTrans.Bounded2Real(0,1,Parms(2))];
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            Parms = [NumTrans.Real2GT(1,Reals(1)) NumTrans.Real2Bounded(0,1,Reals(2))];
-        end
-        
         function thisval=LegalValue(obj,X)
             if ~obj.Initialized
                 error(UninitializedError(obj));
@@ -143,7 +147,7 @@ classdef Binomial < dDiscrete   % NWJEFF: Not vectorized
             end
             obj.DiscreteCDF(end) = 1;
         end
-
+        
         function [Xs, PDFs, CDFs] = MakeTableExact(obj)
             % Make tables of Xs, PDFs, & CDFs for 0-N successes
             SumPr = 0;
@@ -191,7 +195,7 @@ classdef Binomial < dDiscrete   % NWJEFF: Not vectorized
                     CDFs = 1 - flip( obj.PoissonBasis.DiscreteCDF ) + PDFs;
             end
         end
-
+        
         function thisval=Mean(obj)
             if ~obj.Initialized
                 error(UninitializedError(obj));
@@ -226,7 +230,7 @@ classdef Binomial < dDiscrete   % NWJEFF: Not vectorized
             end
             thisval = (obj.P * exp(Theta) + obj.Q)^obj.N;
         end
-
+        
         function thisval=Random(obj,varargin)
             if numel(varargin)==0
                 varargin{1} = 1;

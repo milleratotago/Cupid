@@ -8,6 +8,22 @@ classdef Poisson < dDiscrete   % NWJEFF: Not vectorized
         Warned  % Warning given about numerical problems with large mu
     end
     
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            Reals = NumTrans.GT2Real(eps,Parms(1));
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = NumTrans.Real2GT(eps,Reals(1));
+        end
+        
+        function thisval=NearestLegal(X)
+            thisval = round(X);
+        end
+        
+    end
+    
     methods
         
         function obj=Poisson(varargin)
@@ -53,14 +69,6 @@ classdef Poisson < dDiscrete   % NWJEFF: Not vectorized
             end
         end
         
-        function Reals = ParmsToReals(obj,Parms,~)
-            Reals = NumTrans.GT2Real(eps,Parms(1));
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            Parms = NumTrans.Real2GT(eps,Reals(1));
-        end
-        
         function thisval=LegalValue(obj,X)
             thisval = zeros(size(X));
             for i=1:numel(X)
@@ -68,10 +76,6 @@ classdef Poisson < dDiscrete   % NWJEFF: Not vectorized
                     thisval(i) = true;
                 end
             end
-        end
-        
-        function thisval=NearestLegal(obj,X)
-            thisval = round(X);
         end
         
         function []=MakeTables(obj)

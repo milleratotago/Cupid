@@ -114,7 +114,7 @@ classdef Mixture < dEither
         function BuildMyName(obj)
             sTemp = [num2str(obj.MixtureP(1)) ',' obj.BasisRV{1}.StringName];
             for iDist=2:obj.NDists
-                sTemp = [sTemp ',' num2str(obj.MixtureP(iDist)) ',' obj.BasisRV{iDist}.StringName];
+                sTemp = [sTemp ',' num2str(obj.MixtureP(iDist)) ',' obj.BasisRV{iDist}.StringName]; %#ok<AGROW>
             end
             obj.StringName = ['Mixture(' sTemp ')'];
         end

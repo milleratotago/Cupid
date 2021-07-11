@@ -6,6 +6,19 @@ classdef Chi < dContinuous
         dfm1, Halfdf, Halfdfm1, GammaHalfdf, LnGammaHalfdf, Inv2toHalfdfm1GammaHalfdf
     end
     
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            % Avoid mapping with integer parms
+            Reals = Parms;  % [NumTrans.GT2Real(1,Parms(1))];
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = Reals; % [NumTrans.Real2GT(1,Reals(1))];
+        end
+        
+    end
+    
     methods
         
         function obj=Chi(varargin)   % Constructor
@@ -62,15 +75,6 @@ classdef Chi < dContinuous
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
-        end
-        
-        function Reals = ParmsToReals(obj,Parms,~)
-            % Avoid mapping with integer parms
-            Reals = Parms;  % [NumTrans.GT2Real(1,Parms(1))];
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            Parms = Reals; % [NumTrans.Real2GT(1,Reals(1))];
         end
         
         function thispdf=PDF(obj,X)

@@ -4,6 +4,18 @@ classdef r < dContinuous  % NWJEFF: For large DF, approximate with Normal(0,1/sq
         SampleSize, DF, GamHalf,  Gam1, Gam2, Parentt
     end
     
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            Reals = NumTrans.GT2Real(3,Parms(1));
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = NumTrans.Real2GT(3,Reals(1));
+        end
+        
+    end
+    
     methods
         
         function obj=r(varargin)   % Constructor
@@ -49,14 +61,6 @@ classdef r < dContinuous  % NWJEFF: For large DF, approximate with Normal(0,1/sq
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
-        end
-        
-        function Reals = ParmsToReals(obj,Parms,~)
-            Reals = NumTrans.GT2Real(3,Parms(1));
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            Parms = NumTrans.Real2GT(3,Reals(1));
         end
         
         function thispdf=PDF(obj,X)    % JKB

@@ -5,6 +5,24 @@ classdef Uniform < dContinuous
         min, max, Range, FlatPDF
     end
     
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            % It is tempting to enforce the restriction that Parms(2) has to be greater than Parms(1), like this:
+            % Reals = [Parms(1) NumTrans.GT2Real(Parms(1),Parms(2))];
+            % Unfortunately, this creates problems if you want to estimate Parms(1) while holding Parms(2) fixed.
+            % It may be better to use a different parameterization, e.g. Parms(1) = center & Parms(2) = width,
+            % so that these parameters are independent.  See UniformCW.
+            Reals = Parms;
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            % Parms = [Reals(1) NumTrans.Real2GT(Reals(1),Reals(2))];
+            Parms = Reals;
+        end
+        
+    end
+    
     methods
         
         function obj=Uniform(varargin)
@@ -57,20 +75,6 @@ classdef Uniform < dContinuous
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
-        end
-        
-        function Reals = ParmsToReals(obj,Parms,~)
-            % It is tempting to enforce the restriction that Parms(2) has to be greater than Parms(1), like this:
-            % Reals = [Parms(1) NumTrans.GT2Real(Parms(1),Parms(2))];
-            % Unfortunately, this creates problems if you want to estimate Parms(1) while holding Parms(2) fixed.
-            % It may be better to use a different parameterization, e.g. Parms(1) = center & Parms(2) = width,
-            % so that these parameters are independent.  See UniformCW.
-            Reals = Parms;
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            % Parms = [Reals(1) NumTrans.Real2GT(Reals(1),Reals(2))];
-            Parms = Reals;
         end
         
         function thispdf=PDF(obj,X)

@@ -5,6 +5,18 @@ classdef MultTrans < dTransMono
         Multiplier
     end
     
+    methods (Static)
+        
+        function TransReals = TransParmsToReals(Parms,~)
+            TransReals = Parms(end);
+        end
+        
+        function TransParms = TransRealsToParms(Reals,~)
+            TransParms = Reals(end);
+        end
+        
+    end
+    
     methods
         
         function obj=MultTrans(BasisDist,Multiplier)
@@ -40,15 +52,7 @@ classdef MultTrans < dTransMono
             PreTransX = TransX / obj.Multiplier;
         end
         
-        function TransReals = TransParmsToReals(obj,Parms,~)
-            TransReals = Parms(end);
-        end
-        
-        function TransParms = TransRealsToParms(obj,Reals,~)
-            TransParms = Reals(end);
-        end
-        
-        function thisval = PDFScaleFactor(obj,X)
+        function thisval = PDFScaleFactor(obj,~)
             thisval = 1/obj.Multiplier;
         end
         

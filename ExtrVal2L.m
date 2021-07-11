@@ -7,6 +7,18 @@ classdef ExtrVal2L < dContinuous
         shape, scale
     end
     
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            Reals = [NumTrans.GT2Real(eps,Parms(1)) NumTrans.GT2Real(eps,Parms(2))];
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = [NumTrans.Real2GT(eps,Reals(1)) NumTrans.Real2GT(eps,Reals(2))];
+        end
+        
+    end
+    
     methods
         
         function obj=ExtrVal2L(varargin)
@@ -49,14 +61,6 @@ classdef ExtrVal2L < dContinuous
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
-        end
-        
-        function Reals = ParmsToReals(obj,Parms,~)
-            Reals = [NumTrans.GT2Real(eps,Parms(1)) NumTrans.GT2Real(eps,Parms(2))];
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            Parms = [NumTrans.Real2GT(eps,Reals(1)) NumTrans.Real2GT(eps,Reals(2))];
         end
         
         function thispdf=PDF(obj,X)

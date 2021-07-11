@@ -6,6 +6,18 @@ classdef Geometric < dDiscrete     % NWJEFF: Not vectorized
         MinPDF  % Criterion for deciding when the PDF is small enough to cut off the distribution
     end
     
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            Reals = NumTrans.Bounded2Real(0,1,Parms(1));
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = NumTrans.Real2Bounded(0,1,Reals(1));
+        end
+        
+    end
+    
     methods
         
         function obj=Geometric(varargin)
@@ -61,14 +73,6 @@ classdef Geometric < dDiscrete     % NWJEFF: Not vectorized
             obj.DiscreteCDF(end) = 1;
         end
 
-        function Reals = ParmsToReals(obj,Parms,~)
-            Reals = NumTrans.Bounded2Real(0,1,Parms(1));
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            Parms = NumTrans.Real2Bounded(0,1,Reals(1));
-        end
-        
         function thisval=Mean(obj)
             if ~obj.Initialized
                 error(UninitializedError(obj));

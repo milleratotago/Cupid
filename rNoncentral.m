@@ -122,7 +122,7 @@ classdef rNoncentral < dContinuous
                 thispdf = (obj.SampleSize-2) * gamma(obj.SampleSize-1) * ((1-obj.TrueRho.^2).^((obj.SampleSize-1)/2)).* (1-X.^2).^((obj.SampleSize-4)/2);
                 thispdf = thispdf ./ (obj.Sqrt2Pi * gamma(obj.SampleSize-1/2) * (1-obj.TrueRho.*X).^(obj.SampleSize-3/2));
                 thispdf = thispdf .* (1+ 1/4*(obj.TrueRho.*X+1)/(2*obj.SampleSize-1) + 9/16*(obj.TrueRho.*X+1).^2 / (2*obj.SampleSize-1)/(2*obj.SampleSize+1));
-            end;
+            end
             thispdf(X>obj.UpperBound) = 0;
             thispdf(X<obj.LowerBound) = 0;
             %  thispdf(~isfinite(thispdf))     = 0;

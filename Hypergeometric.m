@@ -9,6 +9,24 @@ classdef Hypergeometric < dDiscrete
         MinPDF  % Criterion for deciding when the PDF is small enough to cut off the distribution
     end
     
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            RealN = NumTrans.GT2Real(1,Parms(1));
+            RealK = NumTrans.GT2Real(1,Parms(2));
+            Realn = NumTrans.GT2Real(1,Parms(3));
+            Reals = [RealN, RealK, Realn];
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            ParmN = NumTrans.GT2Real(1,Reals(1));
+            ParmK = NumTrans.GT2Real(1,Reals(2));
+            Parmn = NumTrans.GT2Real(1,Reals(3));
+            Parms = [ParmN, ParmK, Parmn];
+        end
+        
+    end
+    
     methods
         
         function obj=Hypergeometric(varargin)
@@ -70,20 +88,6 @@ classdef Hypergeometric < dDiscrete
             obj.DiscreteCDF(end) = 1;
         end
 
-        function Reals = ParmsToReals(obj,Parms,~)
-            RealN = NumTrans.GT2Real(1,Parms(1));
-            RealK = NumTrans.GT2Real(1,Parms(2));
-            Realn = NumTrans.GT2Real(1,Parms(3));
-            Reals = [RealN, RealK, Realn];
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            ParmN = NumTrans.GT2Real(1,Reals(1));
-            ParmK = NumTrans.GT2Real(1,Reals(2));
-            Parmn = NumTrans.GT2Real(1,Reals(3));
-            Parms = [ParmN, ParmK, Parmn];
-        end
-        
         function thisval=Mean(obj)
             if ~obj.Initialized
                 error(UninitializedError(obj));

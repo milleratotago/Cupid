@@ -5,6 +5,26 @@ classdef Rayleigh < dContinuous
         Sigma, SigmaSqr
     end
     
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            Reals = NumTrans.GT2Real(0,Parms(1));
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = NumTrans.Real2GT(0,Reals(1));
+        end
+        
+        function thisval=RelSkewness()
+            thisval = 0.631111;
+        end
+        
+        function thisval=Kurtosis()
+            thisval = 3.24509;
+        end
+        
+    end
+    
     methods
         
         function obj=Rayleigh(varargin)   % Constructor
@@ -54,14 +74,6 @@ classdef Rayleigh < dContinuous
             end
         end
         
-        function Reals = ParmsToReals(obj,Parms,~)
-            Reals = NumTrans.GT2Real(0,Parms(1));
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            Parms = NumTrans.Real2GT(0,Reals(1));
-        end
-        
         function thispdf=PDF(obj,X)
             [thispdf, InBounds, Done] = MaybeSplinePDF(obj,X);
             if Done
@@ -95,14 +107,6 @@ classdef Rayleigh < dContinuous
         
         function thisval=Variance(obj)
             thisval = (2 - pi / 2) * obj.SigmaSqr;
-        end
-        
-        function thisval=RelSkewness(obj)
-            thisval = 0.631111;
-        end
-        
-        function thisval=Kurtosis(obj)
-            thisval = 3.24509;
         end
         
     end  % methods

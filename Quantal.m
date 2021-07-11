@@ -6,6 +6,18 @@ classdef Quantal < dContinuous
         Threshold, TM1
     end
     
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            Reals = NumTrans.GT2Real(1,Parms(1));
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = NumTrans.Real2GT(1,Reals(1));
+        end
+        
+    end
+    
     methods
         
         function obj=Quantal(varargin)
@@ -55,14 +67,6 @@ classdef Quantal < dContinuous
         %            thispdf=PDFfromCDF(obj,X);
         %        end
         %
-        function Reals = ParmsToReals(obj,Parms,~)
-            Reals = NumTrans.GT2Real(1,Parms(1));
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            Parms = NumTrans.Real2GT(1,Reals(1));
-        end
-        
         function thiscdf=CDF(obj,X)
             [thiscdf, InBounds, Done] = MaybeSplineCDF(obj,X);
             if Done

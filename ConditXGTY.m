@@ -2,7 +2,7 @@ classdef ConditXGTY  < dConditXY
     % Distribution of random variable X conditional on its being greater than an independent random variable Y
 
     properties(SetAccess = protected)
-        PrXGTY
+        valPrXGTY
     end
 
     methods
@@ -13,7 +13,7 @@ classdef ConditXGTY  < dConditXY
 
         function []=ReInit(obj)
             obj.Initialized = true;
-            obj.PrXGTY = PrXGTY(obj.BasisRV1,obj.BasisRV2);
+            obj.valPrXGTY = PrXGTY(obj.BasisRV1,obj.BasisRV2);
             obj.LowerBound = max(obj.BasisRV1.LowerBound,obj.BasisRV2.LowerBound);
             obj.UpperBound = obj.BasisRV1.UpperBound;
             if (obj.NameBuilding)
@@ -26,7 +26,7 @@ classdef ConditXGTY  < dConditXY
             if Done
                 return;
             end
-            thispdf(InBounds) = obj.BasisRV1.PDF(X(InBounds)) .* obj.BasisRV2.CDF(X(InBounds)) / obj.PrXGTY;
+            thispdf(InBounds) = obj.BasisRV1.PDF(X(InBounds)) .* obj.BasisRV2.CDF(X(InBounds)) / obj.valPrXGTY;
         end
         
     end

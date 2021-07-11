@@ -5,6 +5,18 @@ classdef LinearTrans < dTransMono
         Multiplier, Addend
     end
     
+    methods (Static)
+        
+        function TransReals = TransParmsToReals(Parms,~)
+            TransReals = Parms(end-1:end);
+        end
+        
+        function TransParms = TransRealsToParms(Reals,~)
+            TransParms = Reals(end-1:end);
+        end
+        
+    end
+    
     methods
         
         function obj=LinearTrans(BasisDist,Multiplier,Addend)
@@ -41,14 +53,6 @@ classdef LinearTrans < dTransMono
         
         function PreTransX = TransToPreTrans(obj,TransX)
             PreTransX = (TransX - obj.Addend) / obj.Multiplier;
-        end
-        
-        function TransReals = TransParmsToReals(obj,Parms,~)
-            TransReals = Parms(end-1:end);
-        end
-        
-        function TransParms = TransRealsToParms(obj,Reals,~)
-            TransParms = Reals(end-1:end);
         end
         
         function thisval = PDFScaleFactor(obj,~)

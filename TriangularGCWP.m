@@ -5,6 +5,18 @@ classdef TriangularGCWP < TriangularG
         width, peakprop
     end
 
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            Reals = [ Parms(1) NumTrans.GT2Real(0,Parms(2)) NumTrans.Bounded2Real(0,1,Parms(3)) ];
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = [ Reals(1) NumTrans.Real2GT(0,Reals(2)) NumTrans.Real2Bounded(0,1,Reals(3)) ];
+        end
+        
+    end
+    
     methods
         
         function obj=TriangularGCWP(varargin)
@@ -45,14 +57,6 @@ classdef TriangularGCWP < TriangularG
             Newwidth = ifelse(ParmCodes(2)=='f',obj.width,1.1*obj.width);
             NewPeakprop  = ifelse(ParmCodes(3)=='f',obj.peakprop,0.95*obj.peakprop);
             obj.ResetParms([Newcenter Newwidth NewPeakprop]);
-        end
-        
-        function Reals = ParmsToReals(obj,Parms,~)
-            Reals = [ Parms(1) NumTrans.GT2Real(0,Parms(2)) NumTrans.Bounded2Real(0,1,Parms(3)) ];
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            Parms = [ Reals(1) NumTrans.Real2GT(0,Reals(2)) NumTrans.Real2Bounded(0,1,Reals(3)) ];
         end
         
     end  % methods

@@ -46,13 +46,13 @@ classdef List < dDiscrete
             end
         end
         
-        function Reals = ParmsToReals(obj,Parms,~) %#ok<INUSL>
-%             Reals = [NumTrans.GT2Real(1,Parms(1)) NumTrans.Bounded2Real(0,1,Parms(2))];
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~) %#ok<INUSL>
-%             Parms = [NumTrans.Real2GT(1,Reals(1)) NumTrans.Real2Bounded(0,1,Reals(2))];
-        end
+%         function Reals = ParmsToReals(obj,Parms,~) %#ok<INUSL>
+% %             Reals = [NumTrans.GT2Real(1,Parms(1)) NumTrans.Bounded2Real(0,1,Parms(2))];
+%         end
+%         
+%         function Parms = RealsToParms(obj,Reals,~) %#ok<INUSL>
+% %             Parms = [NumTrans.Real2GT(1,Reals(1)) NumTrans.Real2Bounded(0,1,Reals(2))];
+%         end
                
     end  % methods
     

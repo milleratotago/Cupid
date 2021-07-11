@@ -15,6 +15,26 @@ classdef Normal < dContinuous
         ZTableCDFs, ZTableLen
     end
     
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            % Convert the current parameter values to a list of reals in the range (-inf,inf) for fminsearch to adjust.
+            %            Reals = zeros(obj.NDistParms,1);
+            %            Reals(1) = obj.mu;
+            %            Reals(2) = NumTrans.GT2Real(0,obj.sigma);
+            Reals = [Parms(1) NumTrans.GT2Real(eps,Parms(2))];
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            % Convert fminsearch's reals from the range (-inf,inf) into a list of legal parameter values.
+            %            Parms = zeros(obj.NDistParms,1);
+            %            Parms(1) = Reals(1);
+            %            Parms(2) = NumTrans.GT2Real(0,Reals(2));
+            Parms = [Reals(1) NumTrans.Real2GT(eps,Reals(2))];
+        end
+        
+    end
+    
     methods
         
         function obj=Normal(varargin)   % Constructor
@@ -69,22 +89,6 @@ classdef Normal < dContinuous
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
-        end
-        
-        function Reals = ParmsToReals(obj,Parms,~)
-            % Convert the current parameter values to a list of reals in the range (-inf,inf) for fminsearch to adjust.
-            %            Reals = zeros(obj.NDistParms,1);
-            %            Reals(1) = obj.mu;
-            %            Reals(2) = NumTrans.GT2Real(0,obj.sigma);
-            Reals = [Parms(1) NumTrans.GT2Real(eps,Parms(2))];
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            % Convert fminsearch's reals from the range (-inf,inf) into a list of legal parameter values.
-            %            Parms = zeros(obj.NDistParms,1);
-            %            Parms(1) = Reals(1);
-            %            Parms(2) = NumTrans.GT2Real(0,Reals(2));
-            Parms = [Reals(1) NumTrans.Real2GT(eps,Reals(2))];
         end
         
         function []=SetZExtreme(obj,passZExtreme)

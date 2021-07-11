@@ -9,6 +9,14 @@ classdef Geary < dContinuous
     
     methods (Static)
         
+        function Reals = ParmsToReals(Parms,~)
+            Reals = NumTrans.GT2Real(1,Parms(1));
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = NumTrans.Real2GT(1,Reals(1));
+        end
+        
         function thisA = ObservedA(X)
             % Compute the observed value of Geary's A for the data in X.
             X = X(:);  % Make sure X is a vector.
@@ -62,14 +70,6 @@ classdef Geary < dContinuous
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
-        end
-        
-        function Reals = ParmsToReals(obj,Parms,~)
-            Reals = NumTrans.GT2Real(1,Parms(1));
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            Parms = NumTrans.Real2GT(1,Reals(1));
         end
         
         function thiscdf = CDF(obj,X)

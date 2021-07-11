@@ -14,6 +14,18 @@ classdef BinomialMixed < dDiscrete
         NumDP  % N of decimal places when converting probabilities to string in distribution name.
     end
 
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            Reals = Parms; % [NumTrans.Bounded2Real(0,1,Parms(1))];
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = Reals; % [NumTrans.Real2Bounded(0,1,Reals(1))];
+        end
+        
+    end
+    
     methods
         
         function obj=BinomialMixed(varargin)
@@ -78,14 +90,6 @@ classdef BinomialMixed < dDiscrete
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
-        end
-        
-        function Reals = ParmsToReals(obj,Parms,~)
-            Reals = Parms; % [NumTrans.Bounded2Real(0,1,Parms(1))];
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            Parms = Reals; % [NumTrans.Real2Bounded(0,1,Reals(1))];
         end
         
         function []=MakeTables(obj)

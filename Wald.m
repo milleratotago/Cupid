@@ -42,6 +42,18 @@ Wolf Schwarz says:
         Standard_Normal
     end
     
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            Reals = [NumTrans.GT2Real(0,Parms(1)) NumTrans.GT2Real(0,Parms(2)) NumTrans.GT2Real(1,Parms(3))] ;
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = [NumTrans.Real2GT(0,Reals(1)) NumTrans.Real2GT(0,Reals(2)) NumTrans.Real2GT(1,Reals(3))];
+        end
+        
+    end
+    
     methods
         
         function obj=Wald(varargin)
@@ -131,14 +143,6 @@ Wolf Schwarz says:
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
-        end
-        
-        function Reals = ParmsToReals(obj,Parms,~)
-            Reals = [NumTrans.GT2Real(0,Parms(1)) NumTrans.GT2Real(0,Parms(2)) NumTrans.GT2Real(1,Parms(3))] ;
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            Parms = [NumTrans.Real2GT(0,Reals(1)) NumTrans.Real2GT(0,Reals(2)) NumTrans.Real2GT(1,Reals(3))];
         end
         
         function thispdf=PDF(obj,X)

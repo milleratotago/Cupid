@@ -12,6 +12,18 @@ classdef GenNor2 < dContinuous
         Kappa  % shape, real.  Reasonable values seem to be about -.75 to +.75
     end
     
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            Reals = [Parms(1) NumTrans.GT2Real(eps,Parms(2)) Parms(3) ];
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = [Reals(1) NumTrans.Real2GT(eps,Reals(2)) Reals(3) ];
+        end
+        
+    end
+    
     methods
         
         function obj=GenNor2(varargin)
@@ -66,14 +78,6 @@ classdef GenNor2 < dContinuous
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
-        end
-        
-        function Reals = ParmsToReals(obj,Parms,~)
-            Reals = [Parms(1) NumTrans.GT2Real(eps,Parms(2)) Parms(3) ];
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            Parms = [Reals(1) NumTrans.Real2GT(eps,Reals(2)) Reals(3) ];
         end
         
         function y = XtoY(obj,X)

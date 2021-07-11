@@ -7,6 +7,18 @@ classdef NegativeBinomial < dDiscrete
         NM1, Q, PtoN
     end
     
+    methods (Static)
+        
+       function Reals = ParmsToReals(Parms,~)
+            Reals = [NumTrans.GT2Real(1,Parms(1)) NumTrans.Bounded2Real(0,1,Parms(2))];
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = [NumTrans.Real2GT(1,Reals(1)) NumTrans.Real2Bounded(0,1,Reals(2))];
+        end
+        
+    end
+    
     methods
         
         function obj=NegativeBinomial(varargin)
@@ -98,15 +110,7 @@ classdef NegativeBinomial < dDiscrete
             Pr = nchoosek(obj.N+k-1,k) * obj.PtoN * obj.Q^k;
         end
         
-        function Reals = ParmsToReals(obj,Parms,~) %#ok<INUSL>
-            Reals = [NumTrans.GT2Real(1,Parms(1)) NumTrans.Bounded2Real(0,1,Parms(2))];
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~) %#ok<INUSL>
-            Parms = [NumTrans.Real2GT(1,Reals(1)) NumTrans.Real2Bounded(0,1,Reals(2))];
-        end
-        
-        function thisval=LegalValue(obj,X)
+         function thisval=LegalValue(obj,X)
             assert(obj.Initialized,UninitializedError(obj));
             thisval = zeros(size(X));
             for i=1:numel(X)

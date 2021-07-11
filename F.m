@@ -11,6 +11,18 @@ classdef F < dContinuous
         ComputeBounds, BetaGenerator
     end
     
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            Reals = [NumTrans.GT2Real(1,Parms(1)) NumTrans.GT2Real(1,Parms(2))];
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = [NumTrans.Real2GT(1,Reals(1)) NumTrans.Real2GT(1,Reals(2))];
+        end
+        
+    end
+    
     methods
         
         function obj=F(varargin)
@@ -70,14 +82,6 @@ classdef F < dContinuous
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
-        end
-        
-        function Reals = ParmsToReals(obj,Parms,~)
-            Reals = [NumTrans.GT2Real(1,Parms(1)) NumTrans.GT2Real(1,Parms(2))];
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            Parms = [NumTrans.Real2GT(1,Reals(1)) NumTrans.Real2GT(1,Reals(2))];
         end
         
         function thispdf=PDF(obj,X)

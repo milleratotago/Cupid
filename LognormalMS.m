@@ -5,6 +5,18 @@ classdef LognormalMS < Lognormal
         postmu, postsigma
     end
     
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            Reals = [NumTrans.GT2Real(5*eps,Parms(1)) NumTrans.GT2Real(5*eps,Parms(2))];
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = [NumTrans.Real2GT(5*eps,Reals(1)) NumTrans.Real2GT(5*eps,Reals(2))];
+        end
+        
+    end
+    
     methods
         
         function obj=LognormalMS(varargin)   % Constructor
@@ -51,14 +63,6 @@ classdef LognormalMS < Lognormal
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
-        end
-        
-        function Reals = ParmsToReals(obj,Parms,~)
-            Reals = [NumTrans.GT2Real(5*eps,Parms(1)) NumTrans.GT2Real(5*eps,Parms(2))];
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            Parms = [NumTrans.Real2GT(5*eps,Reals(1)) NumTrans.Real2GT(5*eps,Reals(2))];
         end
         
         function s = EstMom(obj,TargetVals,varargin)

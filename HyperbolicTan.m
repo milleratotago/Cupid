@@ -6,6 +6,18 @@ classdef HyperbolicTan < dContinuous
         Scale
     end
     
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            Reals = NumTrans.GT2Real(eps,Parms(1));
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = NumTrans.Real2GT(eps,Reals(1));
+        end
+        
+    end
+    
     methods
         
         function obj=HyperbolicTan(varargin)
@@ -44,14 +56,6 @@ classdef HyperbolicTan < dContinuous
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
-        end
-        
-        function Reals = ParmsToReals(obj,Parms,~)
-            Reals = NumTrans.GT2Real(eps,Parms(1));
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            Parms = NumTrans.Real2GT(eps,Reals(1));
         end
         
         function thispdf=PDF(obj,X)

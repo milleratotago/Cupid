@@ -4,6 +4,18 @@ classdef ConstantC < dContinuous
     properties(SetAccess = protected)
         value
     end
+
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            Reals = Parms(1);
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = Reals(1);
+        end
+        
+    end
     
     methods
         
@@ -38,14 +50,6 @@ classdef ConstantC < dContinuous
             end
         end
         
-        function Reals = ParmsToReals(obj,Parms,~)
-            Reals = Parms(1);
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            Parms = Reals(1);
-        end
-        
         function thispdf=PDF(obj,X)
             if ~obj.Initialized
                 error(UninitializedError(obj));
@@ -74,7 +78,7 @@ classdef ConstantC < dContinuous
             thisval = obj.value^I;
         end
         
-        function thisval=CenMoment(obj,I)
+        function thisval=CenMoment(~,I)
             if I == 0
                 thisval = 1;
             else

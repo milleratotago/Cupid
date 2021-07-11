@@ -6,6 +6,18 @@ classdef Laplace < dContinuous
         OneOverTwoScale
     end
     
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            Reals = [Parms(1) NumTrans.GT2Real(eps,Parms(2))];
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = [Reals(1) NumTrans.Real2GT(eps,Reals(2))];
+        end
+        
+    end
+    
     methods
         
         function obj=Laplace(varargin)   % Constructor
@@ -47,14 +59,6 @@ classdef Laplace < dContinuous
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
-        end
-        
-        function Reals = ParmsToReals(obj,Parms,~)
-            Reals = [Parms(1) NumTrans.GT2Real(eps,Parms(2))];
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            Parms = [Reals(1) NumTrans.Real2GT(eps,Reals(2))];
         end
         
         function thispdf=PDF(obj,X)

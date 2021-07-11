@@ -8,6 +8,18 @@ classdef ChiSqNoncentral < dContinuous
         Halfdf, ExpNegHalfNoncen, MeanOfEachNormal
     end
     
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            Reals = [NumTrans.GT2Real(1,Parms(1)) NumTrans.GT2Real(0,Parms(2))];
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = [NumTrans.Real2GT(1,Reals(1)) NumTrans.Real2GT(0,Reals(2))];
+        end
+        
+    end
+    
     methods
         
         function obj=ChiSqNoncentral(varargin)
@@ -59,14 +71,6 @@ classdef ChiSqNoncentral < dContinuous
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
-        end
-        
-        function Reals = ParmsToReals(obj,Parms,~)
-            Reals = [NumTrans.GT2Real(1,Parms(1)) NumTrans.GT2Real(0,Parms(2))];
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            Parms = [NumTrans.Real2GT(1,Reals(1)) NumTrans.Real2GT(0,Reals(2))];
         end
         
         function thispdf=PDF(obj,X)

@@ -74,7 +74,7 @@ classdef Order < dEither
         function BuildMyName(obj)
             sTemp = ['Order(' num2str(obj.OrderK)];
             for iDist=1:obj.SampleSize
-                sTemp = [sTemp ',' obj.BasisRV{iDist}.StringName];
+                sTemp = [sTemp ',' obj.BasisRV{iDist}.StringName]; %#ok<AGROW>
             end
             obj.StringName = [sTemp ')'];
         end

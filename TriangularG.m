@@ -8,6 +8,24 @@ classdef TriangularG < dContinuous
         center, heightfac
     end
     
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            % It is tempting to enforce the restrictions Parms(1) < Parms(2) < Parms(3), like this:
+            % Reals = [Parms(1) NumTrans.GT2Real(Parms(1),Parms(2)) NumTrans.GT2Real(Parms(2),Parms(3))];
+            % Unfortunately, this creates problems if you want to estimate some parms while holding other fixed.
+            % It may be better to use a different parameterization to make the parameters independent.
+            Reals = Parms;
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            %            temp = NumTrans.Real2GT(Reals(1),Reals(2));
+            %            Parms = [Reals(1) NumTrans.Real2GT(Reals(1),Reals(2)) NumTrans.Real2GT(temp,Reals(3))];
+            Parms = Reals;
+        end
+        
+    end
+    
     methods
         
         function obj=TriangularG(varargin)
@@ -74,20 +92,6 @@ classdef TriangularG < dContinuous
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
-        end
-        
-        function Reals = ParmsToReals(obj,Parms,~)
-            % It is tempting to enforce the restrictions Parms(1) < Parms(2) < Parms(3), like this:
-            % Reals = [Parms(1) NumTrans.GT2Real(Parms(1),Parms(2)) NumTrans.GT2Real(Parms(2),Parms(3))];
-            % Unfortunately, this creates problems if you want to estimate some parms while holding other fixed.
-            % It may be better to use a different parameterization to make the parameters independent.
-            Reals = Parms;
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            %            temp = NumTrans.Real2GT(Reals(1),Reals(2));
-            %            Parms = [Reals(1) NumTrans.Real2GT(Reals(1),Reals(2)) NumTrans.Real2GT(temp,Reals(3))];
-            Parms = Reals;
         end
         
         function thispdf=PDF(obj,X)

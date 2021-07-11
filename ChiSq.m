@@ -6,6 +6,18 @@ classdef ChiSq < dContinuous
         Halfdf, Halfdfm1, GammaHalfdf, LnGammaHalfdf, Inv2toHalfdfGammaHalfdf
     end
     
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            Reals = NumTrans.GT2Real(1,Parms(1));
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = NumTrans.Real2GT(1,Reals(1));
+        end
+        
+    end
+    
     methods
         
         function obj=ChiSq(varargin)   % Constructor
@@ -61,14 +73,6 @@ classdef ChiSq < dContinuous
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
-        end
-        
-        function Reals = ParmsToReals(obj,Parms,~)
-            Reals = NumTrans.GT2Real(1,Parms(1));
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            Parms = NumTrans.Real2GT(1,Reals(1));
         end
         
         function thispdf=PDF(obj,X)

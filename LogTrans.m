@@ -1,6 +1,22 @@
 classdef LogTrans < dTransMono
     % LogTrans(BasisRV): Log transformation of a positive BasisRV.
     
+    methods (Static)
+        
+        function TransX = PreTransToTrans(PreTransX)
+            TransX = log(PreTransX);
+        end
+        
+        function PreTransX = TransToPreTrans(TransX)
+            PreTransX = exp(TransX);
+        end
+        
+        function thisval = PDFScaleFactor(X)  % only called when obj.DistType=='c'
+            thisval = exp(X);
+        end
+        
+    end
+    
     methods
         
         function obj=LogTrans(BasisDist)
@@ -13,18 +29,6 @@ classdef LogTrans < dTransMono
         function []=ResetParms(obj,newparmvalues)
             ResetParms@dTransMono(obj,newparmvalues);
             ReInit(obj);
-        end
-        
-        function TransX = PreTransToTrans(obj,PreTransX)
-            TransX = log(PreTransX);
-        end
-        
-        function PreTransX = TransToPreTrans(obj,TransX)
-            PreTransX = exp(TransX);
-        end
-        
-        function thisval = PDFScaleFactor(obj,X)  % only called when obj.DistType=='c'
-            thisval = exp(X);
         end
         
     end  % methods

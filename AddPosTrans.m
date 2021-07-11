@@ -1,6 +1,18 @@
 classdef AddPosTrans < AddTrans
     % AddPosTrans(BasisRV,Addend): Shifts the BasisRV by the specified additive constant which is constrained to be positive.
     
+    methods (Static)
+        
+        function TransReals = TransParmsToReals(Parms,~)
+            TransReals = sqrt(Parms(end));
+        end
+        
+        function TransParms = TransRealsToParms(Reals,~)
+            TransParms = Reals(end)^2;
+        end
+        
+    end
+    
     methods
         
         function obj=AddPosTrans(varargin) % BasisDist,Addend
@@ -16,14 +28,6 @@ classdef AddPosTrans < AddTrans
             end
         end
 
-        function TransReals = TransParmsToReals(obj,Parms,~)
-            TransReals = sqrt(Parms(end));
-        end
-        
-        function TransParms = TransRealsToParms(obj,Reals,~)
-            TransParms = Reals(end)^2;
-        end
-        
     end  % methods
     
 end  % class AddPosTrans

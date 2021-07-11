@@ -1,6 +1,23 @@
 classdef ExpTrans < dTransMono
     % ExpTrans(BasisRV): Exponential transformation of a BasisRV.
     
+    methods (Static)
+        
+       function TransX = PreTransToTrans(PreTransX)
+            TransX = exp(PreTransX);
+        end
+        
+        function PreTransX = TransToPreTrans(TransX)
+            PreTransX = log(TransX);
+        end
+        
+        function thisval = PDFScaleFactor(X)
+            thisval = ones(size(X));
+            thisval = thisval ./ X;
+        end
+        
+    end
+    
     methods
         
         function obj=ExpTrans(BasisDist)
@@ -15,20 +32,7 @@ classdef ExpTrans < dTransMono
             ReInit(obj);
         end
         
-        function TransX = PreTransToTrans(obj,PreTransX)
-            TransX = exp(PreTransX);
-        end
-        
-        function PreTransX = TransToPreTrans(obj,TransX)
-            PreTransX = log(TransX);
-        end
-        
-        function thisval = PDFScaleFactor(obj,X)
-            thisval = ones(size(X));
-            thisval = thisval ./ X;
-        end
-        
-    end  % methods
+     end  % methods
     
 end  % class ExpTrans
 

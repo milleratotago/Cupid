@@ -1,6 +1,18 @@
 classdef Wald2 < Wald
     % 2-parameter version of Wald distribution (mu,sigma,barrierA) with sigma=1
     
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            Reals = [NumTrans.GT2Real(0,Parms(1)) NumTrans.GT2Real(0,Parms(2))] ;
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = [NumTrans.Real2GT(0,Reals(1)) NumTrans.Real2GT(0,Reals(2))];
+        end
+        
+    end
+    
     methods
         
         function obj=Wald2(varargin)
@@ -44,14 +56,6 @@ classdef Wald2 < Wald
         
         function []=BuildMyName(obj)
             obj.StringName = [obj.FamilyName '(' num2str(obj.mu) ',' num2str(obj.barrierA) ')'];
-        end
-        
-        function Reals = ParmsToReals(obj,Parms,~)
-            Reals = [NumTrans.GT2Real(0,Parms(1)) NumTrans.GT2Real(0,Parms(2))] ;
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            Parms = [NumTrans.Real2GT(0,Reals(1)) NumTrans.Real2GT(0,Reals(2))];
         end
         
     end  % methods

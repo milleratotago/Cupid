@@ -5,6 +5,18 @@ classdef ConstantD < dDiscrete
         value
     end
     
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            Reals = Parms(1);
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = Reals(1);
+        end
+        
+    end
+    
     methods
         
         function obj=ConstantD(varargin)
@@ -50,14 +62,6 @@ classdef ConstantD < dDiscrete
             obj.StoredTablesInitialized = true;
         end
 
-        function Reals = ParmsToReals(obj,Parms,~)
-            Reals = Parms(1);
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            Parms = Reals(1);
-        end
-        
         function thisval=MGF(obj,Theta)
             thisval = exp(Theta * obj.value);
         end
@@ -66,7 +70,7 @@ classdef ConstantD < dDiscrete
             thisval = obj.value^I;
         end
         
-        function thisval=CenMoment(obj,I)
+        function thisval=CenMoment(~,I)
             if I == 0
                 thisval = 1;
             else

@@ -5,6 +5,18 @@ classdef PowerTrans < dTransMono
         Power, InversePower, PowerMinus1
     end
     
+    methods (Static)
+        
+        function TransReals = TransParmsToReals(Parms,~)
+            TransReals = Parms(end);
+        end
+        
+        function TransParms = TransRealsToParms(Reals,~)
+            TransParms = Reals(end);
+        end
+        
+    end
+    
     methods
         
         function obj=PowerTrans(BasisDist,Power)
@@ -60,14 +72,6 @@ classdef PowerTrans < dTransMono
         
         function PreTransX = TransToPreTrans(obj,TransX)
             PreTransX = TransX.^obj.InversePower;
-        end
-        
-        function TransReals = TransParmsToReals(obj,Parms,~)
-            TransReals = Parms(end);
-        end
-        
-        function TransParms = TransRealsToParms(obj,Reals,~)
-            TransParms = Reals(end);
         end
         
         function thisval = PDFScaleFactor(obj,X)

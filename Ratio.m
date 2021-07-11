@@ -4,20 +4,24 @@ classdef Ratio < dTransDuo
     %  BasisRV1/BasisRV2
     % If the Basis variables are continuous, they must be POSITIVE.
     
+    methods (Static)
+        
+        function FNXY = FofDuo(X,Y)
+            FNXY = X ./ Y;
+        end
+        
+        function X = ReverseFofDuo(FNXY,Y)
+            X = FNXY .* Y;
+        end
+
+    end
+    
     methods
         
         function obj=Ratio(Basis1,Basis2)
             obj=obj@dTransDuo('Ratio',Basis1,Basis2);
         end
         
-        function FNXY = FofDuo(obj,X,Y)
-            FNXY = X ./ Y;
-        end
-        
-        function X = ReverseFofDuo(obj,FNXY,Y)
-            X = FNXY .* Y;
-        end
-
         function [] = SetBoundsContin(obj)
             assert((obj.BasisRV1.LowerBound>0)&&(obj.BasisRV2.LowerBound>0),'Ratio limited to positive RVs.');
             obj.LowerBound = obj.BasisRV1.LowerBound / obj.BasisRV2.UpperBound;

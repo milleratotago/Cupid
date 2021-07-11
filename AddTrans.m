@@ -5,12 +5,24 @@ classdef AddTrans < dTransMono
         Addend
     end
     
+    methods (Static)
+        
+        function TransReals = TransParmsToReals(Parms,~)
+            TransReals = Parms(end);
+        end
+        
+        function TransParms = TransRealsToParms(Reals,~)
+            TransParms = Reals(end);
+        end
+        
+    end
+    
     methods
         
         function obj=AddTrans(varargin) % BasisDist,Addend
             obj=obj@dTransMono('AddTrans');
             obj.ReviseBounds = false;  % This skips a CDFInverse bounds search and may speed estimation.
-                                       % NEWJEFF: It could also be used in other dTransMono descendants.
+            % NEWJEFF: It could also be used in other dTransMono descendants.
             switch nargin
                 case 0
                 case 2
@@ -20,7 +32,7 @@ classdef AddTrans < dTransMono
                     throw(ME);
             end
         end
-
+        
         function Setup(obj,BasisDist,Addend)
             obj.Setup@dTransMono(BasisDist);
             obj.Addend = Addend;
@@ -53,14 +65,6 @@ classdef AddTrans < dTransMono
             PreTransX = TransX - obj.Addend;
         end
         
-        function TransReals = TransParmsToReals(obj,Parms,~)
-            TransReals = Parms(end);
-        end
-        
-        function TransParms = TransRealsToParms(obj,Reals,~)
-            TransParms = Reals(end);
-        end
-        
         function thisval = PDFScaleFactor(~,~)
             thisval = 1;
         end
@@ -78,28 +82,28 @@ classdef AddTrans < dTransMono
             end
             thisval = Variance(obj.BasisRV);
         end
-
+        
         function thisval=Skewness(obj)
             if ~obj.Initialized
                 error(UninitializedError(obj));
             end
             thisval = Skewness(obj.BasisRV);
         end
-
+        
         function thisval=Kurtosis(obj)
             if ~obj.Initialized
                 error(UninitializedError(obj));
             end
             thisval = Kurtosis(obj.BasisRV);
         end
-
+        
         function thisval=CenMoment(obj,I)
             if ~obj.Initialized
                 error(UninitializedError(obj));
             end
             thisval = CenMoment(obj.BasisRV,I);
         end
-
+        
     end  % methods
     
 end  % class AddTrans

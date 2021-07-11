@@ -7,6 +7,18 @@ classdef SkewNor < dContinuous
         Standard_Normal, ZExtreme
     end
     
+    methods (Static)
+        
+        function Reals = ParmsToReals(Parms,~)
+            Reals = [Parms(1) NumTrans.GT2Real(0,Parms(2)) Parms(3)] ;
+        end
+        
+        function Parms = RealsToParms(Reals,~)
+            Parms = [Reals(1) NumTrans.Real2GT(0,Reals(2)) Reals(3)];
+        end
+        
+    end
+    
     methods
         
         function obj=SkewNor(varargin)
@@ -60,14 +72,6 @@ classdef SkewNor < dContinuous
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
-        end
-        
-        function Reals = ParmsToReals(obj,Parms,~)
-            Reals = [Parms(1) NumTrans.GT2Real(0,Parms(2)) Parms(3)] ;
-        end
-        
-        function Parms = RealsToParms(obj,Reals,~)
-            Parms = [Reals(1) NumTrans.Real2GT(0,Reals(2)) Reals(3)];
         end
         
         function thispdf=PDF(obj,X)
