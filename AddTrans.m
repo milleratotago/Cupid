@@ -5,18 +5,6 @@ classdef AddTrans < dTransMono
         Addend
     end
     
-    methods (Static)
-        
-        function TransReals = TransParmsToReals(Parms,~)
-            TransReals = Parms(end);
-        end
-        
-        function TransParms = TransRealsToParms(Reals,~)
-            TransParms = Reals(end);
-        end
-        
-    end
-    
     methods
         
         function obj=AddTrans(varargin) % BasisDist,Addend
@@ -55,6 +43,15 @@ classdef AddTrans < dTransMono
         
         function parmvals = TransParmValues(obj)
             parmvals = obj.Addend;
+        end
+        
+        % Making the next 2 static causes problems:
+        function TransReals = TransParmsToReals(obj,Parms,~)
+            TransReals = Parms(end);
+        end
+        
+        function TransParms = TransRealsToParms(obj,Reals,~)
+            TransParms = Reals(end);
         end
         
         function TransX = PreTransToTrans(obj,PreTransX)

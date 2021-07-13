@@ -1,7 +1,7 @@
 classdef Frechet < dContinuous
     % Frechet distribution with parameters shape>0, scale>0, minval
     % See https://en.wikipedia.org/wiki/Frechet_distribution
-    % NEWJEFF:
+    % NEWJEFF: Good model for making pdf, cdf static
     %   Still numerical errors in unit tests.
     %   Wikipedia also has Skewness (finite for shape>3) & Kurtosis (finite for shape>4)
     
@@ -26,6 +26,7 @@ classdef Frechet < dContinuous
         
         function thisicdf = frechicdf(p,shape,scale,minval)
             thisicdf = zeros(size(p));
+            % thisicdf = minval + scale * (-log(p)).^(-1/shape);  % NEWJEFF: CousineauThiviergeHardingEtAl2016 give this percentile function explicitly, but their -1 looks like a typo
             for iel=1:numel(p)
                 f = @(x) Frechet.frechcdf(x,shape,scale,minval) - p(iel);
                 thisicdf(iel) = fzero(f,[minval realmax]);

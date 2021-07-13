@@ -3,23 +3,6 @@ classdef SqrTrans < dTransMono
     %  all negative.
     % More convenient to descend from dTransMono than Power because of parm handling
 
-    methods (Static)
-        
-        function TransX = PreTransToTrans(PreTransX)
-            TransX = PreTransX.^2;
-        end
-        
-        function PreTransX = TransToPreTrans(TransX)
-            PreTransX = sqrt(TransX);
-        end
-        
-        function thisval = PDFScaleFactor(X)
-            PreTransX = X.^0.5;
-            thisval = ones(size(X)) ./ abs( 2*PreTransX );
-        end
-        
-    end
-    
     methods
         
         function obj=SqrTrans(BasisDist)
@@ -35,6 +18,19 @@ classdef SqrTrans < dTransMono
             ResetParms@dTransMono(obj,newparmvalues);
             obj.TransReverses = obj.BasisRV.UpperBound < 0;
             ReInit(obj);
+        end
+        
+        function TransX = PreTransToTrans(~,PreTransX)
+            TransX = PreTransX.^2;
+        end
+        
+        function PreTransX = TransToPreTrans(~,TransX)
+            PreTransX = sqrt(TransX);
+        end
+        
+        function thisval = PDFScaleFactor(~,X)
+            PreTransX = X.^0.5;
+            thisval = ones(size(X)) ./ abs( 2*PreTransX );
         end
         
     end  % methods

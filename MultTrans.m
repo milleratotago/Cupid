@@ -5,18 +5,6 @@ classdef MultTrans < dTransMono
         Multiplier
     end
     
-    methods (Static)
-        
-        function TransReals = TransParmsToReals(Parms,~)
-            TransReals = Parms(end);
-        end
-        
-        function TransParms = TransRealsToParms(Reals,~)
-            TransParms = Reals(end);
-        end
-        
-    end
-    
     methods
         
         function obj=MultTrans(BasisDist,Multiplier)
@@ -42,6 +30,15 @@ classdef MultTrans < dTransMono
         
         function parmvals = TransParmValues(obj)
             parmvals = obj.Multiplier;
+        end
+        
+        % Making the next 2 static causes problems:
+        function TransReals = TransParmsToReals(obj,Parms,~)
+            TransReals = Parms(end);
+        end
+        
+        function TransParms = TransRealsToParms(obj,Reals,~)
+            TransParms = Reals(end);
         end
         
         function TransX = PreTransToTrans(obj,PreTransX)

@@ -22,18 +22,6 @@ classdef MonotoneTrans < dTransMono  % NWJEFF: Not documented.
         TransFunc, InverseFunc, Increasing
     end
     
-    methods (Static)
-        
-        function TransReals = TransParmsToReals(Parms,~)
-            TransReals = [];
-        end
-        
-        function TransParms = TransRealsToParms(Reals,~)
-            TransParms = [];
-        end
-
-    end
-    
     methods
         
         function obj=MonotoneTrans(BasisDist,TransFunc,InverseFunc)
@@ -55,6 +43,14 @@ classdef MonotoneTrans < dTransMono  % NWJEFF: Not documented.
             ReInit(obj);
         end
         
+        function TransReals = TransParmsToReals(~,~,~)
+            TransReals = [];
+        end
+        
+        function TransParms = TransRealsToParms(~,~,~)
+            TransParms = [];
+        end
+
         function PerturbParms(obj,ParmCodes)
             obj.BasisRV.PerturbParms(ParmCodes);
             obj.ResetParms(obj.BasisRV.ParmValues);

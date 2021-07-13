@@ -5,18 +5,6 @@ classdef PowerTrans < dTransMono
         Power, InversePower, PowerMinus1
     end
     
-    methods (Static)
-        
-        function TransReals = TransParmsToReals(Parms,~)
-            TransReals = Parms(end);
-        end
-        
-        function TransParms = TransRealsToParms(Reals,~)
-            TransParms = Reals(end);
-        end
-        
-    end
-    
     methods
         
         function obj=PowerTrans(BasisDist,Power)
@@ -43,6 +31,14 @@ classdef PowerTrans < dTransMono
             obj.BasisRV.PerturbParms(ParmCodes);
             NewPower = ifelse(ParmCodes(end)=='f', obj.Power,obj.Power*1.02);
             obj.ResetParms([obj.BasisRV.ParmValues NewPower]);
+        end
+        
+        function TransReals = TransParmsToReals(~,Parms,~)
+            TransReals = Parms(end);
+        end
+        
+        function TransParms = TransRealsToParms(~,Reals,~)
+            TransParms = Reals(end);
         end
         
 %        function []=ReInit(obj)

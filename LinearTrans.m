@@ -5,18 +5,6 @@ classdef LinearTrans < dTransMono
         Multiplier, Addend
     end
     
-    methods (Static)
-        
-        function TransReals = TransParmsToReals(Parms,~)
-            TransReals = Parms(end-1:end);
-        end
-        
-        function TransParms = TransRealsToParms(Reals,~)
-            TransParms = Reals(end-1:end);
-        end
-        
-    end
-    
     methods
         
         function obj=LinearTrans(BasisDist,Multiplier,Addend)
@@ -45,6 +33,14 @@ classdef LinearTrans < dTransMono
         
         function parmvals = TransParmValues(obj)
             parmvals = [obj.Multiplier obj.Addend];
+        end
+        
+        function TransReals = TransParmsToReals(~,Parms,~)
+            TransReals = Parms(end-1:end);
+        end
+        
+        function TransParms = TransRealsToParms(~,Reals,~)
+            TransParms = Reals(end-1:end);
         end
         
         function TransX = PreTransToTrans(obj,PreTransX)

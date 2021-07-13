@@ -1,10 +1,14 @@
-classdef ExpTrans < dTransMono
-    % ExpTrans(BasisRV): Exponential transformation of a BasisRV.
+classdef LogTrans < dTransMono
+    % LogTrans(BasisRV): Log transformation of a positive BasisRV.
+    
+    methods (Static)
+        
+    end
     
     methods
         
-        function obj=ExpTrans(BasisDist)
-            obj=obj@dTransMono('ExpTrans',BasisDist);
+        function obj=LogTrans(BasisDist)
+            obj=obj@dTransMono('LogTrans',BasisDist);
             obj.TransReverses = false;
             obj.PDFScaleFactorKnown = true;
             obj.ReInit;
@@ -15,21 +19,22 @@ classdef ExpTrans < dTransMono
             ReInit(obj);
         end
         
-        % Making the next 3 static caused problems.
         function TransX = PreTransToTrans(~,PreTransX)
-            TransX = exp(PreTransX);
+            TransX = log(PreTransX);
         end
         
         function PreTransX = TransToPreTrans(~,TransX)
-            PreTransX = log(TransX);
+            PreTransX = exp(TransX);
         end
         
-        function thisval = PDFScaleFactor(~,X)
-            thisval = ones(size(X));
-            thisval = thisval ./ X;
+        function thisval = PDFScaleFactor(~,X)  % only called when obj.DistType=='c'
+            thisval = exp(X);
         end
         
     end  % methods
     
-end  % class ExpTrans
+end  % class LogTrans
+
+
+
 

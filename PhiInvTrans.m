@@ -1,18 +1,6 @@
 classdef PhiInvTrans < dTransMono
     % Phi^{-1} transformation of a (0-1) random variable.
     
-    methods (Static)
-        
-        function Trans = PreTransToTrans(PreTrans)
-            Trans = norminv(PreTrans);
-        end
-        
-        function PreTrans = TransToPreTrans(Trans)
-            PreTrans = normcdf(Trans);
-        end
-        
-    end
-    
     methods
         
         function obj=PhiInvTrans(BasisDist)
@@ -27,6 +15,14 @@ classdef PhiInvTrans < dTransMono
             assert(obj.BasisRV.LowerBound>0 & obj.BasisRV.UpperBound<1, ...
                 'PhiInvTrans requires BasisRV in range (0-1)');
             ReInit(obj);
+        end
+        
+        function Trans = PreTransToTrans(~, PreTrans)
+            Trans = norminv(PreTrans);
+        end
+        
+        function PreTrans = TransToPreTrans(~, Trans)
+            PreTrans = normcdf(Trans);
         end
         
     end % methods
