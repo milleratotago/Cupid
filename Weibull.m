@@ -61,6 +61,7 @@ classdef Weibull < dContinuous
             %            obj.IntegralPDFXNRelTol = 10*obj.IntegralPDFXNRelTol;
             %            obj.IntegralPDFXmuNAbsTol = 10*obj.IntegralPDFXmuNAbsTol;  % For integrating PDF
             %            obj.IntegralPDFXmuNRelTol = 10*obj.IntegralPDFXmuNRelTol;
+            obj.StartParmsMLEfn = @obj.StartParmsMLE;
             switch nargin
                 case 0
                 case 3
@@ -162,6 +163,19 @@ classdef Weibull < dContinuous
             Gam1 = gamma(1 + 1 / obj.power);
             Gam2 = gamma(1 + 2 / obj.power);
             thisval = (Gam2 - Gam1^2) * obj.scale^2;
+        end
+        
+        function parms = StartParmsMLE(obj,X)
+            obsmedian = median(X);
+            obs10pct = prctile(X,10);
+            obs90pct = prctile(X,90);
+            syms shape tttt
+            estorigin = min(X) - 0.02*(obs90pct-obsmedian);
+            estscale = obsmedian - estorigin;
+            F(tttt) = 1 - exp( -((tttt - estorigin)/estscale)^shape);
+            vpsoln = vpasolve(F(obs90pct)==0.90,shape);
+            estshape = double(vpsoln);
+            parms = [estscale, estshape, estorigin];
         end
         
     end  % methods

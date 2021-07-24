@@ -43,6 +43,12 @@ classdef RecinormalMS < Recinormal
             obj.StringName = [obj.FamilyName '(' num2str(obj.finalmu) ',' num2str(obj.finalsigma) ')'];
         end
         
+        function parms = StartParmsMLE(obj,X)
+            est_mu = mean(X);
+            est_sigma = std(X);
+            parms = [est_mu, est_sigma];
+        end
+        
     end % methods
 
 end % classdef

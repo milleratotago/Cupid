@@ -37,6 +37,11 @@ classdef RecinormalInv < Recinormal
             obj.StringName = [obj.FamilyName '(' num2str(obj.OneOverMu) ',' num2str(obj.OneOverSigma) ')'];
         end
         
+        function parms = StartParmsMLE(obj,X)
+            parms = StartParmsMLE@Recinormal(obj,X);
+            parms = 1 ./ parms;
+        end
+        
     end % methods
 
 end % classdef

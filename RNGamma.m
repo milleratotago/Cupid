@@ -30,13 +30,14 @@ classdef RNGamma < dContinuous
             obj.Standard_Exponential = Exponential(1);
             obj.IntegralPDFXmuNAbsTol = 10*obj.IntegralPDFXmuNAbsTol;  % For integrating PDF
             obj.IntegralPDFXmuNRelTol = 10*obj.IntegralPDFXmuNRelTol;
+            obj.StartParmsMLEfn = @obj.StartParmsMLE;
             switch nargin
                 case 0
                 case 2
                     ResetParms(obj,[varargin{:}]);
                 otherwise
                     ME = MException('RNGamma:Constructor', ...
-                        'RNGamma constructor must receive 0 or 2 arguments.');
+                        'RNGamma constructor needs 0 or 2 arguments.');
                     throw(ME);
             end
         end
@@ -200,6 +201,36 @@ classdef RNGamma < dContinuous
         function thisval=Kurtosis(obj)
             assert(obj.Initialized,UninitializedError(obj));
             thisval = 3 + 6.0 / obj.N;
+        end
+        
+        function [s,EndingVals,fval,exitflag,output] = EstMom(obj,TargetVals,varargin)
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
+            if (numel(varargin)==0) && (numel(TargetVals)==2)
+                % In this case the 2 parameters can be computed directly from the two moments.
+                Mu = TargetVals(1);   % = N/Rate
+                SigSqr = TargetVals(2);  % = N/Rate^2
+                estN = Mu^2/SigSqr;
+                estRate = estN/Mu;
+                obj.ResetParms([estN, estRate]);
+                s = obj.StringName;
+                EndingVals = [estN, estRate];
+                fval = 0;
+                exitflag = 0;
+                output = [];
+            else
+                [s,EndingVals,fval,exitflag,output]=EstMom@dGeneric(obj,TargetVals,varargin{:});
+            end
+        end
+        
+        function parms = StartParmsMLE(obj,X)
+            obsmean = mean(X);
+            obsvar = var(X);
+            HoldParms = obj.ParmValues;
+            obj.EstMom([obsmean, obsvar]);
+            parms = obj.ParmValues;
+            obj.ResetParms(HoldParms);
         end
         
     end  % methods

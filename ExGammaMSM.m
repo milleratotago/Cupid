@@ -6,6 +6,20 @@ classdef ExGammaMSM < ExGamma
         muG, sigmaG, muE
     end
     
+    methods (Static)
+
+        function parms = MomsToParms(GammaMean,GammaVar,ExpMean)
+            % Return values of 3 distribution parameters yielding specified
+            % mean and variance of normal and mean of exponential.
+            % Used with ExHelpStartParmsMLE
+            parms = zeros(3,1);
+            parms(1) = GammaMean;
+            parms(2) = sqrt(GammaVar);
+            parms(3) = ExpMean;
+        end
+
+    end % methods (Static)
+
     methods
         
         function obj=ExGammaMSM(varargin)

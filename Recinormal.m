@@ -34,6 +34,7 @@ classdef Recinormal < dContinuous
             obj.NDistParms = 2;
             obj.NormalBasis = Normal;
             obj.IntegralPDFXmuNAbsTol = 1e-8 * ones(size(obj.IntegralPDFXmuNAbsTol));   % For integrating PDF*(X-mu)^N for N>=1
+            obj.StartParmsMLEfn = @obj.StartParmsMLE;
             switch nargin
                 case 0
                 case 2
@@ -114,11 +115,25 @@ classdef Recinormal < dContinuous
             thiscdf(InBounds) = (1 - obj.NormalBasis.CDF(PreTransX)) / obj.NormalCDFDif;
         end
         
+        function thisicdf = InverseCDF(obj,P)
+            normalCDF = (1-P)*obj.NormalCDFDif + obj.MinNormalCDF;  % 1-P because 1/X reverses large/small mapping
+            inverseX = obj.NormalBasis.InverseCDF(normalCDF);
+            thisicdf = 1 ./ inverseX;
+        end
+        
         function thisval=Random(obj,varargin)
             assert(obj.Initialized,UninitializedError(obj));
             randcdf = rand(varargin{:})*obj.NormalCDFDif + obj.MinNormalCDF;
             randnor = norminv(randcdf,obj.NormalBasis.mu,obj.NormalBasis.sigma);
             thisval= 1 ./ randnor;
+        end
+        
+        function parms = StartParmsMLE(obj,X)
+            pct_50_80  = prctile(X,[50 80]);  % 80 corresponds to Z=0.84
+            est_mu = 1/pct_50_80(1);
+            % 1/pct_50_80(2) should be at prctile20 of recinormal and correspond to Z=-0.84;
+            est_sigma = (est_mu - 1/pct_50_80(2)) / 0.84;
+            parms = [est_mu, est_sigma];
         end
         
     end  % methods

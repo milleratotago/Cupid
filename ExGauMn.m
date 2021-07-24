@@ -5,12 +5,24 @@ classdef ExGauMn < ExGauss
         exmean
     end
     
+    methods (Static)
+
+        function parms = MomsToParms(NorMean,NorVar,ExpMean)
+            % Return values of 3 distribution parameters yielding specified
+            % mean and variance of normal and mean of exponential.
+            % Used with ExHelpStartParmsMLE
+            parms = [NorMean, sqrt(NorVar), ExpMean];
+        end
+
+    end % methods (Static)
+
     methods
         
         function obj=ExGauMn(varargin)
             obj=obj@ExGauss;
             obj.FamilyName = 'ExGauMn';
             obj.ParmNames{3} = 'exmean';
+            obj.StartParmsMLEfn = @obj.StartParmsMLE;
             switch nargin
                 case 0
                 case 3
@@ -63,6 +75,14 @@ classdef ExGauMn < ExGauss
             obj.exmean = 1 / obj.rate;
         end
         
+        function parms = StartParmsMLE(obj,X)
+            parms = StartParmsMLE@ExGauss(obj,X);
+            parms(3) = 1 / parms(3);
+%             HoldParms = obj.ParmValues;
+%             parms = ExHelpStartParmsMLE(obj,X);
+%             obj.ResetParms(HoldParms);
+        end
+
     end
     
 end  % class ExGauMn

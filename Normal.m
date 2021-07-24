@@ -1,7 +1,6 @@
 classdef Normal < dContinuous
     % Normal(mu,sigma[,ZExtreme]):  Normal random variable with mean "mu" and standard dev "sigma"
     % Optional 3rd parameter is ZExtreme
-    % NEWJEFF: EstML is known
     
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
         mu         % distribution mean
@@ -195,6 +194,22 @@ classdef Normal < dContinuous
             else
                 thisval = IntegralX_CToNxPDF(obj,obj.LowerBound,obj.UpperBound,obj.mu,I);
             end
+        end
+        
+  
+        function s = EstML(obj,Observations,varargin)
+            assert(obj.Initialized,UninitializedError(obj));
+            if numel(varargin)<1
+                ParmCodes = obj.DefaultParmCodes;
+            else
+                ParmCodes = varargin{1};
+            end
+            n = numel(Observations);
+            newmu = ifelse(ParmCodes(1)=='f', obj.mu,mean(Observations));
+            newsd = ifelse(ParmCodes(2)=='f', obj.sigma, std(Observations) * sqrt((n-1)/n) );
+            obj.ResetParms([newmu, newsd]);
+            BuildMyName(obj);
+            s=obj.StringName;
         end
         
     end  % methods

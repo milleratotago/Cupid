@@ -1,4 +1,4 @@
-classdef utContamStretch < utContinuous;
+classdef utContamStretch < utContinuous
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.
@@ -25,8 +25,6 @@ classdef utContamStretch < utContinuous;
             testCase.ThisCase  = parmCase;
             switch parmCase
                 case 1
-%                     StretchDist = AddTrans(Beta(4,138),1.1);
-%                     testCase.EstParmCodes = 'fffrfff';
                     StretchDist = Triangular(1.3,1.5);
                     testCase.EstParmCodes = 'ffrff';
                     testCase.Dist = ContamStretch(RNGamma(4,0.2),0.15,StretchDist);
@@ -39,9 +37,9 @@ classdef utContamStretch < utContinuous;
                     testCase.Dist = ContamStretch(RNGammaMS(100,50),0.15,StretchDist);
                     testCase.EstParmCodes = 'frrff';
                 case 4
-                    StretchDist = Triangular(0.999,1.001);
-                    testCase.Dist = ContamStretch(Normal(100,1),0.001,StretchDist);
-                    testCase.EstParmCodes = 'rrfff';
+                    StretchDist = LognormalMS(1.8,0.12);
+                    testCase.Dist = ContamStretch(Weibull(10,1.2,13),0.05,StretchDist);
+                    testCase.EstParmCodes = 'fffrff';
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 
@@ -52,8 +50,8 @@ classdef utContamStretch < utContinuous;
             
             % Adjust tolerances as appropriate for this distribution & parameters:
             SetTolerances(testCase,0.005);
-            if testCase.ThisCase==2
-                testCase.ParmEstAbsTol(:)=.01;
+            if testCase.ThisCase==4
+                SetTolerances(testCase,0.01);
             end
             
             utGenericMethodSetup(testCase);   % Initialize many standard computations
@@ -70,9 +68,9 @@ classdef utContamStretch < utContinuous;
             elseif testCase.ThisCase == 2
             elseif testCase.ThisCase == 3
             elseif testCase.ThisCase == 4
-                tempU = Normal(0,1);
-                tempPDF = tempU.PDF(testCase.xvalues-100);
-                testCase.verifyEqual(testCase.Computed.PDF,tempPDF,'AbsTol',1e-6,'Does not match expected PDF values.');
+%                 tempU = Normal(0,1);
+%                 tempPDF = tempU.PDF(testCase.xvalues-100);
+%                 testCase.verifyEqual(testCase.Computed.PDF,tempPDF,'AbsTol',1e-6,'Does not match expected PDF values.');
             end
         end
         

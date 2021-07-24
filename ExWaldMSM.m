@@ -8,8 +8,23 @@ classdef ExWaldMSM < ExWald  % Old version superceded by simple convolution whic
 
     properties(SetAccess = public)
         MinWaldMean, MinWaldSD, MinExpMean
+        StartParmsMLECandidateProportions
     end
     
+    methods (Static)
+
+        function parms = MomsToParms(WaldMean,WaldVar,ExpMean)
+            % Return values of 3 distribution parameters yielding specified
+            % mean and variance of normal and mean of exponential.
+            % Used with ExHelpStartParmsMLE
+            parms = zeros(3,1);
+            parms(1) = WaldMean;
+            parms(2) = sqrt(WaldVar);
+            parms(3) = ExpMean;
+        end
+
+    end % methods (Static)
+
     methods
         
         function obj=ExWaldMSM(varargin)
@@ -29,6 +44,9 @@ classdef ExWaldMSM < ExWald  % Old version superceded by simple convolution whic
             % This would improve speed but I don't want to hard-code it in; user may call it after making the dist.
             % obj.SearchOptions.TolFun = 1e-4;
             % obj.SearchOptions.TolX = 1e-4;
+            NSteps = 10;
+            obj.StartParmsMLECandidateProportions = ( (1:NSteps) - 0.5) / NSteps;
+            obj.StartParmsMLECandidateProportions = [0.001 obj.StartParmsMLECandidateProportions 0.999];
             switch nargin
                 case 0
                 case 3
@@ -92,6 +110,12 @@ classdef ExWaldMSM < ExWald  % Old version superceded by simple convolution whic
             Parms = [NumTrans.Real2GT(obj.MinWaldMean,Reals(1)) NumTrans.Real2GT(obj.MinWaldSD,Reals(2)) NumTrans.Real2GT(obj.MinExpMean,Reals(3))];
         end
         
+       function parms = StartParmsMLE(obj,X)
+            HoldParms = obj.ParmValues;
+            parms = ExHelpStartParmsMLE(obj,X);
+            obj.ResetParms(HoldParms);
+        end
+
     end  % methods
     
 end  % class ExWaldMSM

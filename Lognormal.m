@@ -2,7 +2,7 @@ classdef Lognormal < dContinuous
     % Lognormal(mu,sigma>0):  log(X) is normally distributed with mu, sigma
     % With this distribution, the MGF cannot be used to determine moments because the MGF is only defined
     % for negative arguments.
-    % The distribution is not uniquely defined by its moments, so moment estimation is impossible.
+    % The distribution is not uniquely defined by its moments, but crude moment estimation is possible (see Wikipedia).
     
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
         mu, sigma,
@@ -31,6 +31,7 @@ classdef Lognormal < dContinuous
             obj.Standard_Normal = Normal(0,1);
             obj.IntegralPDFXmuNAbsTol = 100*obj.IntegralPDFXmuNAbsTol;  % For integrating PDF
             obj.IntegralPDFXmuNRelTol = 100*obj.IntegralPDFXmuNRelTol;
+            obj.StartParmsMLEfn = @obj.StartParmsMLE;
             switch nargin
                 case 0
                 case 2
@@ -182,9 +183,23 @@ classdef Lognormal < dContinuous
             end
         end
         
-%        function []=EstMom(obj,TargetVals,varargin)
-%            warning('The Lognormal distribution cannot be estimated from its moments.');
-%        end
+       function []=EstMom(obj,TargetVals,~)
+           targMn = TargetVals(1);
+           targVar = TargetVals(2);
+           newmu = log(targMn/sqrt(1+targVar/targMn^2));
+           norvar = log(1+targVar/targMn^2);
+           newsigma = sqrt(norvar);
+           obj.ResetParms([newmu, newsigma]);
+       end
+        
+        function parms = StartParmsMLE(obj,X)
+            obsmean = median(X);
+            obssd = std(X);
+            HoldParms = obj.ParmValues;
+            obj.EstMom([obsmean,obssd^2]);
+            parms = obj.ParmValues;
+            obj.ResetParms(HoldParms);
+        end
         
     end  % methods
     

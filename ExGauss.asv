@@ -292,7 +292,7 @@ classdef ExGauss < dContinuous
             obscenmom3 = max(obscenmom3,eps);  % Not less than zero                
             parms = obj.ParmsFrom3Mom(obsmean,obsvar,obscenmom3);
             % ML estimation seems to get caught in bad local minima
-            % if sigma is started too small.
+            
             parms(2) = max(parms(2),0.10*sqrt(obsvar));
 %             HoldParms = obj.ParmValues;
 %             parms = ExHelpStartParmsMLE(obj,X);

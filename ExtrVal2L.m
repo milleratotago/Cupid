@@ -28,6 +28,7 @@ classdef ExtrVal2L < dContinuous
             obj.NDistParms = 2;
             obj.SearchOptions.MaxFunEvals = 2000;
             obj.SearchOptions.MaxIter = 2000;
+            obj.StartParmsMLEfn = @obj.StartParmsMLE;
             switch nargin
                 case 0
                 case 2
@@ -91,6 +92,20 @@ classdef ExtrVal2L < dContinuous
             XX = -log(P);
             XX = XX.^(-1/obj.shape);
             thisval = XX * obj.scale;
+        end
+
+        function parms = StartParmsMLE(obj,X)
+            obsmedian = median(X);
+            obs90pct = prctile(X,90);
+            syms symshape tttt
+            F(tttt) = exp( -(tttt/obsmedian)^(-symshape) );  % Modified Luce
+            vpsoln = vpasolve(F(obs90pct)==0.90,symshape);
+            estshape = double(vpsoln);
+            estscale = obsmedian;
+            HoldParms = obj.ParmValues;
+            obj.EstPctile([obsmedian obs90pct],[0.5 0.9]);
+            parms = obj.ParmValues;
+            obj.ResetParms(HoldParms);
         end
         
     end  % methods

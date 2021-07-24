@@ -44,7 +44,7 @@ classdef NumTrans < handle
             % Convert an arbitrary real number to a number within certain bounds.
             trans = (maximum - minimum) ./ (exp(-real*NumTrans.Slope) + 1) + minimum;
             if isnan(trans)
-                fprintf('Real2Bounded error at min = %f, max = %f, real = %f\n',minimum,maximum,real);
+                warning('Real2Bounded error at min = %f, max = %f, real = %f\n',minimum,maximum,real);
             end
         end
         
@@ -52,7 +52,7 @@ classdef NumTrans < handle
             % Inverse of Real2Bounded: Convert a real number within certain bounds to an arbitrary real number.
             real = log( (trans-minimum) ./ (maximum-trans)) / NumTrans.Slope;
             if isnan(real)
-                fprintf('Bounded2Real error at min = %f, max = %f, trans = %f\n',minimum,maximum,trans);
+                warning('Bounded2Real error at min = %f, max = %f, trans = %f\n',minimum,maximum,trans);
             end
         end
         

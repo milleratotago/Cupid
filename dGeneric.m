@@ -25,6 +25,9 @@ classdef dGeneric < handle  % Calls by reference
     
     properties(SetAccess = public)    % These properties can only be set by the methods of this class.
         StringName        % A name for the particular distribution with its parameters, e.g., "Normal(0,1)".
+        StartParmsMLEfn   % A function used to compute starting parameters for an MLE search from a set of observations
+                          % Note that this function does NOT reset the parameters of the current distribution,
+                          %  but only returns plausible values to which one might reset the distribution.
     end
     
     properties(SetAccess = private)    % These properties can only be set by the methods of this class.
@@ -70,6 +73,7 @@ classdef dGeneric < handle  % Calls by reference
         DefaultNBinsOfX % Number of Xs at which to store CDFs
         
         NBNStored, NBStored  % Used with PushAndStopNameBuilding
+        StartParmsMLEwarned  % Controls warning displayed when StartParmsMLE has been called but none is available
     end
     
     properties(SetAccess = public)  % These properties can be changed without restriction
@@ -129,6 +133,8 @@ classdef dGeneric < handle  % Calls by reference
             obj.NBNStored = 0;
             obj.NBStored = zeros(10,1);
             obj.SkipImpossibleWarn = false;
+            obj.StartParmsMLEfn = @obj.StartParmsMLE;
+            obj.StartParmsMLEwarned = false;
         end
         
         % **************** Some house-keeping functions:
@@ -730,14 +736,33 @@ classdef dGeneric < handle  % Calls by reference
             end
         end
         
+        function parms = StartParmsMLE(obj,X)
+            % Default function to find starting parameters for MLE search.
+            % Individual distributions should override this.
+            parms = obj.ParmValues;  % Use the current parameters if the distribution has not provided a guess.
+            if ~obj.StartParmsMLEwarned
+                obj.StartParmsMLEwarned = true;
+                warning(['No StartParmsMLE function has been provided for ' obj.FamilyName ' so using current parameters.']);
+            end
+        end
+
         function [s,EndingVals,fval,exitflag,output]=EstML(obj,Observations,varargin)
             % Estimate distribution parameters by maximum likelihood [i.e., minimize -log(likelihood)]
+            % varagin: ParmCodes string used to fix certain parameters.
+            % IFF VARARGIN IS NOT USED: The function StartParmsMLE is used to find good starting values
+            % for the distribution parameters and the distribution is reset to these.
+            % 
+            % 
             % exitflags: 1 converged, 0 N of iterations exceeded, -1 terminated by output function.
             if ~obj.Initialized
                 error(UninitializedError(obj));
             end
             if numel(varargin)<1
                 ParmCodes = obj.DefaultParmCodes;
+                startParms = obj.StartParmsMLEfn(Observations);
+                if ~isequal(startParms,obj.ParmValues)
+                    obj.ResetParms(startParms);
+                end
             else
                 ParmCodes = varargin{1};
             end
