@@ -1,5 +1,6 @@
 classdef RNGamma < dContinuous
     % RNGamma(N,Rate) where N is a real number.
+    % NEWJEFF: Wikipedia has information about MLE
     
     properties(SetAccess = private)    % These properties can only be set by the methods of this class.
     end

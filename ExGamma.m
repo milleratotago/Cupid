@@ -2,6 +2,7 @@ classdef ExGamma < dContinuous  % NEWJEFF: Now using j_integralCalc
     % ExGamma distribution (sum of gamma and exponential) with parameters K, rateG, rateE
     % NEWJEFF: Jasiulewicz & Kordecki (2003) Eqn 9 give the PDF but I ...
     %  cannot figure out their formula, and it only appears to work for integer K values.
+    % I did some math with MATLAB (described at the end of this file) but got no speedup
     
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
         K, rateG, rateE
@@ -53,12 +54,13 @@ classdef ExGamma < dContinuous  % NEWJEFF: Now using j_integralCalc
             obj.MinK = 1;
             obj.MaxK = 50;
             obj.CDFNearlyZero = 1e-6;
-            obj.CDFNearlyOne = 1 - 1e-8;
+            obj.CDFNearlyOne = 1 - 1e-6;
             obj.log1mp = log(1 - obj.CDFNearlyZero);
             obj.log1 = log(1 - obj.CDFNearlyOne);
             obj.SearchOptions.TolFun = 1e-6;
             obj.SearchOptions.TolX = 1e-6;
-            obj.jop = j_integralParseArgs;
+            obj.jop = j_integralParseArgs;  % Defaults are: AbsTol,1e-10, RelTol,1e-6  
+            % obj.jop = j_integralParseArgs('AbsTol',1e-6,'RelTol',1e-4);  % SACRIFICING PRECISION GAINS LITTLE SPEED
             obj.StartParmsMLEfn = @obj.StartParmsMLE;
             NSteps = 10;
             obj.StartParmsMLECandidateProportions = ( (1:NSteps) - 0.5) / NSteps;
@@ -97,11 +99,14 @@ classdef ExGamma < dContinuous  % NEWJEFF: Now using j_integralCalc
         function []=ReInit(obj)
             lowerE = -obj.log1mp / obj.rateE;
             lowerG = -obj.log1mp / obj.rateG;
-            obj.LowerBound = lowerE + obj.K*lowerG;  % NEWJEFF
+            obj.LowerBound = lowerE + obj.K*lowerG;  % very crude bounds
             upperE = -obj.log1 / obj.rateE;
             upperG = -obj.log1 / obj.rateG;
-            obj.UpperBound = upperE + obj.K*upperG;  % NEWJEFF
+            obj.UpperBound = upperE + obj.K*upperG;  % very crude bounds
             obj.Initialized = true;
+            % The following produce better bounds but at a speed cost
+            % obj.LowerBound = obj.InverseCDF(obj.CDFNearlyZero);
+            % obj.UpperBound = obj.InverseCDF(obj.CDFNearlyOne);
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
@@ -116,6 +121,14 @@ classdef ExGamma < dContinuous  % NEWJEFF: Now using j_integralCalc
         end
         
         function thispdf=PDF(obj,X)
+            % Using symbolic explorations at the end of this file, I found that the following
+            % would also compute PDF, but this alternative computational method is actually
+            % much slower due to the long times spent in the igamma function.
+            %            lambda = obj.rateE;
+            %            k = obj.K;
+            %            theta = 1 / obj.rateG;
+            %            b = lambda - 1/theta;
+            %            thispdf(InBounds) = lambda * exp(-lambda*X(InBounds)) ./ (gamma(k) * theta^k) .* (gamma(k) - igamma(k, -b*X(InBounds)))/(-b)^k;
             [thispdf, InBounds, Done] = MaybeSplinePDF(obj,X);
             if Done
                 return;
@@ -124,15 +137,16 @@ classdef ExGamma < dContinuous  % NEWJEFF: Now using j_integralCalc
             lrateG = obj.rateG;
             lrateE = obj.rateE;
             km1 = obj.K - 1;
+            X = double(X);  % j_integralCalc requires double precision, maybe due to obj.jop precision settings.
             for iel=1:numel(X)
                 if InBounds(iel)
-                    %                     thispdf(iel) = integral(@FnToInt,eps,X(iel));
-                    thispdf(iel) = j_integralCalc(@FnToInt,eps,X(iel),obj.jop);
+                    % thispdf(iel) = integral(@FnToInt,eps,X(iel));
+                    thispdf(iel) = j_integralCalc(@FnToInt,eps,X(iel),obj.jop);  % Much faster.
                 end
             end
             
             function fofu = FnToInt(u)
-                %                 fofu = localFactor * u.^km1 .* exp(-lrateG*u) .* exp( -lrateE * (X(iel)-u) );
+                % fofu = localFactor * u.^km1 .* exp(-lrateG*u) .* exp( -lrateE * (X(iel)-u) );
                 lnfofu = localPDFFactor + km1 * log(u) -lrateG*u -lrateE * (X(iel)-u) ;
                 fofu = exp(lnfofu);
             end
@@ -145,6 +159,7 @@ classdef ExGamma < dContinuous  % NEWJEFF: Now using j_integralCalc
                 return;
             end
             lnlocalPDFfactor = obj.lnPDFfactor;  % Faster to make these local?
+            X = double(X);  % j_integralCalc requires double precision, maybe due to obj.jop precision settings.
             
             lrateG = obj.rateG;
             lrateE = obj.rateE;
@@ -193,3 +208,30 @@ classdef ExGamma < dContinuous  % NEWJEFF: Now using j_integralCalc
     end  % methods
     
 end  % class ExGamma
+
+%{
+
+The gamma pdf is f(x) = 1/(gamma(k)*theta^k) * x^(k-1) * exp(-x/theta)  where theta is 1/rate
+
+The exponential pdf is g(x) = lambda * exp(-lambda*x)
+
+The convolution pdf is thus h(x) = \int_0^x f(t) g(x-t) dt, which simplifies to
+
+h(x) = lambda * exp(-lambda*x) / (gamma(k) * theta^k) * \int_0^x t^(k-1) * exp(b*t)
+where b = lambda - 1/theta
+
+MATLAB says that integral at the end can be simplified to:
+
+syms x
+syms t
+syms k
+syms b
+assume(k>0)
+
+simp(x,t) = t^(k-1) * exp(b*t);
+intsimp(x) = int(simp(x,t),t,0,x)
+
+ans: intsimp(x) = (gamma(k) - igamma(k, -b*x))/(-b)^k
+but this is actually slower to compute
+
+%}

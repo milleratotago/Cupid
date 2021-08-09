@@ -65,6 +65,7 @@ classdef Frechet2 < Frechet
             % q1 = m + s * log(4)^(-1/alpha)
             % q2 = m + s * log(2)^(-1/alpha)
             % q3 = m + s * log(4/3)^(-1/alpha)
+            X = double(X);  % Required by fsolve
             obs = prctile(X,[25 50 75]);
             % Here is the array of functions, all of which are to be zero'ed
             F = @(p) [...
