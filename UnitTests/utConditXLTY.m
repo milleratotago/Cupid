@@ -1,8 +1,8 @@
-classdef utConditXLTY < utContinuous;
+classdef utConditXLTY < utContinuous
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.
-        parmCase = {1 2 3};
+        parmCase = {1 2 3 4 5};
     end
     
     properties
@@ -35,6 +35,12 @@ classdef utConditXLTY < utContinuous;
                 case 3
                     testCase.Dist = ConditXLTY(RNGamma(10,.1),Uniform(1,200));
                     testCase.EstParmCodes = 'frff';
+                case 4  % Check known mean from Rolf (see fn CompareMeans)
+                    testCase.Dist = ConditXLTY(Exponential(0.01),AddTrans(Exponential(0.025),-40));
+                    testCase.EstParmCodes = 'frf';
+                case 5  % Check known mean from Rolf (see fn CompareMeans)
+                    testCase.Dist = ConditXLTY(Exponential(0.01),AddTrans(Exponential(0.025),40));
+                    testCase.EstParmCodes = 'frf';
             end
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
             %             testCase.Dist.SearchOptions.MaxFunEvals = 30000;
@@ -67,20 +73,27 @@ classdef utConditXLTY < utContinuous;
     
     methods (Test)
         
-        function ComparePDFs(testCase)
-            % Check matches to known PDFs
-            if testCase.ThisCase == 1
-                %                tempU = Uniform(testCase.Dist.LowerBound,testCase.Dist.UpperBound);
-                %                tempPDF = tempU.PDF(testCase.xvalues);
-                %                testCase.verifyEqual(testCase.Computed.PDF,tempPDF,'AbsTol',1e-6,'Does not match expected PDF values.');
-            elseif testCase.ThisCase == 2
-                %                tempU = Normal(testCase.Dist.Mean,testCase.Dist.SD);
-                %                tempPDF = tempU.PDF(testCase.xvalues);
-                %                testCase.verifyEqual(testCase.Computed.PDF,tempPDF,'AbsTol',1e-6,'Does not match expected PDF values.');
-            elseif testCase.ThisCase == 3
-                %                tempU = testCase.Dist.BasisRV;
-                %                tempPDF = tempU.PDF(testCase.xvalues-testCase.Dist.LowerBound);
-                %                testCase.verifyEqual(testCase.Computed.PDF,tempPDF,'AbsTol',1e-6,'Does not match expected PDF values.');
+        function CompareMeans(testCase)
+            % Check matches to known means.
+            % These known means are from Rolf Ulrich's habilitation (1988) p 116, eqn 2.34
+            % "Mathematisierte Theorienbildung in der kognitiven Psychologie". Tübingen: Habilitationsschrift
+            if testCase.ThisCase == 4
+                % X is exponential, Y is shifted exponential with any negative shift d
+                % Note conditional mean of X does not depend on d!!!
+                lambda_x = testCase.Dist.BasisRV1.rate;
+                lambda_y = testCase.Dist.BasisRV2.BasisRV.rate;
+                tempMean = 1 / (lambda_x + lambda_y);
+                testCase.verifyEqual(testCase.Computed.Mean,tempMean,'AbsTol',1e-4,'Does not match expected mean.');
+            elseif testCase.ThisCase == 5
+                % X is exponential, Y is shifted exponential with positive shift d
+                lambda_x = testCase.Dist.BasisRV1.rate;
+                lambda_y = testCase.Dist.BasisRV2.BasisRV.rate;
+                d = testCase.Dist.BasisRV2.Addend;
+                tempMeanNumerator = 1 / lambda_x - ...
+                      lambda_y*exp(-lambda_x*d) / (lambda_x + lambda_y)^2 * ( lambda_y / lambda_x + 2 + d*(lambda_x + lambda_y) );
+                tempMeanDenominator = 1 - exp(-lambda_x*d) * lambda_y / (lambda_x + lambda_y);
+                tempMean = tempMeanNumerator / tempMeanDenominator;
+                testCase.verifyEqual(testCase.Computed.Mean,tempMean,'AbsTol',1e-4,'Does not match expected mean.');
             end
         end
         

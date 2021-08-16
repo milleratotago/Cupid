@@ -1,4 +1,4 @@
-classdef utConditXGTY < utContinuous;
+classdef utConditXGTY < utContinuous
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

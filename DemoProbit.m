@@ -45,21 +45,18 @@ CgreaterCount = binornd(NTrialsPerC,PrCgreaterthanX);
 ClesserCount = NTrialsPerC - CgreaterCount;
 monoCDFs = SpearKar.monotonize(ClesserCount,CgreaterCount);
 
-% Augment Cs and monoCDFs so that monoCDFs includes 0 and 1.
+% Augment Cs and monoCDFs, if necessary, so that monoCDFs includes 0 and 1.
 % The choice of corresponding min and max Cs is somewhat arbitrary.
-minC = Cs(1) - (Cs(2) - Cs(1));  % Make the overall minimum one "step" below the previous minimum
-maxC = Cs(end) + (Cs(end) - Cs(end-1));  % Make the overall maximum one "step" above the previous maximum
-AugCs = [minC Cs maxC];
-AugCDFs = [0 monoCDFs 1];
+[Cs,monoCDFs] = SpearKar.Stretch01(Cs,monoCDFs);
 
 % Create a SpearKar distribution based on these values
-SK = SpearKar(AugCs,AugCDFs);
+SK = SpearKar(Cs,monoCDFs);
 
 % Compute nonparametric estimates of the mean, variance, etc
 SK.Mean
+SK.SD
 SK.Variance
 SK.Median
-SK.SD
 
 %% mAFC task, maximum-likelihood fit
 % Generate some artificial data to be used in illustrating the mAFC analyses.
