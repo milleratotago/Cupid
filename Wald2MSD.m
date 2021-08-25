@@ -22,6 +22,7 @@ classdef Wald2MSD < Wald
             obj.NDistParms = 2;
             obj.minmean = eps;
             obj.minsd = eps;
+            obj.StartParmsMLEfn = @obj.StartParmsMLE;
             switch nargin
                 case 0
                 case 2
@@ -68,6 +69,10 @@ classdef Wald2MSD < Wald
             Parms = [NumTrans.Real2GT(obj.minmean,Reals(1)) NumTrans.Real2GT(obj.minsd,Reals(2))];
         end
         
+        function parms = StartParmsMLE(obj,X)
+            parms = [mean(X), std(X)];
+        end
+
     end  % methods
     
 end  % class Wald2MSD
