@@ -17,6 +17,21 @@ classdef Loglogistic < dContinuous
             Parms = [NumTrans.Real2GT(eps,Reals(1)) NumTrans.Real2GT(eps,Reals(2))];
         end
         
+        function parms = StartParmsMLE(X)
+            % Median is scale, lower quartile
+            pctiles = prctile(X,25:25:75);
+            obs25pct = pctiles(1);
+            obsmedian = pctiles(2);
+            obs75pct = pctiles(3);
+            estscale1 = -log(3)/log(obs25pct/obsmedian);
+            estscale2 = log(3)/log(obs75pct/obsmedian);
+            parms = [obsmedian, (estscale1+estscale2)/2];
+            % Median formulas from Wikipedia
+            % syms alpha beta obs25 obs75
+            % solve(obs75 == 3^(1/beta) * alpha,beta)
+            % solve(obs25 == 3^(-1/beta) * alpha,beta)
+        end
+        
     end
     
     methods
@@ -112,21 +127,6 @@ classdef Loglogistic < dContinuous
                 warning('True variance undefined; approximating with variance of this truncated approximation distribution.');
                 thisval = Variance@dContinuous(obj);
             end
-        end
-        
-        function parms = StartParmsMLE(obj,X)
-            % Median is scale, lower quartile
-            pctiles = prctile(X,25:25:75);
-            obs25pct = pctiles(1);
-            obsmedian = pctiles(2);
-            obs75pct = pctiles(3);
-            estscale1 = -log(3)/log(obs25pct/obsmedian);
-            estscale2 = log(3)/log(obs75pct/obsmedian);
-            parms = [obsmedian, (estscale1+estscale2)/2];
-            % Median formulas from Wikipedia
-            % syms alpha beta obs25 obs75
-            % solve(obs75 == 3^(1/beta) * alpha,beta)
-            % solve(obs25 == 3^(-1/beta) * alpha,beta)
         end
         
     end  % methods

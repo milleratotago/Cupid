@@ -4,15 +4,19 @@ classdef ExGamma < dContinuous  % NEWJEFF: Now using j_integralCalc
     %  cannot figure out their formula, and it only appears to work for integer K values.
     % I did some math with MATLAB (described at the end of this file) but got no speedup
     
+    properties(SetAccess = public)
+        jop % hold the options structure controlling integral calculation
+    end
+
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
         K, rateG, rateE
         lnPDFfactor, lnCDFfactor
         log1mp, log1  % log of probabilities nearly 0 & 1 used in setting bounds.
         
-        % For speed, this distribution uses calls to 2 private MATLAB functions
-        % that I copied into my own functions j_integralParseArgs and j_integralCalc.
+        % For speed, this distribution uses calls to 3 private MATLAB functions
+        % that I copied into my own functions j_integralParseArgs, j_integralCalc, and j_Gauss7Kronrod15.
         % These functions are part of MATLAB's private 'integral' functionality so
-        % I cannot distribute them.  But you can make them yourself as follows:
+        % I cannot distribute them, but you can make them yourself as follows:
         %
         % The file j_integralCalc.m is the output of 'type integralCalc' in R2016b 2020-04-22
         %
@@ -20,9 +24,6 @@ classdef ExGamma < dContinuous  % NEWJEFF: Now using j_integralCalc
         % except that the call to Gauss7Kronrod15 was changed to j_Gauss7Kronrod15
         %
         % The file j_Gauss7Kronrod15.m is the output of 'type Gauss7Kronrod15' in R2016b 2020-04-22
-        
-        
-        jop % hold the options structure controlling integral calculation
     end
     
     properties(SetAccess = public)

@@ -4,7 +4,7 @@ classdef dTransDuo < dEither   % NWJEFF: Need a demo of using this generically f
     
     properties(SetAccess = protected)
         BasisRV1, BasisRV2
-        CDFRelTol, CDFAbsTol
+        CDFIntRelTol, CDFIntAbsTol
     end
 
     methods (Abstract)
@@ -21,8 +21,8 @@ classdef dTransDuo < dEither   % NWJEFF: Need a demo of using this generically f
             obj=obj@dEither(FamilyName);
             obj.BasisRV1 = Basis1;
             obj.BasisRV2 = Basis2;
-            obj.CDFRelTol = 1e-3;
-            obj.CDFAbsTol = 1e-4;
+            obj.CDFIntRelTol = 1e-3;
+            obj.CDFIntAbsTol = 1e-4;
             assert(Basis1.DistType==Basis2.DistType, ...
               [obj.FamilyName ' can only handle Basis distributions of the same type (so far).']);
             obj.DistType = Basis1.DistType;
@@ -88,7 +88,7 @@ classdef dTransDuo < dEither   % NWJEFF: Need a demo of using this generically f
             for iel=1:numel(X)
                 if InBounds(iel)
                     fun = @(x) obj.BasisRV1.CDF(obj.ReverseFofDuo(X(iel),x)).*obj.BasisRV2.PDF(x);
-                    thiscdf(iel)=integral(fun,obj.BasisRV2.LowerBound,obj.BasisRV2.UpperBound,'RelTol', obj.CDFRelTol, 'AbsTol', obj.CDFAbsTol);
+                    thiscdf(iel)=integral(fun,obj.BasisRV2.LowerBound,obj.BasisRV2.UpperBound,'RelTol', obj.CDFIntRelTol, 'AbsTol', obj.CDFIntAbsTol);
                 end
             end
         end

@@ -17,7 +17,7 @@ function Run(CaseNs)
 
     MarkerRoot = '00Results/00';
     if GlobalSkipEstAll
-        MarkerRoot = [MarkerRoot 'GSE'];
+        MarkerRoot = [MarkerRoot 'GSE']; %#ok<UNRCH>
     end
         
     for iCase=CaseNs
@@ -100,7 +100,8 @@ function Run(CaseNs)
             rpt{end+1} = SingleTest('Uquad');
             rpt{end+1} = SingleTest('Wald2');
             rpt{end+1} = SingleTest('Wald2MSD');
-            rpt{end+1} = SingleTest('Weibull');
+            rpt{end+1} = SingleTest('Weibull'); %#ok<*AGROW>
+            rpt{end+1} = SingleTest('Weibull2');
             sectiontime = toc(sectiontime) / 60;
             WriteMarker([MarkerRoot '1CntFas'],rpt,sectiontime);
         end
@@ -271,7 +272,7 @@ function Run(CaseNs)
         % Note: When running parallel, MATLAB reports xxx seconds testing time, but it appears to sum the
         % times for the different processors working in parallel.
         
-        totalmins_elapsed = toc(time0) / 60
+        totalmins_elapsed = toc(time0) / 60 %#ok<NOPRT>
         
     end
     
