@@ -1,4 +1,4 @@
-classdef utGenNor2 < utContinuous;
+classdef utGenNor2 < utContinuous
     
     properties (ClassSetupParameter)
         parmxi    = struct( 'n100',-100 , 'n1',-1    , 'p0',0     , 'p5',5      , 'p25',25   , 'p250',250 );

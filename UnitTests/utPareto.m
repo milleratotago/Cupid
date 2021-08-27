@@ -1,4 +1,4 @@
-classdef utPareto < utContinuous;
+classdef utPareto < utContinuous
     
     properties (ClassSetupParameter)
         parm1K = struct( 'p_5',.5  , 'p2',2 , 'p5',5   , 'p25',25 , 'p250',250 );

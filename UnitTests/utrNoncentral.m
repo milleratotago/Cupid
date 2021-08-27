@@ -1,4 +1,4 @@
-classdef utrNoncentral < utContinuous;
+classdef utrNoncentral < utContinuous
     
     properties (ClassSetupParameter)
         parmSampleSize = struct( 'p6',6       , 'p12',12 , 'p24',24 , 'p150',150 );

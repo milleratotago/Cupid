@@ -1,4 +1,4 @@
-classdef utMixture < utContinuous;
+classdef utMixture < utContinuous
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

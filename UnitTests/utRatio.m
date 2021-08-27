@@ -1,4 +1,4 @@
-classdef utRatio < utContinuous;
+classdef utRatio < utContinuous
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

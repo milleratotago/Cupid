@@ -1,4 +1,4 @@
-classdef utContinuous < utGeneric;
+classdef utContinuous < utGeneric
     
     % An abstract class for checking properties of continuous distributions:
     %    checking pdf/cdf values against known values, and

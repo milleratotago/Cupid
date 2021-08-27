@@ -1,4 +1,4 @@
-classdef utSqrtTrans < utContinuous;
+classdef utSqrtTrans < utContinuous
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

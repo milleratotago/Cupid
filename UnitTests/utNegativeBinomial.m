@@ -1,4 +1,4 @@
-classdef utNegativeBinomial < utDiscrete;
+classdef utNegativeBinomial < utDiscrete
     
     properties (ClassSetupParameter)
         parmN = struct('p2',2  , 'p4',4     , 'p20',20 );

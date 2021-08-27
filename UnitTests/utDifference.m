@@ -1,4 +1,4 @@
-classdef utDifference < utContinuous;
+classdef utDifference < utContinuous
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

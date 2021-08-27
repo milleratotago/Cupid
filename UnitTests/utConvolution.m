@@ -1,4 +1,4 @@
-classdef utConvolution < utContinuous;
+classdef utConvolution < utContinuous
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

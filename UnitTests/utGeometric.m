@@ -1,4 +1,4 @@
-classdef utGeometric < utDiscrete;
+classdef utGeometric < utDiscrete
     
     properties (ClassSetupParameter)
         parmp = struct('p_1',0.1, 'p_33',.33 , 'p_55',.55 , 'p_73',.73, 'p_48',.48 );

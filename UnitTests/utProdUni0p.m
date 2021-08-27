@@ -1,4 +1,4 @@
-classdef utProdUni0p < utContinuous;
+classdef utProdUni0p < utContinuous
     % Special test class for MultTrans implementation of distribution of product of K Uniform(0,p)
     properties (ClassSetupParameter)
         parmK   = struct( 'K1',1     , 'K2',2     , 'K3',3     , 'K5',5  );  % Big numerical problems already at K = 10

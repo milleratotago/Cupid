@@ -1,10 +1,10 @@
-classdef utAddTrans < utContinuous;
-    
+classdef utAddTrans < utContinuous
+   
     properties (ClassSetupParameter)
-        % Parm values to be combined sequentially.
-        parmCase = {1 2 3};
+        % Parm values to be combined sequentially:
+        parmCase = {1 2 3}
     end
-    
+   
     properties
         Dummy1, Dummy2  % Provide the dummy variables that were used to make parent classes abstract.
         ThisCase

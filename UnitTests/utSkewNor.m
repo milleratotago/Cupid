@@ -1,4 +1,4 @@
-classdef utSkewNor < utContinuous;
+classdef utSkewNor < utContinuous
     
     
     properties (ClassSetupParameter)

@@ -1,4 +1,4 @@
-classdef utdMATLABc < utContinuous;
+classdef utdMATLABc < utContinuous
     % Unit testing for the dMATLABc class, which allows continuous MATLAB probability distribution objects
     % to be used as Cupid distributions.
     

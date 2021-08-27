@@ -1,4 +1,4 @@
-classdef utStudRng < utContinuous;
+classdef utStudRng < utContinuous
     
     properties (ClassSetupParameter)
         parmDF = struct( 'p50',50 , 'p70',70 , 'p90',90  );

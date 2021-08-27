@@ -1,4 +1,4 @@
-classdef utRecinormalMS < utContinuous;
+classdef utRecinormalMS < utContinuous
     
     properties (ClassSetupParameter)
         parm1mu       = struct( 'p_05' ,20  , 'p_005',209 , 'p_0065' ,154);

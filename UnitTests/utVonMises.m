@@ -1,4 +1,4 @@
-classdef utVonMises < utContinuous;
+classdef utVonMises < utContinuous
     
     properties (ClassSetupParameter)
         parmloc   = struct( 'p_1',.1   , 'p_85',.85  , 'p1_1',1.1 , 'p1_5',1.5   , 'p3_3',3.3   , 'p6_2',6.2 );

@@ -1,4 +1,4 @@
-classdef utDiscrete < utGeneric;
+classdef utDiscrete < utGeneric
     
     % An abstract class for checking properties of discrete distributions:
     %    checking pdf/cdf values against known values, and

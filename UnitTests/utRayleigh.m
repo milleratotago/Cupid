@@ -1,4 +1,4 @@
-classdef utRayleigh < utContinuous;
+classdef utRayleigh < utContinuous
     
     properties (ClassSetupParameter)
         parmSigma  = struct( 'p_1',.1 , 'p1',1 , 'p2',2 , 'p4',4 , 'p10',10 );

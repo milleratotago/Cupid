@@ -1,4 +1,4 @@
-classdef utLogTrans < utContinuous;
+classdef utLogTrans < utContinuous
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

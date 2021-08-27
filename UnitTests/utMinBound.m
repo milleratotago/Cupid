@@ -1,4 +1,4 @@
-classdef utMinBound < utContinuous;
+classdef utMinBound < utContinuous
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

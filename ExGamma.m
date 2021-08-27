@@ -35,7 +35,7 @@ classdef ExGamma < dContinuous  % NEWJEFF: Now using j_integralCalc
 
         function parms = MomsToParms(GammaMean,GammaVar,ExpMean)
             % Return values of 3 distribution parameters yielding specified
-            % mean and variance of normal and mean of exponential.
+            % mean and variance of gamma and mean of exponential.
             % Used with ExHelpStartParmsMLE
             parms = zeros(3,1);
             parms(1) = GammaMean^2 / GammaVar;

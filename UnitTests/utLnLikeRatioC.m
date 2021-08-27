@@ -1,4 +1,4 @@
-classdef utLnLikeRatioC < utContinuous;
+classdef utLnLikeRatioC < utContinuous
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

@@ -35,7 +35,7 @@ function Run(CaseNs)
             case 3; DerivedCont = true; Fast = true;
             case 4; DerivedDisc = true; Fast = true;
             case 5; Continuous  = true; Slow = true;
-            case 6; Discrete    = true; Slow = true;  % UNUSED
+            case 6; Discrete    = true; Slow = true;
             case 7; DerivedCont = true; Slow = true;
             case 8; DerivedDisc = true; Slow = true;
         end
@@ -118,7 +118,6 @@ function Run(CaseNs)
             rpt{end+1} = SingleTest('List');
             rpt{end+1} = SingleTest('NegativeBinomial');
             rpt{end+1} = SingleTest('Poisson');
-            rpt{end+1} = SingleTest('RankDist');
             rpt{end+1} = SingleTest('UniformInt');
 %            rpt{end+1} = SingleTest('YNdPrime');
 %            rpt{end+1} = SingleTest('YNdPrimeSym');
@@ -231,6 +230,7 @@ function Run(CaseNs)
             rpt = cell(0,0);
             sectiontime = tic;
             %    rpt{end+1} = SingleTest('');
+            rpt{end+1} = SingleTest('RankDist');
             sectiontime = toc(sectiontime) / 60;
             WriteMarker([MarkerRoot '6DisSlo'],rpt,sectiontime);
         end

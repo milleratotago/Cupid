@@ -1,4 +1,4 @@
-classdef utPowerTrans < utContinuous;
+classdef utPowerTrans < utContinuous
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

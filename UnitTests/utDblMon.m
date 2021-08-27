@@ -1,4 +1,4 @@
-classdef utDblMon < utContinuous;
+classdef utDblMon < utContinuous
     
     properties (ClassSetupParameter)
         parm1tzero   = struct( 'p150',150 , 'p200',200 ,   'p500',500   );

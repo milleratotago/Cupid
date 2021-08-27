@@ -1,4 +1,4 @@
-classdef utList < utDiscrete;
+classdef utList < utDiscrete
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

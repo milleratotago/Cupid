@@ -1,4 +1,4 @@
-classdef utF < utContinuous;
+classdef utF < utContinuous
     
     properties (ClassSetupParameter)
         parm1DfNum   = struct( 'p2a',2 , 'p1a',1  , 'p1b',1    , 'p2b',2     , 'p4',4       ,  'p8', 8   );

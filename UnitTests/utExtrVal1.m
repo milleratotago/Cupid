@@ -1,4 +1,4 @@
-classdef utExtrVal1 < utContinuous;
+classdef utExtrVal1 < utContinuous
     
     properties (ClassSetupParameter)
         parmalpha = struct( 'p_5',.5 , 'p1',1   , 'p3',3, 'p10',10 , 'p500',500 );

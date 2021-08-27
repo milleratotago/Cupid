@@ -15,8 +15,12 @@ classdef Frechet < dContinuous
         end
         
         function thispdf = frechpdf(x,shape,scale,minval)
-            thiscdf = Frechet.frechcdf(x,shape,scale,minval);
-            thispdf = shape/scale * ( (x-minval)/scale ).^(-1-shape) .* thiscdf;
+            try
+                thiscdf = Frechet.frechcdf(x,shape,scale,minval);
+                thispdf = shape/scale * ( (x-minval)/scale ).^(-1-shape) .* thiscdf;
+            catch
+                thispdf = 0;
+            end
         end
         
         function thiscdf = frechcdf(x,shape,scale,minval)

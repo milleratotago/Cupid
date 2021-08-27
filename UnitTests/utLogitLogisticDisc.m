@@ -1,4 +1,4 @@
-classdef utLogitLogisticDisc < utDiscrete;
+classdef utLogitLogisticDisc < utDiscrete
 % Special class to test combination of logistic & logit transformations,
 % which should result in the original X
     

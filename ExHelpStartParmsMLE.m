@@ -1,5 +1,6 @@
 function [parms, foundOne] = ExHelpStartParmsMLE(dist,X)
-    % Helper function to search for StartParmsMLE for ExGamma and ExWaldMSM
+    % Helper function to search for StartParmsMLE for ExGamma, ExWaldMSM, and
+    %  any other distribution for which the function MomsToParms is defined.
     % This fn tries NSteps different sets of starting parameter values for the distributions,
     %  using different proportions of variance in exponential component for each try,
     %  and it returns the best parameters to be used as the MLE starting values.

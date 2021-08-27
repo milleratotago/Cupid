@@ -1,4 +1,4 @@
-classdef utContamShift < utContinuous;
+classdef utContamShift < utContinuous
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

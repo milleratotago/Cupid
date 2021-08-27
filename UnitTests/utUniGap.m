@@ -1,4 +1,4 @@
-classdef utUniGap < utContinuous;
+classdef utUniGap < utContinuous
     
     properties (ClassSetupParameter)
         parmt = struct( 'p1',1 , 'p5',5   , 'p10',10 , 'p25',25   , 'p250',250   );

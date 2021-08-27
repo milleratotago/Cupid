@@ -1,4 +1,4 @@
-classdef utStochCasc2T < utContinuous;
+classdef utStochCasc2T < utContinuous
     
     properties (ClassSetupParameter)
         parmrate1  = struct( 'p_005',.005 , 'p_012',.012 , 'p_01',.01    , 'p1',1    );

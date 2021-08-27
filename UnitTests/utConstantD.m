@@ -1,4 +1,4 @@
-classdef utConstantD < utDiscrete;
+classdef utConstantD < utDiscrete
     
     properties (ClassSetupParameter)
         thisConstant = struct('n2',-2  , 'p4',4, 'n20',-20, 'p100',100, 'p500',500 );

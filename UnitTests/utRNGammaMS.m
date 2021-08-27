@@ -1,4 +1,4 @@
-classdef utRNGammaMS < utContinuous;
+classdef utRNGammaMS < utContinuous
     
     properties (ClassSetupParameter)
         ParmMu = struct( 'p300',300 , 'p10',10 , 'p3',3, 'p210',210);

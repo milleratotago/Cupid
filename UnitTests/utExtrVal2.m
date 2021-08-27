@@ -1,4 +1,4 @@
-classdef utExtrVal2 < utContinuous;
+classdef utExtrVal2 < utContinuous
     
     properties (ClassSetupParameter)
         parmmu    = struct( 'p_5',.5 , 'p1',1   , 'p30',30   , 'p10',10 , 'p500',500 );

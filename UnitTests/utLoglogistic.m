@@ -1,4 +1,4 @@
-classdef utLoglogistic < utContinuous;
+classdef utLoglogistic < utContinuous
     
     properties (ClassSetupParameter)
         parmscale = struct( 'p200',200 , 'p275',275  , 'p500',500 , 'p1000',1000 );

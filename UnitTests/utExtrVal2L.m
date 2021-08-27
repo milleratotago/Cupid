@@ -1,4 +1,4 @@
-classdef utExtrVal2L < utContinuous;
+classdef utExtrVal2L < utContinuous
     
     properties (ClassSetupParameter)
         parmscale = struct( 'p5',5   , 'p300',300, 'p22',22   , 'p84',84 , 'p2000',2000 );

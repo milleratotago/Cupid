@@ -1,4 +1,4 @@
-classdef utKolmSmir < utContinuous;
+classdef utKolmSmir < utContinuous
     
     properties (ClassSetupParameter)
         parmDF = struct( 'p10',10 , 'p40',40 ,   'p160', 160   ,  'p640', 640, 'p2560', 2560  );

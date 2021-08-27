@@ -1,4 +1,4 @@
-classdef utQuick < utContinuous;
+classdef utQuick < utContinuous
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

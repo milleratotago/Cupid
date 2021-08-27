@@ -1,4 +1,4 @@
-classdef utExponenMn < utContinuous;
+classdef utExponenMn < utContinuous
     
     properties (ClassSetupParameter)
         parmmean  = struct( 'p205',205 , 'p97',97 , 'p11_3',11.3 , 'p1_7',1.7 , 'p_13',.13 );

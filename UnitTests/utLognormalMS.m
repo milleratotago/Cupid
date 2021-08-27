@@ -1,4 +1,4 @@
-classdef utLognormalMS < utContinuous;
+classdef utLognormalMS < utContinuous
     
     properties (ClassSetupParameter)
         parmpostmu    = struct( 'p2',2 , 'p10',10 , 'p50',50 , 'p200',200 );

@@ -251,7 +251,7 @@ classdef ExGauss < dContinuous
             end
             if strcmp(ParmCodes,'rrr')
                 % Formulas for unconstrained moment estimation from Wikipedia.
-                parms = ExGauss.ParmsFrom3Mom(TargetVals(1),TargetVals(2),TargetVals(3));
+                parms = obj.ParmsFrom3Mom(TargetVals(1),TargetVals(2),TargetVals(3));
                 obj.ResetParms(parms);
             else
                 % Use standard search if there are constraints

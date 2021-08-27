@@ -1,4 +1,4 @@
-classdef utLogitLogistic < utContinuous;
+classdef utLogitLogistic < utContinuous
 % Special class to test combination of logistic & logit transformations,
 % which should result in the original X
     

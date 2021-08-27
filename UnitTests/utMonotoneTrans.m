@@ -1,4 +1,4 @@
-classdef utMonotoneTrans < utContinuous;
+classdef utMonotoneTrans < utContinuous
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

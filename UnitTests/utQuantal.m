@@ -1,4 +1,4 @@
-classdef utQuantal < utContinuous;
+classdef utQuantal < utContinuous
     
     properties (ClassSetupParameter)
         parmthreshold  = struct( 'p1',1 , 'p2',2 , 'p4',4 , 'p8',8 , 'p16',16 , 'p32',32 );

@@ -39,6 +39,7 @@ classdef Convolve2 < Convolution
             if Done
                 return;
             end
+            X = double(X);
             for iel=1:numel(X)
                 if InBounds(iel)
 %                    thispdf(iel)=integral(@(x) obj.BasisRV1.PDF(obj.ReverseFofDuo(X(iel),x)).*obj.BasisRV2.PDF(x),obj.BasisRV2.LowerBound,obj.BasisRV2.UpperBound,...

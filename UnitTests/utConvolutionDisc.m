@@ -1,4 +1,4 @@
-classdef utConvolutionDisc < utDiscrete;
+classdef utConvolutionDisc < utDiscrete
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

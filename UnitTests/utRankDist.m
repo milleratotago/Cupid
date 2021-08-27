@@ -1,4 +1,4 @@
-classdef utRankDist < utDiscrete;
+classdef utRankDist < utDiscrete
     
     properties (ClassSetupParameter)
         parmCase = {1 2 3 4};

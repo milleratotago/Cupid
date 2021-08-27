@@ -1,4 +1,4 @@
-classdef utExpLogDisc < utDiscrete;
+classdef utExpLogDisc < utDiscrete
 % Special class to test combination of Log & Exp transformations,
 % which should result in the original X
     

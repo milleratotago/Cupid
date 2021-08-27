@@ -1,4 +1,4 @@
-classdef utTriangularG < utContinuous;
+classdef utTriangularG < utContinuous
     
     properties (ClassSetupParameter)
         parmlow  = struct( 'n100',-100 , 'p250',250   );

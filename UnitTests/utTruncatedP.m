@@ -1,4 +1,4 @@
-classdef utTruncatedP < utContinuous;
+classdef utTruncatedP < utContinuous
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

@@ -1,4 +1,4 @@
-classdef uttNoncentral < utContinuous;
+classdef uttNoncentral < utContinuous
     
     properties (ClassSetupParameter)
         parmdf     = struct( 'p6',6       , 'p12',12 , 'p24',24, 'p120',120);

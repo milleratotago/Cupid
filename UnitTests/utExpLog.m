@@ -1,4 +1,4 @@
-classdef utExpLog < utContinuous;
+classdef utExpLog < utContinuous
 % Special class to test combination of logistic & logit transformations,
 % which should result in the original X
     

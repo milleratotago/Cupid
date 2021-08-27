@@ -1,4 +1,4 @@
-classdef utJohnsonSB < utContinuous;
+classdef utJohnsonSB < utContinuous
     
     properties (ClassSetupParameter)
         parm1Loc    = struct( 'p2',2  , 'p3',3    , 'n100',-100 ,  'p5',5 );

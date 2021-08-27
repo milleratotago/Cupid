@@ -1,4 +1,4 @@
-classdef utLnLikeRatioD < utDiscrete;
+classdef utLnLikeRatioD < utDiscrete
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

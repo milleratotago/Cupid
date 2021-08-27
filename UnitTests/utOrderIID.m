@@ -1,4 +1,4 @@
-classdef utOrderIID < utContinuous;
+classdef utOrderIID < utContinuous
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

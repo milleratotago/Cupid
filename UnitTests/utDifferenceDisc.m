@@ -1,4 +1,4 @@
-classdef utDifferenceDisc < utDiscrete;
+classdef utDifferenceDisc < utDiscrete
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

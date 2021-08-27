@@ -1,4 +1,4 @@
-classdef utTruncatedPDisc < utDiscrete;
+classdef utTruncatedPDisc < utDiscrete
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

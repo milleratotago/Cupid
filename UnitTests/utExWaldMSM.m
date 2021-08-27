@@ -1,4 +1,4 @@
-classdef utExWaldMSM < utContinuous;
+classdef utExWaldMSM < utContinuous
     
     
     properties (ClassSetupParameter)

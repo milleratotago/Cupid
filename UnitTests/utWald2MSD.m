@@ -1,4 +1,4 @@
-classdef utWald2MSD < utContinuous;
+classdef utWald2MSD < utContinuous
     
     properties (ClassSetupParameter)
         Wald2MSDmu      = struct( 'p20',20 ,  'p10',10 ,  'p40',40  ,  'p50',50 );

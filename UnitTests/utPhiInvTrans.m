@@ -1,4 +1,4 @@
-classdef utPhiInvTrans < utContinuous;
+classdef utPhiInvTrans < utContinuous
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

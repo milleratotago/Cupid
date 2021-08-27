@@ -1,4 +1,4 @@
-classdef utAddTransDisc < utDiscrete;
+classdef utAddTransDisc < utDiscrete
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

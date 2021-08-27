@@ -1,4 +1,4 @@
-classdef utExGauMn < utContinuous;
+classdef utExGauMn < utContinuous
     
     properties (ClassSetupParameter)
         parmmu    = struct( 'p100',100 , 'p200',200 , 'p50',50   );  % normal mu

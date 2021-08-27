@@ -1,4 +1,4 @@
-classdef utWald2 < utContinuous;
+classdef utWald2 < utContinuous
     
     
     properties (ClassSetupParameter)

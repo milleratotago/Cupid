@@ -1,4 +1,4 @@
-classdef utProdUni01 < utContinuous;
+classdef utProdUni01 < utContinuous
     
     properties (ClassSetupParameter)
         parmK   = struct( 'K1',1 , 'K2',2  , 'K3',3    , 'K5',5  );  % Big numerical problems already at K = 10

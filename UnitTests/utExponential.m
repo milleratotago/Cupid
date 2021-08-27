@@ -1,4 +1,4 @@
-classdef utExponential < utContinuous;
+classdef utExponential < utContinuous
     
     properties (ClassSetupParameter)
         parmrate  = struct( 'p_005',.005 , 'p_01',.01 , 'p_1',.1 , 'p1',1 , 'p10',10 );

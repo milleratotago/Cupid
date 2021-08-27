@@ -1,4 +1,4 @@
-classdef utPoisson < utDiscrete;
+classdef utPoisson < utDiscrete
     
     properties (ClassSetupParameter)
         parmmu = struct('p_8',0.8 , 'p5',5   , 'p250',25   );

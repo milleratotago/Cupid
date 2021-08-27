@@ -1,4 +1,4 @@
-classdef utt < utContinuous;
+classdef utt < utContinuous
     
     properties (ClassSetupParameter)
         parmDF = struct( 'p6',6 , 'p12',12 , 'p24',24 ,  'p48', 48   ,  'p96', 96   ,  'p320', 320  );

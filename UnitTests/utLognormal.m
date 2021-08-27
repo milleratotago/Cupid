@@ -1,4 +1,4 @@
-classdef utLognormal < utContinuous;
+classdef utLognormal < utContinuous
     
     properties (ClassSetupParameter)
         parmmu    = struct( 'n2',-2    , 'n1',-1  , 'p0',0 , 'p1',1     ); % , 'p5',5     );  MOMENTS INACCURATE

@@ -1,4 +1,4 @@
-classdef utWeibull < utContinuous;
+classdef utWeibull < utContinuous
     
     properties (ClassSetupParameter)
         parmScale  = struct( 'p_9',.9   , 'p1',1 , 'p5',5     , 'p20',20   );

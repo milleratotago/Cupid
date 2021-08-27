@@ -1,4 +1,4 @@
-classdef utRosin < utContinuous;
+classdef utRosin < utContinuous
     
     properties (ClassSetupParameter)
         parmP80   = struct( 'p10',10   , 'p20',20 , 'p50',50 , 'p250',250 , 'p1250',1250 );

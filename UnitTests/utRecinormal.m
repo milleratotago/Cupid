@@ -1,8 +1,9 @@
-classdef utRecinormal < utContinuous;
+classdef utRecinormal < utContinuous
     
     properties (ClassSetupParameter)
+        % There are bad numerical problems if the underlying normal gets too close to zero.
         parm1mu       = struct( 'p_05',.05 , 'p_005',.005 , 'p_0065',.0065);
-        parm2sigma    = struct( 'p_002',.002 , 'p_001',.001 , 'p_00022',.00022);
+        parm2sigma    = struct( 'p_0015',.0015 , 'p_000031',.00031 , 'p_00022',.00022);
     end
     
     properties

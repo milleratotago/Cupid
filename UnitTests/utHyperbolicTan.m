@@ -1,4 +1,4 @@
-classdef utHyperbolicTan < utContinuous;
+classdef utHyperbolicTan < utContinuous
     
     properties (ClassSetupParameter)
         parmScale  = struct( 'p_005',.005 , 'p_01',.01 , 'p_1',.1 , 'p1',1 , 'p10',10 );

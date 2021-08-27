@@ -1,4 +1,4 @@
-classdef utTriangularGCWP < utContinuous;
+classdef utTriangularGCWP < utContinuous
     
     properties (ClassSetupParameter)
         parm1center   = struct( 'n100',-100 , 'n1',-1     , 'p0',0     , 'p5',5   , 'p250',250 );

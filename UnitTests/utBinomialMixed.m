@@ -1,4 +1,4 @@
-classdef utBinomialMixed < utDiscrete;
+classdef utBinomialMixed < utDiscrete
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

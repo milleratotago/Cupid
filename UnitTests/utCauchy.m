@@ -1,4 +1,4 @@
-classdef utCauchy < utContinuous;
+classdef utCauchy < utContinuous
     
     properties (ClassSetupParameter)
         parmLoc   = struct( 'n100',-100 , 'p0',0 ,  'p10',10 , 'p100',100 );

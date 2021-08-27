@@ -59,6 +59,11 @@ classdef ExGauRatio < ExGauss
             obj.rate = 1 / (s * (skew1/2)^(1/3));
             obj.ratio = (1 / obj.rate)/obj.sigma;
         end
+
+        function parms = ParmsFrom3Mom(obj,targ1,targ2,targ3)
+            parms = ParmsFrom3Mom@ExGauss(obj,targ1,targ2,targ3);
+            parms(3) = 1 / (parms(2) * parms(3));
+        end
         
     end
     

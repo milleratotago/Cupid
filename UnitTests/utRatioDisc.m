@@ -1,4 +1,4 @@
-classdef utRatioDisc < utDiscrete;
+classdef utRatioDisc < utDiscrete
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

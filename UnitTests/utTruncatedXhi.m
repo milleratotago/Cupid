@@ -1,4 +1,4 @@
-classdef utTruncatedXhi < utContinuous;
+classdef utTruncatedXhi < utContinuous
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

@@ -1,4 +1,4 @@
-classdef utHypergeometric < utDiscrete;
+classdef utHypergeometric < utDiscrete
     
     properties (ClassSetupParameter)
         parmN = struct('N28',28, 'N30',30, 'N49',49, 'N51',51, 'N56',56);

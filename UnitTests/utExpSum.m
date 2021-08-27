@@ -1,4 +1,4 @@
-classdef utExpSum < utContinuous;
+classdef utExpSum < utContinuous
     
     properties (ClassSetupParameter)
         % Remember: the rates must be different.  Testing works better if rate1 is smaller

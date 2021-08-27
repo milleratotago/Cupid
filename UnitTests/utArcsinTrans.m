@@ -1,4 +1,4 @@
-classdef utArcsinTrans < utContinuous;
+classdef utArcsinTrans < utContinuous
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

@@ -1,4 +1,4 @@
-classdef utAttainP < utContinuous;
+classdef utAttainP < utContinuous
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

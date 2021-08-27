@@ -1,4 +1,4 @@
-classdef utghHoag < utContinuous;
+classdef utghHoag < utContinuous
     
     properties (ClassSetupParameter)
         parmA = struct( 'n10',-10    , 'n1',-1     , 'p0',0     , 'p5',5      , 'p25',25   , 'p2_5',2.5  );

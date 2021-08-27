@@ -1,4 +1,4 @@
-classdef utUniform < utContinuous;
+classdef utUniform < utContinuous
     
     properties (ClassSetupParameter)
         parmlow = struct( 'n100',-100 , 'n1',-1   , 'p0',0 , 'p5',5   , 'p250',250   );

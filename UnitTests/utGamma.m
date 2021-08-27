@@ -1,4 +1,4 @@
-classdef utGamma < utContinuous;
+classdef utGamma < utContinuous
     
     properties (ClassSetupParameter)
         parmN    = struct( 'p1',1     , 'p2',2   , 'p4',4, 'p10',10);

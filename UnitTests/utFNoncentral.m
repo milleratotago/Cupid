@@ -1,4 +1,4 @@
-classdef utFNoncentral < utContinuous;
+classdef utFNoncentral < utContinuous
     
     properties (ClassSetupParameter)
         parm1DfNum   = struct( 'p1a',1    , 'p1b',1  , 'p1c',1    , 'p2',2      , 'p4',4      ,  'p8', 8     );

@@ -1,4 +1,4 @@
-classdef utProductDisc < utDiscrete;
+classdef utProductDisc < utDiscrete
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

@@ -1,4 +1,4 @@
-classdef utMonotoneTransDisc < utDiscrete;
+classdef utMonotoneTransDisc < utDiscrete
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

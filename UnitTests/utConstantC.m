@@ -1,4 +1,4 @@
-classdef utConstantC < utContinuous;
+classdef utConstantC < utContinuous
     
     properties (ClassSetupParameter)
         thisconstant    = struct( 'p10',10 , 'p50',50 , 'p200',200 );

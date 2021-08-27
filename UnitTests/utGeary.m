@@ -1,4 +1,4 @@
-classdef utGeary < utContinuous;
+classdef utGeary < utContinuous
     
     properties (ClassSetupParameter)
         parmSampSiz = struct( 'p6',6 , 'p12',12 , 'p24',24 ,  'p48', 48   ,  'p96', 96   ,  'p201', 201  );

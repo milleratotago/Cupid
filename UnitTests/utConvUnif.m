@@ -1,4 +1,4 @@
-classdef utConvUnif < utContinuous;
+classdef utConvUnif < utContinuous
     
     properties (ClassSetupParameter)
         % Parm values to be combined sequentially.

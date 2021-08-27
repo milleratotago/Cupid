@@ -1,4 +1,4 @@
-classdef utExGamma < utContinuous;
+classdef utExGamma < utContinuous
     
     properties (ClassSetupParameter)
         % Avoid similar rates for G and E, as this produces nearly singular info matrices in estimation.

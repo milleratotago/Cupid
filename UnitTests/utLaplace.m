@@ -1,4 +1,4 @@
-classdef utLaplace < utContinuous;
+classdef utLaplace < utContinuous
     
     properties (ClassSetupParameter)
         parmLocation = struct( 'n100',-100 , 'p0',0 , 'p5',5   , 'p25',25   , 'p250',250 );

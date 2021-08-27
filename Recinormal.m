@@ -1,15 +1,11 @@
 classdef Recinormal < dContinuous
-    % Recinormal(mu,sigma) is reciprocal of a Normal(mu,sigma) random variable called "NormalBasis".
-    % NormalBasis is automatically truncated so that it is all-positive or all-negative (whichever
-    % has the larger probability) to avoid the possibility of 1/0.
+    % Reci2(mu,sigma) is reciprocal of an underlying Normal(mu,sigma) random variable, truncated to be positive.
+    % This version relies on the PDF, CDF, etc from MOSCOSO DEL PRADO MARTIN (draft of December 2008)
     
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
-        mu, sigma, ZExtreme, NormalBasis
-        MinNormalCDF, MaxNormalCDF  % These define the CDF range of NormalBasis.
-        % If NormalBasis is truncated to be all positive, these will be (p,1)
-        % If NormalBasis is truncated to be all negative, these will be (0,p)
-        NormalCDFDif
-        sqrteps
+        mu, sigma  % Parameters of the underlying normal
+        PrUnderlyingPositive
+        MinNormalCDF  %  = 1 - PrUnderlyingPositive
     end
     
     methods (Static)
@@ -28,20 +24,16 @@ classdef Recinormal < dContinuous
         
         function obj=Recinormal(varargin)   % Constructor
             obj=obj@dContinuous('Recinormal');
-            obj.sqrteps = sqrt(eps);
             obj.ParmTypes = 'rr';
             obj.DefaultParmCodes = 'rr';
             obj.NDistParms = 2;
-            obj.NormalBasis = Normal;
-            obj.IntegralPDFXmuNAbsTol = 1e-8 * ones(size(obj.IntegralPDFXmuNAbsTol));   % For integrating PDF*(X-mu)^N for N>=1
-            obj.StartParmsMLEfn = @obj.StartParmsMLE;
             switch nargin
                 case 0
                 case 2
                     ResetParms(obj,[varargin{:}]);
                 otherwise
-                    ME = MException('Recinormal:Constructor', ...
-                        'Recinormal:Constructor requires 0 or 2 arguments.');
+                    ME = MException('Reci2:Constructor', ...
+                        'Reci2:Constructor requires 0 or 2 arguments.');
                     throw(ME);
             end
         end
@@ -63,33 +55,17 @@ classdef Recinormal < dContinuous
         
         function []=ReInit(obj)
             if obj.sigma <= 0
-                error('Recinormal sigma must be > 0.');
+                error('Reci2 sigma must be > 0.');
             end
             obj.Initialized = false;
-            obj.NormalBasis.ResetParms([obj.mu obj.sigma]);
-            % CDF0 = obj.NormalBasis.CDF(0);
-            if obj.NormalBasis.LowerBound>0
-                % NormalBasis is all positive without truncation.
-                obj.MinNormalCDF = eps;
-                obj.MaxNormalCDF = 1-eps;
-            elseif obj.NormalBasis.UpperBound<0
-                % NormalBasis is all negative without truncation.
-                obj.MinNormalCDF = eps;
-                obj.MaxNormalCDF = 1-eps;
-            elseif obj.NormalBasis.UpperBound>abs(obj.NormalBasis.LowerBound)
-                % NormalBasis is mostly positive but needs truncation.
-                obj.MinNormalCDF = obj.NormalBasis.CDF(sqrt(eps));
-                obj.MaxNormalCDF = 1-eps;
-            else
-                % NormalBasis is mostly negative but needs truncation.
-                obj.MinNormalCDF = eps;
-                obj.MaxNormalCDF = obj.NormalBasis.CDF(-sqrt(eps));
-            end
-            obj.NormalCDFDif = obj.MaxNormalCDF - obj.MinNormalCDF;
-            obj.LowerBound = 1 / obj.NormalBasis.InverseCDF(obj.MaxNormalCDF) + obj.sqrteps;
-            obj.UpperBound = 1 / obj.NormalBasis.InverseCDF(obj.MinNormalCDF) - obj.sqrteps;
+            obj.MinNormalCDF = normcdf(0,obj.mu,obj.sigma); %  = 1 - PrUnderlyingPositive
+            obj.PrUnderlyingPositive = 1 - obj.MinNormalCDF;
+            UnderlyingMin = max(eps,norminv(obj.CDFNearlyZero,obj.mu,obj.sigma));
+            UnderlyingMax = norminv(obj.CDFNearlyOne,obj.mu,obj.sigma);
+            obj.LowerBound = max(eps,1/UnderlyingMax);
+            obj.UpperBound = 1/UnderlyingMin;
             obj.Initialized = true;
-            % Be cautious with bounds because of problems near 1/0
+%             % Be cautious with bounds because of problems near 1/0
             obj.LowerBound = max(obj.LowerBound, obj.InverseCDF(obj.CDFNearlyZero));
             obj.UpperBound = min(obj.UpperBound, obj.InverseCDF(obj.CDFNearlyOne));
             if (obj.NameBuilding)
@@ -102,8 +78,7 @@ classdef Recinormal < dContinuous
             if Done
                 return;
             end
-            PreTransX = 1 ./ X(InBounds);
-            thispdf(InBounds) = obj.NormalBasis.PDF(PreTransX) .* PreTransX.^2 / obj.NormalCDFDif;
+            thispdf(InBounds) = 1 ./ (X(InBounds).^2 * sqrt(2*pi) * obj.sigma) .* exp( -(obj.mu*X(InBounds)-1).^2 ./ (2*obj.sigma^2*X(InBounds).^2) );
         end
         
         function thiscdf=CDF(obj,X)
@@ -112,33 +87,38 @@ classdef Recinormal < dContinuous
                 return;
             end
             PreTransX = 1 ./ X(InBounds);
-            thiscdf(InBounds) = (1 - obj.NormalBasis.CDF(PreTransX)) / obj.NormalCDFDif;
+            thiscdf(InBounds) = (1 - normcdf(PreTransX,obj.mu,obj.sigma)) / obj.PrUnderlyingPositive;
         end
         
         function thisicdf = InverseCDF(obj,P)
-            normalCDF = (1-P)*obj.NormalCDFDif + obj.MinNormalCDF;  % 1-P because 1/X reverses large/small mapping
-            inverseX = obj.NormalBasis.InverseCDF(normalCDF);
+            normalCDF = (1-P)*obj.PrUnderlyingPositive + obj.MinNormalCDF;  % 1-P because 1/X reverses large/small mapping
+            inverseX = norminv(normalCDF,obj.mu,obj.sigma);
             thisicdf = 1 ./ inverseX;
         end
         
         function thisval=Random(obj,varargin)
             assert(obj.Initialized,UninitializedError(obj));
-            randcdf = rand(varargin{:})*obj.NormalCDFDif + obj.MinNormalCDF;
-            randnor = norminv(randcdf,obj.NormalBasis.mu,obj.NormalBasis.sigma);
+            randcdf = rand(varargin{:})*obj.PrUnderlyingPositive + obj.MinNormalCDF;
+            randnor = norminv(randcdf,obj.mu,obj.sigma);
             thisval= 1 ./ randnor;
         end
         
-        function parms = StartParmsMLE(obj,X)
-            pct_50_80  = prctile(X,[50 80]);  % 80 corresponds to Z=0.84
-            est_mu = 1/pct_50_80(1);
-            % 1/pct_50_80(2) should be at prctile20 of recinormal and correspond to Z=-0.84;
-            est_sigma = (est_mu - 1/pct_50_80(2)) / 0.84;
-            parms = [est_mu, est_sigma];
-        end
+        function s = EstML(obj,X,varargin)
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
+            % According to MOSCOSO DEL PRADO MARTIN, p 79, Appendix A:
+            Xinv = 1./ X;
+            est_mu = mean(Xinv);
+            est_sigma = std(Xinv);
+            ResetParms(obj,[est_mu, est_sigma]);
+            BuildMyName(obj);
+            s=obj.StringName;
+       end
         
     end  % methods
     
-end  % class Recinormal
+end  % class Reci2
 
 
 
