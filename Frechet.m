@@ -151,7 +151,7 @@ classdef Frechet < dContinuous
             % q1 = m + s * log(4)^(-1/alpha)
             % q2 = m + s * log(2)^(-1/alpha)
             % q3 = m + s * log(4/3)^(-1/alpha)
-            obs = prctile(X,[25 50 75]);
+            obs = double(prctile(X,[25 50 75]));
             % Here is the array of functions, all of which are to be zero'ed
             F = @(p) [...
                 ( (obs(1)-p(3))/p(2) )^(-p(1)) - log(4); ...
@@ -160,7 +160,7 @@ classdef Frechet < dContinuous
                 ];
             startm = min(X) / 2;
             starts = mean(X) - startm;
-            x0 = [3 starts startm];
+            x0 = double([3 starts startm]);
             parms = fsolve(F,x0,obj.fsolveoptions);
         end
         

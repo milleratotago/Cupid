@@ -19,6 +19,7 @@ classdef dGeneric < handle  % Calls by reference
     %
     
     % NewJeff: Code duplication warning! I should be able to combine EstML & EstMLcensored, plus MLSE & MLSEcensored.
+    % NEWJEFF: linear interp1 should be an option instead of spline interpolation. Also, interpolation should be moved to dContinuous.
     
     properties(Hidden)  % Properties seen only by class methods
     end

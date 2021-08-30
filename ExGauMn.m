@@ -67,10 +67,11 @@ classdef ExGauMn < ExGauss
             obj.ResetParms([newmu newsigma newmean]);
         end
         
-        function parms = ParmsFrom3Mom(obj,targ1,targ2,targ3)
-            parms = ParmsFrom3Mom@ExGauss(obj,targ1,targ2,targ3);
-            parms(3) = 1 / parms(3);
-        end
+%       Problem: During EstML, ParmsFrom3Mom is called by parent ExGauss & wants real rate
+%         function parms = ParmsFrom3Mom(obj,targ1,targ2,targ3)
+%             parms = ParmsFrom3Mom@ExGauss(obj,targ1,targ2,targ3);
+%             parms(3) = 1 / parms(3);
+%         end
         
         function []=MomSetParms(obj,m,s,skew1,ssqr)
             % apply moment-based estimation formulas with this parameterization

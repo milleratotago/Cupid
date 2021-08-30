@@ -60,10 +60,11 @@ classdef ExGauRatio < ExGauss
             obj.ratio = (1 / obj.rate)/obj.sigma;
         end
 
-        function parms = ParmsFrom3Mom(obj,targ1,targ2,targ3)
-            parms = ParmsFrom3Mom@ExGauss(obj,targ1,targ2,targ3);
-            parms(3) = 1 / (parms(2) * parms(3));
-        end
+%       Problem: During EstML, ParmsFrom3Mom is called by parent ExGauss & wants real rate
+%         function parms = ParmsFrom3Mom(obj,targ1,targ2,targ3)
+%             parms = ParmsFrom3Mom@ExGauss(obj,targ1,targ2,targ3);
+%             parms(3) = 1 / (parms(2) * parms(3));
+%         end
         
     end
     

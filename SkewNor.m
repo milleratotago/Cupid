@@ -29,6 +29,7 @@ classdef SkewNor < dContinuous
             obj.Standard_Normal = Normal(0,1);
             obj.Sqrt2OverPi = sqrt(2/pi);
             obj.ZExtreme = 30;
+            obj.StartParmsMLEfn = @obj.StartParmsMLE;
             switch nargin
                 case 0
                 case 3
@@ -156,6 +157,15 @@ classdef SkewNor < dContinuous
                 end
                 thisval(i) = obj.Loc + obj.Scale*RSN;
             end
+        end
+        
+        function parms = StartParmsMLE(obj,X)
+            % Very seat-of-the-pants guesses based on some trial and error
+            obs = prctile(X,[10 50 90]);
+            thisMedian = obs(2);
+            thissd = std(X);
+            shapeguess = 10*(obs(1) + obs(3) - 2*thisMedian) / thissd;
+            parms = [thisMedian 1.5*thissd shapeguess];
         end
         
     end  % methods

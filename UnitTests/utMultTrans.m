@@ -33,7 +33,7 @@ classdef utMultTrans < utContinuous
                 testCase.Dist = MultTrans(Normal(100,10),0.2);
                 testCase.EstParmCodes = 'rrf';  % Don't adjust both multiplier and SD since they can trade off.
               case 3
-                testCase.Dist = MultTrans(Exponential(0.1),10);
+                testCase.Dist = MultTrans(Exponential(0.1),-10);
                 testCase.EstParmCodes = 'rf';  % Don't adjust both rate and multiplier since they can trade off.
                 testCase.SkipEstML = true;  % The exponential produces a better ML at a different rate.
             end

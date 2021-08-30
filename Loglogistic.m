@@ -7,6 +7,10 @@ classdef Loglogistic < dContinuous
       b  % s
     end
     
+    properties(SetAccess = public)
+        fsolveoptions  % Used by StartParmsMLE
+    end
+    
     methods (Static)
         
         function Reals = ParmsToReals(Parms,~)
@@ -42,6 +46,7 @@ classdef Loglogistic < dContinuous
             obj.DefaultParmCodes = 'rr';
             obj.NDistParms = 2;
             obj.StartParmsMLEfn = @obj.StartParmsMLE;
+            obj.fsolveoptions = optimset('Display','off');
             switch nargin
                 case 0
                 case 2
@@ -129,8 +134,26 @@ classdef Loglogistic < dContinuous
             end
         end
         
+%         function s = EstMom(obj,TargetVals)
+%             % Based on the following moment functions from Wikipedia:
+%             % (a = scale, b = shape)
+%             % mu == a*b/sin(b)
+%             % var == a^2 * (2*b / sin(2*b) - b^2 / sin(b)^2)
+%             % Here is the array of functions, all of which are to be zero'ed
+%             F = @(p) [...
+%                 ( TargetVals(1) - p(1)*p(2)/sin(p(2))); ...
+%                 ( TargetVals(2) - p(1)^2 * ( 2*p(2))/sin(2*p(2)) - p(2)^2 / sin(p(2))^2 ) ...
+%                 ];
+%             x0 = [10 2];
+%             EndingVals = fsolve(F,x0,obj.fsolveoptions);
+%             obj.ResetParms(EndingVals);
+%             BuildMyName(obj);
+%             s=obj.StringName;
+%         end
+        
     end  % methods
     
 end  % class Loglogistic
+
 
 

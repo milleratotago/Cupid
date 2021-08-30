@@ -50,7 +50,7 @@ classdef MultTrans < dTransMono
         end
         
         function thisval = PDFScaleFactor(obj,~)
-            thisval = 1/obj.Multiplier;
+            thisval = abs(1/obj.Multiplier);
         end
         
         function thisval=Mean(obj)

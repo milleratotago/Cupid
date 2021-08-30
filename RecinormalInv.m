@@ -14,6 +14,7 @@ classdef RecinormalInv < Recinormal
             obj.FamilyName = 'RecinormalInv';
             obj.ParmNames{1} = 'OneOverMu';
             obj.ParmNames{2} = 'OneOverSigma';
+            obj.StartParmsMLEfn = @obj.StartParmsMLE;
             ResetParms(obj,[OneOverMu,OneOverSigma]);
         end
 

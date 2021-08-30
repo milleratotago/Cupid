@@ -27,6 +27,7 @@ classdef Recinormal < dContinuous
             obj.ParmTypes = 'rr';
             obj.DefaultParmCodes = 'rr';
             obj.NDistParms = 2;
+            obj.StartParmsMLEfn = @obj.StartParmsMLE;
             switch nargin
                 case 0
                 case 2
@@ -116,9 +117,13 @@ classdef Recinormal < dContinuous
             s=obj.StringName;
        end
         
+       function parms = StartParmsMLE(obj,X)
+           parms = EstML(obj,X);
+       end
+        
     end  % methods
     
-end  % class Reci2
+end  % class Recinormal
 
 
 
