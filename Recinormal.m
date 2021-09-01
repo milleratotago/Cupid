@@ -1,5 +1,5 @@
 classdef Recinormal < dContinuous
-    % Reci2(mu,sigma) is reciprocal of an underlying Normal(mu,sigma) random variable, truncated to be positive.
+    % Recinormal(mu,sigma) is reciprocal of an underlying Normal(mu,sigma) random variable, truncated to be positive.
     % This version relies on the PDF, CDF, etc from MOSCOSO DEL PRADO MARTIN (draft of December 2008)
     
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
@@ -11,11 +11,11 @@ classdef Recinormal < dContinuous
     methods (Static)
         
         function Reals = ParmsToReals(Parms,~)
-            Reals = [Parms(1) NumTrans.GT2Real(eps,Parms(2))];
+            Reals = [NumTrans.GT2Real(eps,Parms(1)) NumTrans.GT2Real(eps,Parms(2))];
         end
         
         function Parms = RealsToParms(Reals,~)
-            Parms = [Reals(1) NumTrans.Real2GT(eps,Reals(2))];
+            Parms = [NumTrans.Real2GT(eps,Reals(1)) NumTrans.Real2GT(eps,Reals(2))];
         end
         
     end
@@ -33,8 +33,8 @@ classdef Recinormal < dContinuous
                 case 2
                     ResetParms(obj,[varargin{:}]);
                 otherwise
-                    ME = MException('Reci2:Constructor', ...
-                        'Reci2:Constructor requires 0 or 2 arguments.');
+                    ME = MException('Recinormal:Constructor', ...
+                        'Recinormal:Constructor requires 0 or 2 arguments.');
                     throw(ME);
             end
         end
@@ -56,7 +56,7 @@ classdef Recinormal < dContinuous
         
         function []=ReInit(obj)
             if obj.sigma <= 0
-                error('Reci2 sigma must be > 0.');
+                error('Recinormal sigma must be > 0.');
             end
             obj.Initialized = false;
             obj.MinNormalCDF = normcdf(0,obj.mu,obj.sigma); %  = 1 - PrUnderlyingPositive
@@ -66,9 +66,13 @@ classdef Recinormal < dContinuous
             obj.LowerBound = max(eps,1/UnderlyingMax);
             obj.UpperBound = 1/UnderlyingMin;
             obj.Initialized = true;
-%             % Be cautious with bounds because of problems near 1/0
+            % Be cautious with bounds because of problems near 1/0
             obj.LowerBound = max(obj.LowerBound, obj.InverseCDF(obj.CDFNearlyZero));
-            obj.UpperBound = min(obj.UpperBound, obj.InverseCDF(obj.CDFNearlyOne));
+            MaybeUpperBound = obj.InverseCDF(obj.CDFNearlyOne);
+            if (MaybeUpperBound > obj.LowerBound) && (MaybeUpperBound < obj.UpperBound)
+                obj.UpperBound = MaybeUpperBound;
+            end
+            assert( (obj.LowerBound > 0) && (obj.UpperBound > obj.LowerBound));  % NEWJEFF FOR DEBUGGING
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
@@ -104,21 +108,10 @@ classdef Recinormal < dContinuous
             thisval= 1 ./ randnor;
         end
         
-        function s = EstML(obj,X,varargin)
-            if ~obj.Initialized
-                error(UninitializedError(obj));
-            end
-            % According to MOSCOSO DEL PRADO MARTIN, p 79, Appendix A:
-            Xinv = 1./ X;
-            est_mu = mean(Xinv);
-            est_sigma = std(Xinv);
-            ResetParms(obj,[est_mu, est_sigma]);
-            BuildMyName(obj);
-            s=obj.StringName;
-       end
-        
-       function parms = StartParmsMLE(obj,X)
-           parms = EstML(obj,X);
+       function parms = StartParmsMLE(~,X)
+           % According to MOSCOSO DEL PRADO MARTIN, p 79, Appendix A:
+           Y = 1 ./ X;
+           parms = [mean(Y) std(Y)];
        end
         
     end  % methods

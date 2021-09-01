@@ -38,6 +38,14 @@ classdef RecinormalInv < Recinormal
             obj.StringName = [obj.FamilyName '(' num2str(obj.OneOverMu) ',' num2str(obj.OneOverSigma) ')'];
         end
         
+%         function Reals = ParmsToReals(obj,Parms,~)
+%             Reals = [NumTrans.GT2Real(eps,Parms(1)) NumTrans.GT2Real(eps,Parms(2))];
+%         end
+%         
+%         function Parms = RealsToParms(obj,Reals,~)
+%             Parms = [NumTrans.Real2GT(eps,Reals(1)) NumTrans.Real2GT(eps,Reals(2))];
+%         end
+        
         function parms = StartParmsMLE(obj,X)
             parms = StartParmsMLE@Recinormal(obj,X);
             parms = 1 ./ parms;
