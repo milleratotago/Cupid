@@ -26,6 +26,7 @@ classdef Convolve2 < Convolution
         function obj=Convolve2(Basis1,Basis2)
             obj=obj@Convolution(Basis1,Basis2);
             obj.FamilyName = 'Convolve2';
+            obj.BuildMyName;  % need to rebuild because name was built by Convolution
             obj.jopPDF = j_integralParseArgs('AbsTol',obj.PDFIntAbsTol,'RelTol',obj.PDFIntRelTol);  % Defaults are: AbsTol,1e-10, RelTol,1e-6  
             obj.jopCDF = j_integralParseArgs('AbsTol',obj.CDFIntAbsTol,'RelTol',obj.CDFIntRelTol);  % Defaults are: AbsTol,1e-10, RelTol,1e-6  
         end

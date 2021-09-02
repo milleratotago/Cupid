@@ -245,6 +245,9 @@ function Run(CaseNs)
             rpt{end+1} = SingleTest('ContamShift');
             rpt{end+1} = SingleTest('ContamStretch');
             rpt{end+1} = SingleTest('Convolution');
+            rpt{end+1} = SingleTest('Convolve2');
+            rpt{end+1} = SingleTest('ConvolveFFTc');
+            rpt{end+1} = SingleTest('ConvolveFFTcIID');
             rpt{end+1} = SingleTest('Difference');
             rpt{end+1} = SingleTest('InfMix');
             rpt{end+1} = SingleTest('MinBound');
