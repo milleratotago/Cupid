@@ -1,5 +1,6 @@
 classdef Frechet2 < Frechet
     % Frechet2 special case of Frechet distribution with minval = 0
+    % Same as the ExtrVal2L distribution.
     
     methods(Static)
         

@@ -72,7 +72,7 @@ classdef Recinormal < dContinuous
             if (MaybeUpperBound > obj.LowerBound) && (MaybeUpperBound < obj.UpperBound)
                 obj.UpperBound = MaybeUpperBound;
             end
-            assert( (obj.LowerBound > 0) && (obj.UpperBound > obj.LowerBound));  % NEWJEFF FOR DEBUGGING
+            % assert( (obj.LowerBound > 0) && (obj.UpperBound > obj.LowerBound));  % Was used for debugging
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end

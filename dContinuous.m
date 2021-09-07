@@ -37,6 +37,7 @@ classdef dContinuous < dGeneric   % Calls by reference
         IntegralPDFXNAbsTol, IntegralPDFXNRelTol
         IntegralPDFXmuNAbsTol, IntegralPDFXmuNRelTol
         IntegralCDFXNAbsTol, IntegralCDFXNRelTol
+        osInverseCDF  % optimset when using fzero to compute InverseCDF
     end
     
     methods(Abstract)
@@ -68,6 +69,7 @@ classdef dContinuous < dGeneric   % Calls by reference
             obj.IntegralPDFXmuNRelTol = 1e-6  * ones(1,MaxN);
             obj.IntegralCDFXNAbsTol = 1e-10 * ones(1,MaxN);     % For integrating CDF*X^N for N>=1
             obj.IntegralCDFXNRelTol = 1e-6  * ones(1,MaxN);
+            obj.osInverseCDF = optimset('TolFun',obj.InverseCDFTol);
         end
         
         function []=ClearBeforeResetParmsC(obj)
@@ -143,31 +145,38 @@ classdef dContinuous < dGeneric   % Calls by reference
             if ~obj.Initialized
                 error(UninitializedError(obj));
             end
-            if min(P)<=0
-                warning(['InverseCDF expects all P>0 but this call has a P of ',num2str(min(P))]);
-                P(P<=0) = eps(0);
+            if min(P)<0
+                warning(['InverseCDF expects all P>=0 but this call has a P of ',num2str(min(P))]);
+                P(P<=0) = 0;
             end
-            if max(P)>=1
-                warning(['InverseCDF expects all P<1 but this call has a P of ',num2str(max(P))]);
-                P(P>=1) = 1 - eps(1);
+            if max(P)>1
+                warning(['InverseCDF expects all P<=1 but this call has a P of ',num2str(max(P))]);
+                P(P>=1) = 1;
             end
             [thisval, ~, Done] = MaybeSplineInvCDF(obj,P);
             if Done
                 return;
             end
-            os = optimset('TolFun',obj.InverseCDFTol);  % NEWJEFF: This should be done globally, not every time InverseCDF is called.
             thisval = zeros(size(P));
             for i=1:numel(P)
-                try
-                    % fzero fails if CDF is too big for LowerBound or too small for UpperBound
-                    thisval(i) = fzero(@(x) CDF(obj,x)-P(i) , [obj.LowerBound obj.UpperBound], os);
-                catch InverseCDFErr
-                    if CDF(obj,obj.LowerBound)>P(i)
-                        thisval(i) = obj.LowerBound;
-                    else
-                        thisval(i) = obj.UpperBound;
+                if P(i) == 0
+                    thisval(i) = obj.LowerBound;
+                elseif P(i) == 1
+                    thisval(i) = obj.UpperBound;
+                else
+                    try
+                        % fzero fails if CDF is too big for LowerBound or too small for UpperBound
+                        thisval(i) = fzero(@(x) CDF(obj,x)-P(i) , [obj.LowerBound obj.UpperBound], obj.osInverseCDF);
+                    catch InverseCDFErr
+                        if CDF(obj,obj.LowerBound)>P(i)
+                            thisval(i) = obj.LowerBound;
+                        elseif CDF(obj,obj.UpperBound)<P(i)
+                            thisval(i) = obj.UpperBound;
+                        else
+                            error('Unhandled error in InverseCDF');
+                        end
                     end
-                end
+                end % if P(i) == 0
             end
         end
         

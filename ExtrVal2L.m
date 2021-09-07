@@ -2,6 +2,7 @@ classdef ExtrVal2L < dContinuous
     % Extreme Value Type II distribution given by Luce (1986, p 508) with parameters shape (his alpha) and scale>0 (his beta).
     % As shape gets larger, distribution becomes more normal.
     % Unlike Luce, here we divide by scale so that larger scale values give distributions with larger scores.
+    % This is the same as the Frechet2 distribution.
     
     properties(SetAccess = protected)
         shape, scale

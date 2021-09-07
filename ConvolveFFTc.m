@@ -11,7 +11,7 @@ classdef ConvolveFFTc < dContinuous
     % SplinePDF is used.
     
     properties (Constant)
-        defaultNxPoints = 2^16;
+        defaultNxPoints = 2^12;  % 4096 is a reasonable speed/accuracy compromise in cases examined so far.
     end
     
     properties(SetAccess = private)
@@ -23,6 +23,11 @@ classdef ConvolveFFTc < dContinuous
         BasisVariances
         KnownMeans
         KnownVariances
+        % The following are used for a discrete approximation
+        % instead of Splines
+        DiscreteXs
+        DiscretePDFs
+        DiscreteCDFs
     end
     
     methods
@@ -157,6 +162,7 @@ classdef ConvolveFFTc < dContinuous
             % I don't really understand this
             fftpdf = real(ifft(prod(fft(Y,[],2))));
             % fftpdf = fftshift(fftpdf);
+            % NEWJEFF: Following line seems redundant with later normalization
             fftpdf = fftpdf / trapz(X,fftpdf);  % normalize pdf values for integral=1
             
             % At this point the fftpdf values are correct, but the X vector still
@@ -172,19 +178,40 @@ classdef ConvolveFFTc < dContinuous
             X = X(first_pos_pdf:last_pos_pdf);
             fftpdf = fftpdf(first_pos_pdf:last_pos_pdf);
             
-            % These are the final X and fftpdf values used for splinepdf
-            obj.SplinePDFsXs = X;
-            obj.SplinePDFs = fftpdf;
-            obj.PDFSplineInfo = spline(obj.SplinePDFsXs,[0 obj.SplinePDFs 0]);  % Include end 0's to guarantee flatness at edges.
-            obj.UseSplinePDF = true;
-            obj.HaveSplinePDFs = true;
+%             % These are the final X and fftpdf values used for splinepdf
+%             obj.SplinePDFsXs = X;
+%             obj.SplinePDFs = fftpdf;
+%             obj.PDFSplineInfo = spline(obj.SplinePDFsXs,[0 obj.SplinePDFs 0]);  % Include end 0's to guarantee flatness at edges.
+%             obj.UseSplinePDF = true;
+%             obj.HaveSplinePDFs = true;
             
+            % These are the final X, pdf, and cdf values used for the discrete approximation:
+            fftpdf(fftpdf<0) = 0;  % Must be numerical errors so get rid of them
+            fftpdf = fftpdf / sum(fftpdf); %  / trapz(X,fftpdf);  % normalize to area 1
+            obj.DiscreteXs = X;
+            obj.DiscretePDFs = fftpdf;
+            obj.DiscreteCDFs = cumsum(obj.DiscretePDFs);
+            obj.DiscreteCDFs = obj.DiscreteCDFs / obj.DiscreteCDFs(end);
+           
             obj.LowerBound = X(1);
             obj.UpperBound = X(end);
             obj.Initialized = true;
             if obj.NameBuilding
                 obj.BuildMyName;
             end
+        end
+        
+        function thispdf = PDF(obj,X)
+            thispdf=zeros(size(X));
+            InBounds = (X>=obj.LowerBound) & (X<=obj.UpperBound);
+            thispdf(InBounds) = interp1(obj.DiscreteXs,obj.DiscretePDFs,X(InBounds));
+        end
+        
+        function thiscdf = CDF(obj,X)
+            thiscdf = zeros(size(X));
+            thiscdf(X>=obj.UpperBound) = 1;
+            InBounds = (X>=obj.LowerBound) & (X<=obj.UpperBound);
+            thiscdf(InBounds) = interp1(obj.DiscreteXs,obj.DiscreteCDFs,X(InBounds));
         end
         
         function thisval=Mean(obj)

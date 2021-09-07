@@ -5,6 +5,8 @@ classdef SkewNor < dContinuous
         Loc, Scale, Shape,
         Sqrt2OverPi, Delta, EX, VarX, Rho, Sqrt1minusRhoSqr,
         Standard_Normal, ZExtreme
+        ComputingBounds  % Switch used to inhibit CDF integration when computing bounds
+        InverseCDF02  % An arbitrary cutoff below which I integrate the PDF to get the CDF
     end
     
     methods (Static)
@@ -68,8 +70,11 @@ classdef SkewNor < dContinuous
             obj.LowerBound = obj.Loc - obj.ZExtreme * obj.Scale;
             obj.UpperBound = obj.Loc + obj.ZExtreme * obj.Scale;
             obj.Initialized = true;
+            obj.ComputingBounds = true;
             obj.LowerBound = InverseCDF(obj,obj.CDFNearlyZero);
             obj.UpperBound = InverseCDF(obj,obj.CDFNearlyOne);
+            obj.InverseCDF02 = InverseCDF(obj,0.02);
+            obj.ComputingBounds = false;
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
@@ -92,16 +97,32 @@ classdef SkewNor < dContinuous
         
         function thiscdf=CDF(obj,X)
             % Using Owen's T function. See https://en.wikipedia.org/wiki/Skew_normal_distribution
+            % This function produced negative CDFs eg
+            % SkewNor(500.276,321.6111,25.0131).CDF(464) = -0.0019775
+            % even though LowerBound = 345.77
+            % In an attempt to fix this, I tried various cluges, including
+            % the final cluge setting negative CDF values to zero.
+            % But none of these cluges produced satisfactory results,
+            % so I am falling back on the default integration CDF routine
+            % for small X values, which seems more accurate though slower.
             [thiscdf, InBounds, Done] = MaybeSplineCDF(obj,X);
             if Done
                 return;
             end
+            Xin = X(InBounds);
             Z = (X(InBounds) - obj.Loc) / obj.Scale;
-            norcdf = obj.Standard_Normal.CDF(Z);
+            norcdf = normcdf(Z); %  obj.Standard_Normal.CDF(Z);
             wantpos = find(InBounds>0);
             for i=1:numel(Z)
-                thiscdf(wantpos(i)) = norcdf(i) - 2*TfnOwen(Z(i),obj.Shape);
+                if ~obj.ComputingBounds && (Xin(i) < obj.InverseCDF02)
+                    % Computing CDF by integration does not work until bounds have been set
+                    thisone = CDF@dContinuous(obj,Xin(i));
+                else
+                    thisone = norcdf(i) - 2*TfnOwen(Z(i),obj.Shape);
+                end
+                thiscdf(wantpos(i)) = thisone;
             end
+%             thiscdf(thiscdf<0) = 0;  % CLUGE HERE
         end
         
         function thisval=Mean(obj)
