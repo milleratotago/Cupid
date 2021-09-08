@@ -30,9 +30,14 @@ classdef Frechet < dContinuous
         function thisicdf = frechicdf(p,shape,scale,minval)
             thisicdf = zeros(size(p));
             % thisicdf = minval + scale * (-log(p)).^(-1/shape);  % NEWJEFF: CousineauThiviergeHardingEtAl2016 give this percentile function explicitly, but their -1 looks like a typo
+            cdfAtMax = Frechet.frechcdf(realmax,shape,scale,minval);
             for iel=1:numel(p)
-                f = @(x) Frechet.frechcdf(x,shape,scale,minval) - p(iel);
-                thisicdf(iel) = fzero(f,[minval realmax]);
+                if p(iel) >= cdfAtMax
+                    thisicdf(iel) = realmax;
+                else
+                    f = @(x) Frechet.frechcdf(x,shape,scale,minval) - p(iel);
+                    thisicdf(iel) = fzero(f,[minval realmax]);
+                end
             end
         end
         

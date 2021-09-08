@@ -2,6 +2,10 @@ classdef Loglogistic < dContinuous
     % Loglogistic(scale>0,shape>0):  log(X) has a logistic distribution
     % Based on https://en.wikipedia.org/wiki/Log-logistic_distribution
     
+    properties(Constant)
+        minShape = 0.5;  % to prevent numerical errors during parameter search it is helpful to use a lower bound
+    end
+    
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
       scale, shape  % called alpha & beta, respectively, in Wikipedia
       b  % s
@@ -14,11 +18,11 @@ classdef Loglogistic < dContinuous
     methods (Static)
         
         function Reals = ParmsToReals(Parms,~)
-            Reals = [NumTrans.GT2Real(eps,Parms(1)) NumTrans.GT2Real(eps,Parms(2))];
+            Reals = [NumTrans.GT2Real(eps,Parms(1)) NumTrans.GT2Real(Loglogistic.minShape,Parms(2))];
         end
         
         function Parms = RealsToParms(Reals,~)
-            Parms = [NumTrans.Real2GT(eps,Reals(1)) NumTrans.Real2GT(eps,Reals(2))];
+            Parms = [NumTrans.Real2GT(eps,Reals(1)) NumTrans.Real2GT(Loglogistic.minShape,Reals(2))];
         end
         
         function parms = StartParmsMLE(X)
@@ -63,6 +67,10 @@ classdef Loglogistic < dContinuous
             obj.scale = newparmvalues(1);
             obj.shape = newparmvalues(2);
             ReInit(obj);
+        end
+        
+        function parms = ParmValues(obj)
+            parms = [obj.scale, obj.shape];
         end
         
         function PerturbParms(obj,ParmCodes)
