@@ -54,7 +54,11 @@ classdef Frechet2 < Frechet
             assert(obj.shape>0,'Frechet2 shape parameter must be > 0.');
             assert(obj.scale>0,'Frechet2 scale parameter must be > 0.');
             obj.LowerBound = obj.minval+eps;
-            obj.UpperBound = Frechet.frechicdf(obj.CDFNearlyOne,obj.shape,obj.scale,obj.minval);
+            obj.UpperBound = obj.minval + obj.scale * (-1 / log(obj.maxCDF))^(1/obj.shape);
+            if obj.UpperBound > obj.maxUpperBound
+                obj.UpperBound = obj.maxUpperBound;
+            end
+%             obj.UpperBound = Frechet.frechicdf(obj.CDFNearlyOne,obj.shape,obj.scale,obj.minval);
             obj.Initialized = true;
             if (obj.NameBuilding)
                 BuildMyName(obj);

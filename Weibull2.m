@@ -4,11 +4,11 @@ classdef Weibull2 < Weibull
     methods (Static)
         
         function Reals = ParmsToReals(Parms,~)
-            Reals = [NumTrans.GT2Real(eps,Parms(1)) NumTrans.GT2Real(eps,Parms(2))];
+            Reals = [NumTrans.GT2Real(eps,Parms(1)) NumTrans.Bounded2Real(Weibull.minPower,Weibull.maxPower,Parms(2))];
         end
         
         function Parms = RealsToParms(Reals,~)
-            Parms = [NumTrans.Real2GT(eps,Reals(1)) NumTrans.Real2GT(eps,Reals(2))];
+            Parms = [NumTrans.Real2GT(eps,Reals(1)) NumTrans.Real2Bounded(Weibull.minPower,Weibull.maxPower,Reals(2))];
         end
         
     end
@@ -41,7 +41,11 @@ classdef Weibull2 < Weibull
             ReInit(obj);
         end
         
-        function PerturbParms(obj,ParmCodes)
+       function parms = ParmValues(obj)
+            parms = [obj.scale, obj.power];
+        end
+        
+       function PerturbParms(obj,ParmCodes)
             % Perturb parameter values a little bit, e.g., prior to estimation attempts for testing.
             newscale  = ifelse(ParmCodes(1)=='f', obj.scale, 1.05*obj.scale);
             newpower  = ifelse(ParmCodes(2)=='f', obj.power, 0.95*obj.power);

@@ -30,6 +30,11 @@ classdef Weibull < dContinuous
     % More could be be done for OrderIID statistics from Weibull (see p. 254-5).
     %  The best way to do this might to treat it as a new distribution: WeibulO.
     
+    properties (Constant)
+        minPower = 0.2;
+        maxPower = 1000;
+    end
+
     properties(SetAccess = protected)
         scale, power, origin, invpower, Standard_Exponential
     end
@@ -37,11 +42,11 @@ classdef Weibull < dContinuous
     methods (Static)
         
         function Reals = ParmsToReals(Parms,~)
-            Reals = [NumTrans.GT2Real(eps,Parms(1)) NumTrans.GT2Real(eps,Parms(2)) Parms(3)];
+            Reals = [NumTrans.GT2Real(eps,Parms(1)) NumTrans.Bounded2Real(Weibull.minPower,Weibull.maxPower,Parms(2)) Parms(3)];
         end
         
         function Parms = RealsToParms(Reals,~)
-            Parms = [NumTrans.Real2GT(eps,Reals(1)) NumTrans.Real2GT(eps,Reals(2)) Reals(3)];
+            Parms = [NumTrans.Real2GT(eps,Reals(1)) NumTrans.Real2Bounded(Weibull.minPower,Weibull.maxPower,Reals(2)) Reals(3)];
         end
         
     end
@@ -79,6 +84,10 @@ classdef Weibull < dContinuous
             obj.power = newparmvalues(2);
             obj.origin = newparmvalues(3);
             ReInit(obj);
+        end
+        
+        function parms = ParmValues(obj)
+            parms = [obj.scale, obj.power, obj.origin];
         end
         
         function PerturbParms(obj,ParmCodes)

@@ -27,24 +27,24 @@ classdef Frechet < dContinuous
             thiscdf = exp( -((x-minval)/scale).^(-shape));
         end
         
-        function thisicdf = frechicdf(p,shape,scale,minval)
-            thisicdf = zeros(size(p));
-            % thisicdf = minval + scale * (-log(p)).^(-1/shape);  % NEWJEFF: CousineauThiviergeHardingEtAl2016 give this percentile function explicitly, but their -1 looks like a typo
-            cdfAtMax = Frechet.frechcdf(realmax,shape,scale,minval);
-            for iel=1:numel(p)
-                if p(iel) >= cdfAtMax
-                    thisicdf(iel) = realmax;
-                else
-                    f = @(x) Frechet.frechcdf(x,shape,scale,minval) - p(iel);
-                    thisicdf(iel) = fzero(f,[minval realmax]);
-                end
-            end
-        end
+%         function thisicdf = frechicdf(p,shape,scale,minval)
+%             thisicdf = zeros(size(p));
+%             % thisicdf = minval + scale * (-log(p)).^(-1/shape);  % NEWJEFF: CousineauThiviergeHardingEtAl2016 give this percentile function explicitly, but their -1 looks like a typo
+%             cdfAtMax = Frechet.frechcdf(realmax,shape,scale,minval);
+%             for iel=1:numel(p)
+%                 if p(iel) >= cdfAtMax
+%                     thisicdf(iel) = realmax;
+%                 else
+%                     f = @(x) Frechet.frechcdf(x,shape,scale,minval) - p(iel);
+%                     thisicdf(iel) = fzero(f,[minval+eps realmax]);
+%                 end
+%             end
+%         end
         
     end % methods(Static)
     
     properties(SetAccess = protected)
-        shape, scale, minval
+        shape, scale, minval, maxCDF, maxUpperBound
     end
     
     properties(SetAccess = public)
@@ -61,6 +61,8 @@ classdef Frechet < dContinuous
             obj.CDFNearlyOne = 0.999999;
             obj.StartParmsMLEfn = @obj.StartParmsMLE;
             obj.fsolveoptions = optimset('Display','off');
+            obj.maxCDF = 0.9999;
+            obj.maxUpperBound = 50000;
             switch nargin
                 case 0
                 case 3
@@ -92,7 +94,11 @@ classdef Frechet < dContinuous
             assert(obj.shape>0,'Frechet shape parameter must be > 0.');
             assert(obj.scale>0,'Frechet scale parameter must be > 0.');
             obj.LowerBound = obj.minval+eps;
-            obj.UpperBound = Frechet.frechicdf(obj.CDFNearlyOne,obj.shape,obj.scale,obj.minval);
+            obj.UpperBound = obj.minval + obj.scale * (-1 / log(obj.maxCDF))^(1/obj.shape);
+            % obj.UpperBound = Frechet.frechicdf(obj.CDFNearlyOne,obj.shape,obj.scale,obj.minval);
+            if obj.UpperBound > obj.maxUpperBound
+                obj.UpperBound = obj.maxUpperBound;
+            end
             obj.Initialized = true;
             if (obj.NameBuilding)
                 BuildMyName(obj);
@@ -173,3 +179,17 @@ classdef Frechet < dContinuous
     
 end  % class Frechet
 
+%{
+
+Some symbolics to try to compute an upper bound, but this was not helpful
+Ignoring minval
+syms scale shape
+syms x
+cdffn(x) = exp( -(x/scale).^(-shape));
+solve(cdffn(x)==0.9999,x,'ReturnConditions',true)
+ans =
+(scale*exp((pi*k*2i)/shape))/(- log(9999/10000) + z*pi*2i)^(1/shape)
+
+rx = rscale * (-1 / log(0.999))^(1/rshape)
+
+%}

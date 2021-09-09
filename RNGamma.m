@@ -65,6 +65,7 @@ classdef RNGamma < dContinuous
             obj.LowerBound = obj.XNearlyZero;
             obj.UpperBound = obj.Standard_Exponential.InverseCDF(obj.CDFNearlyOne) / obj.Rate * obj.N;
             obj.Initialized = true;
+            % obj.UpperBound = obj.Standard_Exponential.InverseCDF(obj.CDFNearlyOne) / obj.Rate * obj.N;
             if (obj.NameBuilding)
                 BuildMyName(obj);
             end
