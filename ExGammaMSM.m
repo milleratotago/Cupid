@@ -44,12 +44,11 @@ classdef ExGammaMSM < ExGamma
             obj.muG = newparmvalues(1);
             obj.sigmaG = newparmvalues(2);
             obj.muE = newparmvalues(3);
-            tempKG = (obj.muG/obj.sigmaG)^2;
-            tempRateG = tempKG / obj.muG;
-            tempRateE = 1 / obj.muE;
+            temp_g_shape = (obj.muG/obj.sigmaG)^2;
+            temp_g_scale = obj.muG / temp_g_shape;
             HoldNameBuilding = obj.NameBuilding;
             obj.NameBuilding = false;
-            ResetParms@ExGamma(obj,[tempKG tempRateG tempRateE]);
+            ResetParms@ExGamma(obj,[temp_g_shape temp_g_scale obj.muE]);
             obj.NameBuilding = HoldNameBuilding;
             ReInit(obj);
         end
