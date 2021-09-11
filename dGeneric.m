@@ -26,6 +26,7 @@ classdef dGeneric < handle  % Calls by reference
     
     properties(SetAccess = public)    % These properties can only be set by the methods of this class.
         StringName        % A name for the particular distribution with its parameters, e.g., "Normal(0,1)".
+        NameBuilding     % If true, generate FamilyName each time parameters are reset.  (setting to false speeds estimation)
         StartParmsMLEfn   % A function used to compute starting parameters for an MLE search from a set of observations
                           % Note that this function does NOT reset the parameters of the current distribution,
                           %  but only returns plausible values to which one might reset the distribution.
@@ -43,7 +44,6 @@ classdef dGeneric < handle  % Calls by reference
         Initialized,      % Keeps track of whether legal parameter values have been set.
         LowerBound,       % Effective minimum/maximum values for the distribution.
         UpperBound,
-        NameBuilding,     % If true, generate FamilyName each time parameters are reset.  (setting to false speeds estimation)
         NValues,          % Number of discrete values in discrete or mixed distribution.
         
         % Splines can be used to approximate the PDF of the distribution as follows:
@@ -758,6 +758,7 @@ classdef dGeneric < handle  % Calls by reference
             if ~obj.Initialized
                 error(UninitializedError(obj));
             end
+            obj.PushAndStopNameBuilding;
             if numel(varargin)<1
                 ParmCodes = obj.DefaultParmCodes;
                 startParms = obj.StartParmsMLEfn(Observations);
@@ -771,7 +772,6 @@ classdef dGeneric < handle  % Calls by reference
             PTRFn = @obj.ParmsToReals;
             ErrFn = @MyErrFunc;
             StartingVals = ParmValues(obj);
-            obj.PushAndStopNameBuilding;
             HoldWarn = obj.SkipImpossibleWarn;
             obj.SkipImpossibleWarn = true;  % Do not warn about impossible values when parameter searching.
             [EndingVals,fval,exitflag,output] = fminsearcharb(ErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);

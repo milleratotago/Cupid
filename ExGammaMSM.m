@@ -62,12 +62,12 @@ classdef ExGammaMSM < ExGamma
             obj.ResetParms([newMuG newSigmaG newMuE]);
         end
         
-        function []=ReInit(obj)
-            ReInit@ExGamma(obj);
-            if (obj.NameBuilding)
-                BuildMyName(obj);
-            end
-        end
+%         function []=ReInit(obj)
+%             ReInit@ExGamma(obj);
+%             if (obj.NameBuilding)
+%                 BuildMyName(obj);
+%             end
+%         end
         
         function Reals = ParmsToReals(obj,Parms,~)
             muG = Parms(1);

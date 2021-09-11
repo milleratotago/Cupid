@@ -1,11 +1,13 @@
 classdef utExGamma < utContinuous
+    % NEWJEFF: Warning: unit testing only includes cases with parmGscale < parmEmean
+    % and the accuracy is not too good when parmGscale is nearly as large as parmEmean
     
     properties (ClassSetupParameter)
         % Avoid similar rates for G and E, as this produces nearly singular info matrices in estimation.
         % Seems much slower when parmGscale > parmEmean & can bomb if discrepancy is large.
-        parmGshape = struct( 'p1_5',1.5 , 'p120',120, 'p30', 30, 'p10',10);
-        parmGscale = struct( 'p400',400 , 'p4',4    , 'p25', 25, 'p75',75);
-        parmEmean  = struct( 'p350',350 , 'p200',200, 'p153',153,'p68',68);
+        parmGshape = struct( 'p1_5',2.5 , 'p120',120, 'p30', 30, 'p10',10);
+        parmGscale = struct( 'p40' ,40  , 'p4',4    , 'p25', 25, 'p55',55);
+        parmEmean  = struct( 'p350',350 , 'p200',200, 'p153',153,'p98',98);
     end
     
     properties

@@ -4,9 +4,22 @@ classdef ExGamma < dContinuous
     %  which in this code are called g_shape, g_scale, and e_mean, respectively.
     % Seems much slower when parmGscale > parmEmean & can bomb if discrepancy is large.
     
+    % NOTES CONCERNING CASES WHERE g_scale > e_mean:
+    % Computation of the PDF requires numerical integration in these cases, and this can be very slow.
+    %   Specifically, this integral goes from 0 to X to compute PDF(X)---see function T.
+    % An option to use a much faster approximation is can be selected by setting
+    %    obj.UseApproxIntegrals = true;
+    % When this approximation is selected, the integrals are approximated using cumtrapz,
+    % and two further parameters can be set to control the speed & accuracy of this approximation:
+    %    obj.ApproxnPointsBelow: This is the number of points in a linspace between 0 and min(X)
+    %                            cumtrapz uses the values of the required function at each point in this linespace.
+    %    obj.ApproxSpacingInRange: This is the density of points for sampling between min(X) and max(X) -- i.e., the stepsize between points in this range.
+    %                            cumtrapz also uses the values of the required function at each of these points.
+
+
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
         g_shape, g_scale, e_mean
-        Ggamma  % Gamma distribution used in PDF computation when obj.e_mean > obj.g_scale
+        utilGamma  % utility Gamma distribution used in PDF computation when obj.e_mean > obj.g_scale & sometimes when obj.e_mean < obj.g_scal
         const1  % (obj.e_mean / (obj.e_mean - obj.g_scale))^obj.g_shape     used in T function when obj.g_scale < obj.e_mean
         const2  % 1 / ( gamma(obj.g_shape) * obj.g_scale^obj.g_shape )  used in T function when obj.g_scale >= obj.e_mean
         const3  % -(1/obj.g_scale - 1/obj.e_mean)                used in T function when obj.g_scale >= obj.e_mean
@@ -15,6 +28,9 @@ classdef ExGamma < dContinuous
     
     properties(SetAccess = public)
         min_g_shape, max_g_shape  % lower & upper limits on gamma K parameter to avoid numerical errors
+        UseApproxIntegrals  % true to use faster cumtrapz approx of T values when e_mean < g_scale
+        ApproxnPointsBelow  % number of fn evals between 0 and min(X)
+        ApproxSpacingInRange = 0.001;  % density of points to check between min(X) and max(X)
         StartParmsMLECandidateProportions
     end
     
@@ -45,7 +61,11 @@ classdef ExGamma < dContinuous
             obj.CDFNearlyOne = 1 - 1e-8;
             obj.log1mp = log(1 - obj.CDFNearlyZero);
             obj.log1 = log(1 - obj.CDFNearlyOne);
-            obj.Ggamma = RNGamma(4,1/10);  % Unused default parameters
+            obj.utilGamma = RNGamma(4,1/10);  % Unused default parameters
+            obj.utilGamma.NameBuilding = false;
+            obj.UseApproxIntegrals = false;
+            obj.ApproxnPointsBelow = 10000;  % number of fn evals between 0 and min(X)
+            obj.ApproxSpacingInRange = 0.001;  % density of points to check between min(X) and max(X)
             obj.StartParmsMLEfn = @obj.StartParmsMLE;
             NSteps = 10;
             obj.StartParmsMLECandidateProportions = ( (1:NSteps) - 0.5) / NSteps;
@@ -67,12 +87,13 @@ classdef ExGamma < dContinuous
             obj.g_scale = newparmvalues(2);
             obj.e_mean = newparmvalues(3);
             if obj.e_mean > obj.g_scale
-                % Used in T function when obj.g_scale < obj.e_mean
+                % utilGamma is used in  theT function when obj.g_scale < obj.e_mean
                 % GXS show the inverse of the 2nd parameter, but
                 %  my RNGamma has rate rather than mean as second parameter
-                obj.Ggamma.ResetParms([obj.g_shape, (obj.e_mean-obj.g_scale) / (obj.e_mean*obj.g_scale)]);
-            else
+                obj.utilGamma.ResetParms([obj.g_shape, (obj.e_mean-obj.g_scale) / (obj.e_mean*obj.g_scale)]);
+            else  %NEWJEFF: Need to check here--maybe also use utilGamma (see PDF)
                 % Used in T function when obj.g_scale >= obj.e_mean
+                % utilGamma may also be used in this case but it is reset later if needed.                
                 obj.const2 = 1 / ( gamma(obj.g_shape) * obj.g_scale^obj.g_shape );
                 obj.const3 = -(1/obj.g_scale - 1/obj.e_mean);
             end
@@ -112,7 +133,25 @@ classdef ExGamma < dContinuous
 
         function gvals = G(obj,X)
             % CSX p 3059: G is the CDF of a Gamma with parameters obj.g_shape, obj.e_mean*obj.g_scale/(obj.e_mean-obj.g_scale)
-            gvals = obj.Ggamma.CDF(X);
+            gvals = obj.utilGamma.CDF(X);
+        end
+        
+        function Xintegrals = ApproxIntegrals(obj,X)
+            % Compute an approximation Stevens' technique with additional Xs in RT range
+            xMin = min(X);
+            chkBelowMin = linspace(0,xMin,obj.ApproxnPointsBelow);
+            chkInRange = ( floor(xMin):obj.ApproxSpacingInRange:ceil(max(X)) );  % make sure to check densely even between Xs
+            NAddedInRange = numel(chkInRange);
+            chkX = [chkBelowMin chkInRange reshape(X,1,[])];
+            FnVals = chkX.^(obj.g_shape-1) .* exp(obj.const3*chkX);
+            [sortedchkX, sortPos] = sort(chkX);
+            sortedFnVals = FnVals(sortPos);
+            sortedInt = cumtrapz(sortedchkX,sortedFnVals);
+            % Now reverse the sort
+            unsorted = 1:length(sortedchkX);
+            newInd(sortPos) = unsorted;
+            Xintegrals = sortedInt(newInd);
+            Xintegrals = Xintegrals(obj.ApproxnPointsBelow+NAddedInRange+1:end)';
         end
         
         function tvals = T(obj,X)
@@ -120,10 +159,14 @@ classdef ExGamma < dContinuous
             if obj.g_scale < obj.e_mean
                 tvals = obj.const1 * obj.G(X);
             else
-                Xintegrals = zeros(size(X));
-                fn = @(y) y.^(obj.g_shape-1) .* exp(obj.const3*y);
-                for i=1:numel(X)
-                    Xintegrals(i) = integral(fn,0,X(i));
+                if obj.UseApproxIntegrals
+                    Xintegrals = obj.ApproxIntegrals(X);
+                else
+                    Xintegrals = zeros(size(X));
+                    fn = @(y) y.^(obj.g_shape-1) .* exp(obj.const3*y);
+                    for i=1:numel(X)
+                        Xintegrals(i) = integral(fn,0,X(i));
+                    end
                 end
                 tvals = obj.const2 * Xintegrals;
             end
@@ -134,7 +177,17 @@ classdef ExGamma < dContinuous
             if Done
                 return;
             end
-            thispdf(InBounds) = 1/obj.e_mean * exp(-X(InBounds)/obj.e_mean) .* obj.T(X(InBounds));
+            if (obj.e_mean < obj.g_scale) && (obj.e_mean / obj.Mean < 0.01)
+                % Cluge: to avoid numerical errors, use plain shifted gamma pdf when the
+                % exponential component is just a small fraction of the overall mean
+                obj.utilGamma.ResetParms([obj.g_shape,1/obj.g_scale]);
+                thispdf(InBounds) = obj.utilGamma.PDF(X(InBounds)-obj.e_mean);
+            else
+                % use local variable to ensure that this works regardless of row/column vectors:
+                temp_exp = exp(-X(InBounds)/obj.e_mean);
+                temp_T = obj.T(X(InBounds));
+                thispdf(InBounds) = 1/obj.e_mean * temp_exp(:) .* temp_T(:);
+            end
 % I don't know where this old version came from or whether it is right.
 %            lambda = obj.e_mean;
 %            k = obj.g_shape;
