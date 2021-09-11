@@ -2,20 +2,28 @@ classdef ExGamma < dContinuous
     % ExGamma distribution (sum of gamma and exponential) with parameters K, rateG, rateE
     % Based on ChenXieStory2011 (CXS) with gamma parameters alpha & beta and exponential theta
     %  which in this code are called g_shape, g_scale, and e_mean, respectively.
-    % Seems much slower when parmGscale > parmEmean & can bomb if discrepancy is large.
-    
-    % NOTES CONCERNING CASES WHERE g_scale > e_mean:
-    % Computation of the PDF requires numerical integration in these cases, and this can be very slow.
-    %   Specifically, this integral goes from 0 to X to compute PDF(X)---see function T.
-    % An option to use a much faster approximation is can be selected by setting
-    %    obj.UseApproxIntegrals = true;
-    % When this approximation is selected, the integrals are approximated using cumtrapz,
-    % and two further parameters can be set to control the speed & accuracy of this approximation:
-    %    obj.ApproxnPointsBelow: This is the number of points in a linspace between 0 and min(X)
-    %                            cumtrapz uses the values of the required function at each point in this linespace.
-    %    obj.ApproxSpacingInRange: This is the density of points for sampling between min(X) and max(X) -- i.e., the stepsize between points in this range.
-    %                            cumtrapz also uses the values of the required function at each of these points.
 
+    % PDF computations can be divided into 3 cases:
+    %
+    % 1.  obj.g_scale < obj.e_mean
+    %     This case is easy and largely free of numerical problems.
+    %
+    % 2.  (obj.e_mean < obj.g_scale) && (obj.e_mean / obj.Mean < obj.cutoffGammaApprox)
+    %     In this case, to avoid numerical errors just approximate the ExGamma
+    %     with an RNGamma shifted by e_mean.
+    %     obj.cutoffGammaApprox default is the smallest value I can find to avoid numerical errors.
+    %
+    % 3.  (obj.e_mean < obj.g_scale) && (obj.e_mean / obj.Mean >= obj.cutoffGammaApprox)
+    %     Computation of the PDF requires numerical integration in these cases, and this can be very slow.
+    %     Specifically, this integral goes from 0 to X to compute PDF(X)---see function T.
+    %     An option to use a much faster approximation is can be selected by setting
+    %        obj.UseApproxIntegrals = true;
+    %     When this approximation is selected, the integrals are approximated using cumtrapz,
+    %     and two further parameters can be set to control the speed & accuracy of this approximation:
+    %        obj.ApproxnPointsBelow: This is the number of points in a linspace between 0 and min(X)
+    %                                cumtrapz uses the values of the required function at each point in this linespace.
+    %        obj.ApproxSpacingInRange: This is the density of points for sampling between min(X) and max(X) -- i.e., the stepsize between points in this range.
+    %                                cumtrapz also uses the values of the required function at each of these points.
 
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
         g_shape, g_scale, e_mean
@@ -24,13 +32,15 @@ classdef ExGamma < dContinuous
         const2  % 1 / ( gamma(obj.g_shape) * obj.g_scale^obj.g_shape )  used in T function when obj.g_scale >= obj.e_mean
         const3  % -(1/obj.g_scale - 1/obj.e_mean)                used in T function when obj.g_scale >= obj.e_mean
         log1mp, log1  % log of probabilities nearly 0 & 1 used in setting bounds.
+        pdfCase  % Used to keep track of 3 PDF cases described above
     end
     
     properties(SetAccess = public)
         min_g_shape, max_g_shape  % lower & upper limits on gamma K parameter to avoid numerical errors
-        UseApproxIntegrals  % true to use faster cumtrapz approx of T values when e_mean < g_scale
-        ApproxnPointsBelow  % number of fn evals between 0 and min(X)
-        ApproxSpacingInRange = 0.001;  % density of points to check between min(X) and max(X)
+        UseApproxIntegrals    % true to use faster cumtrapz approx of T values when e_mean < g_scale
+        ApproxnPointsBelow    % number of fn evals between 0 and min(X)
+        ApproxSpacingInRange  % density of points to check between min(X) and max(X)
+        cutoffGammaApprox     % just use a plain RNGamma approximation when  (obj.e_mean / obj.Mean < obj.cutoffGammaApprox)
         StartParmsMLECandidateProportions
     end
     
@@ -66,6 +76,7 @@ classdef ExGamma < dContinuous
             obj.UseApproxIntegrals = false;
             obj.ApproxnPointsBelow = 10000;  % number of fn evals between 0 and min(X)
             obj.ApproxSpacingInRange = 0.001;  % density of points to check between min(X) and max(X)
+            obj.cutoffGammaApprox = 0.025;
             obj.StartParmsMLEfn = @obj.StartParmsMLE;
             NSteps = 10;
             obj.StartParmsMLECandidateProportions = ( (1:NSteps) - 0.5) / NSteps;
@@ -86,18 +97,28 @@ classdef ExGamma < dContinuous
             obj.g_shape = newparmvalues(1);
             obj.g_scale = newparmvalues(2);
             obj.e_mean = newparmvalues(3);
-            if obj.e_mean > obj.g_scale
+            newMean = obj.g_shape * obj.g_scale + obj.e_mean;
+            if obj.g_scale < obj.e_mean
+                obj.pdfCase = 1;
                 % utilGamma is used in  theT function when obj.g_scale < obj.e_mean
                 % GXS show the inverse of the 2nd parameter, but
                 %  my RNGamma has rate rather than mean as second parameter
                 obj.utilGamma.ResetParms([obj.g_shape, (obj.e_mean-obj.g_scale) / (obj.e_mean*obj.g_scale)]);
-            else  %NEWJEFF: Need to check here--maybe also use utilGamma (see PDF)
+                obj.const1 = (obj.e_mean / (obj.e_mean - obj.g_scale))^obj.g_shape;
+            elseif (obj.e_mean < obj.g_scale) && (obj.e_mean / newMean < obj.cutoffGammaApprox)
+                % Cluge: to avoid numerical errors, use plain shifted gamma pdf when the
+                % exponential component is just a small fraction of the overall mean
+                obj.pdfCase = 2;  % shifted RNGamma approximation
+                obj.utilGamma.ResetParms([obj.g_shape,1/obj.g_scale]);
+            elseif (obj.e_mean < obj.g_scale)
+                obj.pdfCase = 3;  % compute or approximate integral
                 % Used in T function when obj.g_scale >= obj.e_mean
                 % utilGamma may also be used in this case but it is reset later if needed.                
                 obj.const2 = 1 / ( gamma(obj.g_shape) * obj.g_scale^obj.g_shape );
                 obj.const3 = -(1/obj.g_scale - 1/obj.e_mean);
+            else
+                error('Unhandled parameters--maybe obj.g_shape == obj.e_mean?');
             end
-            obj.const1 = (obj.e_mean / (obj.e_mean - obj.g_scale))^obj.g_shape;
             ReInit(obj);
         end
         
@@ -177,16 +198,14 @@ classdef ExGamma < dContinuous
             if Done
                 return;
             end
-            if (obj.e_mean < obj.g_scale) && (obj.e_mean / obj.Mean < 0.01)
-                % Cluge: to avoid numerical errors, use plain shifted gamma pdf when the
-                % exponential component is just a small fraction of the overall mean
-                obj.utilGamma.ResetParms([obj.g_shape,1/obj.g_scale]);
-                thispdf(InBounds) = obj.utilGamma.PDF(X(InBounds)-obj.e_mean);
-            else
-                % use local variable to ensure that this works regardless of row/column vectors:
-                temp_exp = exp(-X(InBounds)/obj.e_mean);
-                temp_T = obj.T(X(InBounds));
-                thispdf(InBounds) = 1/obj.e_mean * temp_exp(:) .* temp_T(:);
+            switch obj.pdfCase
+                case {1, 3}
+                    % use local variable to ensure that this works regardless of row/column vectors:
+                    temp_exp = exp(-X(InBounds)/obj.e_mean);
+                    temp_T = obj.T(X(InBounds));
+                    thispdf(InBounds) = 1/obj.e_mean * temp_exp(:) .* temp_T(:);
+                case 2
+                    thispdf(InBounds) = obj.utilGamma.PDF(X(InBounds)-obj.e_mean);
             end
 % I don't know where this old version came from or whether it is right.
 %            lambda = obj.e_mean;
