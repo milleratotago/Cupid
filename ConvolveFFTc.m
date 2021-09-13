@@ -192,7 +192,9 @@ classdef ConvolveFFTc < dContinuous
             obj.DiscretePDFs = fftpdf;
             obj.DiscreteCDFs = cumsum(obj.DiscretePDFs);
             obj.DiscreteCDFs = obj.DiscreteCDFs / obj.DiscreteCDFs(end);
-           
+            xStep = obj.DiscreteXs(2) - obj.DiscreteXs(1)           ;
+            obj.DiscretePDFs = obj.DiscretePDFs / xStep;
+            
             obj.LowerBound = X(1);
             obj.UpperBound = X(end);
             obj.Initialized = true;

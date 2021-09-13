@@ -778,6 +778,10 @@ classdef dGeneric < handle  % Calls by reference
             obj.SkipImpossibleWarn = HoldWarn;
             obj.ResetParms(EndingVals);
             obj.PopNameBuilding;
+            if exitflag == 0
+                fprintf('NEWJEFF DEBUG exitflag %d\n',exitflag);
+                EndingVals = EndingVals * 1;
+            end
             BuildMyName(obj);
             s=obj.StringName;
             function thiserrval=MyErrFunc(X)
