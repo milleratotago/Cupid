@@ -65,7 +65,7 @@ classdef AddTrans < dTransMono
         function thisval = PDFScaleFactor(~,~)
             thisval = 1;
         end
-        
+
         function thisval=Mean(obj)
             if ~obj.Initialized
                 error(UninitializedError(obj));

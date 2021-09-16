@@ -244,15 +244,19 @@ classdef (Abstract) dTransMono < dEither
             thiscdf(thiscdf>1) = 1;
         end
         
-        %         function thisval=InverseCDF(obj,P)
-        %             assert(obj.Initialized,UninitializedError(obj));
-        %             assert(min(P)>=0&&max(P)<=1,'InverseCDF requires 0<=P<=1');
-        %             if obj.TransReverses
-        %                 P = 1 - P;
-        %             end
-        %             PreTransX = InverseCDF(obj.BasisRV,P);
-        %             thisval = PreTransToTrans(obj,PreTransX);
-        %         end
+        function thisval=InverseCDF(obj,P)
+            assert(obj.Initialized,UninitializedError(obj));
+            assert(min(P)>=0&&max(P)<=1,'InverseCDF requires 0<=P<=1');
+            if obj.DistType=='d'
+                thisval = InverseCDF@dDiscrete(obj,X);
+                return;
+            end
+            if obj.TransReverses
+                P = 1 - P;
+            end
+            PreTransX = InverseCDF(obj.BasisRV,P);
+            thisval = PreTransToTrans(obj,PreTransX);
+        end
         
         function thisval=Random(obj,varargin)
             if ~obj.Initialized

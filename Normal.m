@@ -2,6 +2,10 @@ classdef Normal < dContinuous
     % Normal(mu,sigma[,ZExtreme]):  Normal random variable with mean "mu" and standard dev "sigma"
     % Optional 3rd parameter is ZExtreme
     
+    properties (SetAccess = public)
+        EstMLreturnsLikelihood
+    end
+    
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
         mu         % distribution mean
         sigma      % distribution standard deviation
@@ -43,6 +47,7 @@ classdef Normal < dContinuous
             obj.NDistParms = 2;
             obj.ZExtreme = 25;
             obj.HaveStoredZCDFLookupTable = false;
+            obj.EstMLreturnsLikelihood = false;
             switch nargin
                 case 0
                 case 2
@@ -62,6 +67,10 @@ classdef Normal < dContinuous
             obj.mu = newparmvalues(1);
             obj.sigma = newparmvalues(2);
             ReInit(obj);
+        end
+        
+        function parms = ParmValues(obj)
+            parms = [obj.mu, obj.sigma];
         end
         
         function PerturbParms(obj,ParmCodes)
@@ -197,7 +206,7 @@ classdef Normal < dContinuous
         end
         
   
-        function s = EstML(obj,Observations,varargin)
+        function [s,EndingVals,fval,exitflag,outstruc] = EstML(obj,Observations,varargin)
             assert(obj.Initialized,UninitializedError(obj));
             if numel(varargin)<1
                 ParmCodes = obj.DefaultParmCodes;
@@ -208,6 +217,14 @@ classdef Normal < dContinuous
             newmu = ifelse(ParmCodes(1)=='f', obj.mu,mean(Observations));
             newsd = ifelse(ParmCodes(2)=='f', obj.sigma, std(Observations) * sqrt((n-1)/n) );
             obj.ResetParms([newmu, newsd]);
+            EndingVals = [newmu, newsd];
+            if obj.EstMLreturnsLikelihood
+                fval = -LnLikelihood(obj,Observations);
+            else
+                fval = nan;
+            end
+            exitflag = 1;
+            outstruc.funcCount = 1;
             BuildMyName(obj);
             s=obj.StringName;
         end

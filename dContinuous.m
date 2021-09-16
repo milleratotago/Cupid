@@ -158,6 +158,9 @@ classdef dContinuous < dGeneric   % Calls by reference
                 return;
             end
             thisval = zeros(size(P));
+            P = double(P);  % FZERO accepts inputs only of data type double.
+            obj.LowerBound = double(obj.LowerBound);
+            obj.UpperBound = double(obj.UpperBound);
             for i=1:numel(P)
                 if P(i) == 0
                     thisval(i) = obj.LowerBound;
