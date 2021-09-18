@@ -2,10 +2,6 @@ classdef ConvUnif < Convolution
     % ConvUnif(BasisRV1,minUni,maxUni) creates a random variable that is
     %  the sum of a basis random variable and an independent Uniform(minUni,maxUni);
     
-    properties(SetAccess = public)
-        CDFIntAbsTol, CDFIntRelTol  % NOTE: I find these have remarkably little influence on speed of EstML
-    end
-    
     properties
         uniMin, uniMax
         uniRange
