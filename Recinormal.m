@@ -1,13 +1,20 @@
 classdef Recinormal < dContinuous
     % Recinormal(mu,sigma) is reciprocal of an underlying Normal(mu,sigma) random variable, truncated to be positive.
     % This version relies on the PDF, CDF, etc from MOSCOSO DEL PRADO MARTIN (draft of December 2008)
+
+    % Note: Throughout this code, 'Z' refers to the underlying normal distribution,
+    % where the recinormal is 1/Z.
     
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
-        mu, sigma  % Parameters of the underlying normal
-        PrUnderlyingPositive
-        MinNormalCDF  %  = 1 - PrUnderlyingPositive
+        mu, sigma    % Parameters of the underlying normal
+        PrZinBounds  % probability minZ <= Z <= maxZ
+        CDFofMinZ    % probability Z < minZ
     end
     
+    properties(SetAccess = public)
+        minZ, maxZ   % min and max of Z with bounds selected for recinormal
+    end
+
     methods (Static)
         
         function Reals = ParmsToReals(Parms,~)
@@ -27,6 +34,10 @@ classdef Recinormal < dContinuous
             obj.ParmTypes = 'rr';
             obj.DefaultParmCodes = 'rr';
             obj.NDistParms = 2;
+            obj.CDFNearlyZero = 0.0025;  % Serious numerical errors if we go too far out
+            obj.CDFNearlyOne  = 0.9975;  % in tails of underlying normal distribution.
+            obj.minZ = 1e-5;
+            obj.maxZ = inf;
             obj.StartParmsMLEfn = @obj.StartParmsMLE;
             switch nargin
                 case 0
@@ -59,19 +70,20 @@ classdef Recinormal < dContinuous
                 error('Recinormal sigma must be > 0.');
             end
             obj.Initialized = false;
-            obj.MinNormalCDF = normcdf(0,obj.mu,obj.sigma); %  = 1 - PrUnderlyingPositive
-            obj.PrUnderlyingPositive = 1 - obj.MinNormalCDF;
-            UnderlyingMin = max(eps,norminv(obj.CDFNearlyZero,obj.mu,obj.sigma));
-            UnderlyingMax = norminv(obj.CDFNearlyOne,obj.mu,obj.sigma);
-            obj.LowerBound = max(eps,1/UnderlyingMax);
-            obj.UpperBound = 1/UnderlyingMin;
+            % Find min and max of underlying normal distribution.
+            currentMin = max(obj.minZ,norminv(obj.CDFNearlyZero,obj.mu,obj.sigma));
+            currentMax = min(obj.maxZ,norminv(obj.CDFNearlyOne,obj.mu,obj.sigma));
+            obj.LowerBound = 1/currentMax;
+            obj.UpperBound = 1/currentMin;
+            obj.CDFofMinZ = normcdf(currentMin,obj.mu,obj.sigma);
+            obj.PrZinBounds = normcdf(currentMax,obj.mu,obj.sigma) - obj.CDFofMinZ;
             obj.Initialized = true;
-            % Be cautious with bounds because of problems near 1/0
-            obj.LowerBound = max(obj.LowerBound, obj.InverseCDF(obj.CDFNearlyZero));
-            MaybeUpperBound = obj.InverseCDF(obj.CDFNearlyOne);
-            if (MaybeUpperBound > obj.LowerBound) && (MaybeUpperBound < obj.UpperBound)
-                obj.UpperBound = MaybeUpperBound;
-            end
+%            % Be cautious with bounds because of problems near 1/0
+%            obj.LowerBound = max(obj.LowerBound, obj.InverseCDF(obj.CDFNearlyZero));
+%            MaybeUpperBound = obj.InverseCDF(obj.CDFNearlyOne);
+%            if (MaybeUpperBound > obj.LowerBound) && (MaybeUpperBound < obj.UpperBound)
+%                obj.UpperBound = MaybeUpperBound;
+%            end
             % assert( (obj.LowerBound > 0) && (obj.UpperBound > obj.LowerBound));  % Was used for debugging
             if (obj.NameBuilding)
                 BuildMyName(obj);
@@ -84,6 +96,7 @@ classdef Recinormal < dContinuous
                 return;
             end
             thispdf(InBounds) = 1 ./ (X(InBounds).^2 * sqrt(2*pi) * obj.sigma) .* exp( -(obj.mu*X(InBounds)-1).^2 ./ (2*obj.sigma^2*X(InBounds).^2) );
+            thispdf(InBounds) = thispdf(InBounds) / obj.PrZinBounds;
         end
         
         function thiscdf=CDF(obj,X)
@@ -91,21 +104,22 @@ classdef Recinormal < dContinuous
             if Done
                 return;
             end
-            PreTransX = 1 ./ X(InBounds);
-            thiscdf(InBounds) = (1 - normcdf(PreTransX,obj.mu,obj.sigma)) / obj.PrUnderlyingPositive;
+            ZinBounds = 1 ./ X(InBounds);
+            CDFofZinBounds = (normcdf(ZinBounds,obj.mu,obj.sigma) - obj.CDFofMinZ) / obj.PrZinBounds;
+            thiscdf(InBounds) = 1 - CDFofZinBounds;
         end
         
         function thisicdf = InverseCDF(obj,P)
-            normalCDF = (1-P)*obj.PrUnderlyingPositive + obj.MinNormalCDF;  % 1-P because 1/X reverses large/small mapping
-            inverseX = norminv(normalCDF,obj.mu,obj.sigma);
-            thisicdf = 1 ./ inverseX;
+            CDFofZinBounds = (1-P)*obj.PrZinBounds + obj.CDFofMinZ;  % 1-P because 1/X reverses large/small mapping
+            Z = norminv(CDFofZinBounds,obj.mu,obj.sigma);
+            thisicdf = 1 ./ Z;
         end
         
         function thisval=Random(obj,varargin)
             assert(obj.Initialized,UninitializedError(obj));
-            randcdf = rand(varargin{:})*obj.PrUnderlyingPositive + obj.MinNormalCDF;
-            randnor = norminv(randcdf,obj.mu,obj.sigma);
-            thisval= 1 ./ randnor;
+            randcdf = rand(varargin{:})*obj.PrZinBounds + obj.CDFofMinZ;
+            randZ = norminv(randcdf,obj.mu,obj.sigma);
+            thisval= 1 ./ randZ;
         end
         
        function parms = StartParmsMLE(~,X)
