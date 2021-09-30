@@ -32,6 +32,7 @@ classdef clOutlierModel < handle
         DefaultParmCodes
         SearchOptions
         SplinePDFs
+        SplineCDFs
         
         % Indices of parameters within the overall parameter list:
         TrueParmIndices   % Cell array 1:NConds with indices of each distribution's parameters
@@ -49,6 +50,7 @@ classdef clOutlierModel < handle
             assert(prOutlier > 0 && prOutlier < 1,'prOutlier must be between 0 & 1');
             [obj.SearchOptions, varargin] = ExtractNameVali('SearchOptions',optimset,varargin);
             [obj.SplinePDFs, varargin] = ExtractNameVali({'SplinePDF','SplinePDFs'},0,varargin);
+            [obj.SplineCDFs, varargin] = ExtractNameVali({'SplineCDF','SplineCDFs'},0,varargin);
             assert(numel(varargin)==0,'Unrecognized argument');
             if iscell(TrueDists)
                 obj.TrueDists = TrueDists;
@@ -98,6 +100,9 @@ classdef clOutlierModel < handle
                 end
                 if obj.SplinePDFs > 0
                     obj.ObsDists{iCond}.UseSplinePDFOn(obj.SplinePDFs);
+                end
+                if obj.SplineCDFs > 0
+                    obj.ObsDists{iCond}.UseSplineCDFOn(obj.SplineCDFs);
                 end
             end
         end

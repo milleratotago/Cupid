@@ -6,21 +6,32 @@ classdef TruncParent < dTransMono
         LowerCutoffP, UpperCutoffP,   % Distribution cutoffs in terms of probs.
         UnconditionalP, XTolerance,
         IthValOffset
+        FixedCutoffLow  % Booleans indicating whether truncation cutoffs are free parameters or Fixed.
+        FixedCutoffHi
     end
     
     methods
         
-        function obj=TruncParent(DistName,BasisDist)
+        function obj=TruncParent(DistName,BasisDist,varargin)
             obj=obj@dTransMono(DistName,BasisDist);
+            [obj.FixedCutoffLow, varargin] = ExtractNamei({'FixedCutoffLow','LowCutoffFixed'},varargin);
+            [obj.FixedCutoffHi, varargin] = ExtractNamei({'FixedCutoffHi','HiCutoffFixed'},varargin);
+            if numel(varargin) > 0
+               error('Unrecognized argument setting up Truncated distribution');
+            end
             obj.PDFScaleFactorKnown = true;
             obj.TransReverses = false;
         end
 
         function []=NewCutoffs(obj,LowerX,UpperX)
-%             obj.LowerCutoffX = max(LowerX,obj.BasisRV.LowerBound);  % NWJEFF: This can lead to fixed cutoffs seeming to be adjusted
+%             obj.LowerCutoffX = max(LowerX,obj.BasisRV.LowerBound);  % NWJEFF: This can lead to Fixed cutoffs seeming to be adjusted
 %             obj.UpperCutoffX = min(UpperX,obj.BasisRV.UpperBound);  % if the BasisRV does not extend to the lower/upper bounds.
-            obj.LowerCutoffX = LowerX;
-            obj.UpperCutoffX = UpperX;
+            if ~obj.FixedCutoffLow
+                obj.LowerCutoffX = LowerX;
+            end
+            if ~obj.FixedCutoffHi
+               obj.UpperCutoffX = UpperX;
+            end
             obj.LowerCutoffP = obj.BasisRV.CDF(LowerX);
             obj.UpperCutoffP = obj.BasisRV.CDF(UpperX);
             obj.UnconditionalP = obj.UpperCutoffP - obj.LowerCutoffP;

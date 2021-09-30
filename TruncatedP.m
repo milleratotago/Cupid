@@ -4,10 +4,15 @@ classdef TruncatedP < TruncParent
     
     methods
         
-        function obj=TruncatedP(BasisDist,LowerP,UpperP)
-            obj=obj@TruncParent('TruncatedP',BasisDist);
+        function obj=TruncatedP(BasisDist,LowerP,UpperP,varargin)
+            obj=obj@TruncParent('TruncatedP',BasisDist,,varargin{:});
             obj.NewCutoffs(obj.BasisRV.InverseCDF(LowerP),obj.BasisRV.InverseCDF(UpperP));
-            obj.AddParms(2,'rr');
+            if ~obj.FixedCutoffLow
+                obj.AddParms(1,'r');
+            end
+            if ~obj.FixedCutoffHi
+                obj.AddParms(1,'r');
+            end
             obj.ReInit;
         end
         
@@ -32,14 +37,29 @@ classdef TruncatedP < TruncParent
         
         function TransReals = TransParmsToReals(obj,Parms,~)
             % TransReals = NumTrans.Bounded2Real(0,1,Parms(end-1:end));
-            TransReals(2) = NumTrans.Bounded2Real(0,1,Parms(end));
-            TransReals(1) = NumTrans.Bounded2Real(0,Parms(end),Parms(end-1));
+            if ~obj.FixedCutoffLow && ~obj.FixedCutoffHi
+                TransReals(2) = NumTrans.Bounded2Real(0,1,Parms(end));
+                TransReals(1) = NumTrans.Bounded2Real(0,Parms(end),Parms(end-1));
+            elseif obj.FixedCutoffLow && obj.FixedCutoffHi
+                TransReals = [];
+            elseif obj.FixedCutoffLow
+                TransReals = NumTrans.Bounded2Real(0,1,Parms(end));
+            else
+                TransReals = NumTrans.Bounded2Real(0,obj.UpperCutoffP,Parms(end));
+            end
         end
         
         function TransParms = TransRealsToParms(obj,Reals,~)
             % TransParms = NumTrans.Real2Bounded(0,1,Reals(end-1:end));
-            TransParms(2) = NumTrans.Real2Bounded(0,1,Reals(end));
-            TransParms(1) = NumTrans.Real2Bounded(0,TransParms(2),Reals(end-1));
+            if ~obj.FixedCutoffLow && ~obj.FixedCutoffHi
+                TransParms(2) = NumTrans.Real2Bounded(0,1,Reals(end));
+                TransParms(1) = NumTrans.Real2Bounded(0,TransParms(2),Reals(end-1));
+            elseif obj.FixedCutoffLow && obj.FixedCutoffHi
+                TransParms = [];
+            elseif obj.FixedCutoffLow
+                TransParms = NumTrans.Real2Bounded(0,1,Reals(end));
+            else
+                TransParms = NumTrans.Real2Bounded(0,obj.UpperCutoffP,Reals(end));
         end
         
     end  % methods

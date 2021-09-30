@@ -4,10 +4,12 @@ classdef TruncatedXhi < TruncParent
     
     methods
         
-        function obj=TruncatedXhi(BasisDist,UpperX)
-            obj=obj@TruncParent('TruncatedXhi',BasisDist);
+        function obj=TruncatedXhi(BasisDist,UpperX,varargin)
+            obj=obj@TruncParent('TruncatedXhi',BasisDist,varargin{:});
             obj.NewCutoffs(obj.BasisRV.LowerBound,UpperX);
-            obj.AddParms(1,'r');
+            if ~obj.FixedCutoffHi
+                obj.AddParms(1,'r');
+            end
             obj.ReInit;
         end
         
@@ -30,11 +32,19 @@ classdef TruncatedXhi < TruncParent
         end
         
         function TransReals = TransParmsToReals(obj,Parms,~)
-            TransReals = Parms(end);
+            if ~obj.FixedCutoffHi
+                TransReals = Parms(end);
+            else
+                TransReals = [];
+            end
         end
         
         function TransParms = TransRealsToParms(obj,Reals,~)
-            TransParms = Reals(end);
+            if ~obj.FixedCutoffHi
+                TransParms = Reals(end);
+            else
+                TransParms = [];
+            end
         end
         
     end  % methods
