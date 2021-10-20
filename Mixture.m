@@ -3,6 +3,10 @@ classdef Mixture < dEither
     %  a mixture of the indicated basis RVs with the indicated probabilities.
     % The final pk is ignored can be omitted.
     
+    properties(SetAccess = public)
+        TrimBounds  % set to true if you want Lower & Upper bounds trimmed
+    end
+
     properties(SetAccess = protected)
         NDists           % Number of distributions that contribute to the mixture.
         BasisRV          % Cell array with the individual distributions in the mixture.
@@ -24,6 +28,7 @@ classdef Mixture < dEither
         function obj=Mixture(varargin)
             obj=obj@dEither('Mixture');
             obj.AdjustMixturePs = false;
+            obj.TrimBounds = false;
             switch nargin
                 case 0
                 case {1, 2}
@@ -177,6 +182,10 @@ classdef Mixture < dEither
                         obj.UpperBound = obj.BasisRV{iDist}.UpperBound;
                     end
                 end
+            end
+            if obj.TrimBounds
+                obj.LowerBound = obj.InverseCDF(obj.CDFNearlyZero);
+                obj.UpperBound = obj.InverseCDF(obj.CDFNearlyOne);
             end
         end
         

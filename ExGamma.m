@@ -27,6 +27,7 @@ classdef ExGamma < dContinuous
 
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
         g_shape, g_scale, e_mean
+        BasisE, BasisG  % underlying exponential & gamma distributions used in setting bounds
         utilGamma  % utility Gamma distribution used in PDF computation when obj.e_mean > obj.g_scale & sometimes when obj.e_mean < obj.g_scal
         const1  % (obj.e_mean / (obj.e_mean - obj.g_scale))^obj.g_shape     used in T function when obj.g_scale < obj.e_mean
         const2  % 1 / ( gamma(obj.g_shape) * obj.g_scale^obj.g_shape )  used in T function when obj.g_scale >= obj.e_mean
@@ -37,11 +38,14 @@ classdef ExGamma < dContinuous
     
     properties(SetAccess = public)
         min_g_shape, max_g_shape  % lower & upper limits on gamma K parameter to avoid numerical errors
-        UseApproxIntegrals    % true to use faster cumtrapz approx of T values when e_mean < g_scale
+        UseApproxIntegrals    % set to true to use faster cumtrapz approx of T values when e_mean < g_scale
         ApproxnPointsBelow    % number of fn evals between 0 and min(X)
         ApproxSpacingInRange  % density of points to check between min(X) and max(X)
         cutoffGammaApprox     % just use a plain RNGamma approximation when  (obj.e_mean / obj.Mean < obj.cutoffGammaApprox)
         StartParmsMLECandidateProportions
+        minDif_e_mean_g_scale % this is the minimum accepted value of (e_mean-g_scale). this value is used in the denominator
+                              % of the const1 computation, and there are numerical errors if it is too small.
+                              % Current default is 1, which is pretty conservative
     end
     
     methods (Static)
@@ -69,6 +73,8 @@ classdef ExGamma < dContinuous
             obj.max_g_shape = 999;
             obj.CDFNearlyZero = 1e-6;
             obj.CDFNearlyOne = 1 - 1e-8;
+            obj.BasisE = Exponential;
+            obj.BasisG = RNGamma;
             obj.log1mp = log(1 - obj.CDFNearlyZero);
             obj.log1 = log(1 - obj.CDFNearlyOne);
             obj.utilGamma = RNGamma(4,1/10);  % Unused default parameters
@@ -81,6 +87,7 @@ classdef ExGamma < dContinuous
             NSteps = 10;
             obj.StartParmsMLECandidateProportions = ( (1:NSteps) - 0.5) / NSteps;
             obj.StartParmsMLECandidateProportions = [obj.StartParmsMLECandidateProportions];
+            obj.minDif_e_mean_g_scale = 1;
             switch nargin
                 case 0
                 case 3
@@ -100,11 +107,19 @@ classdef ExGamma < dContinuous
             newMean = obj.g_shape * obj.g_scale + obj.e_mean;
             if obj.g_scale < obj.e_mean
                 obj.pdfCase = 1;
-                % utilGamma is used in  theT function when obj.g_scale < obj.e_mean
+                % utilGamma is used in the T function when obj.g_scale < obj.e_mean
                 % GXS show the inverse of the 2nd parameter, but
                 %  my RNGamma has rate rather than mean as second parameter
                 obj.utilGamma.ResetParms([obj.g_shape, (obj.e_mean-obj.g_scale) / (obj.e_mean*obj.g_scale)]);
+                if obj.e_mean - obj.g_scale < obj.minDif_e_mean_g_scale
+                    % numerical errors if these are too close together
+                    % so nudge them apart
+                    obj.e_mean = obj.e_mean + 1;
+                end
                 obj.const1 = (obj.e_mean / (obj.e_mean - obj.g_scale))^obj.g_shape;
+                if isinf(obj.const1)
+                    warning('infinite const1');
+                end
             elseif (obj.e_mean < obj.g_scale) && (obj.e_mean / newMean < obj.cutoffGammaApprox)
                 % Cluge: to avoid numerical errors, use plain shifted gamma pdf when the
                 % exponential component is just a small fraction of the overall mean
@@ -132,12 +147,17 @@ classdef ExGamma < dContinuous
         end
         
         function []=ReInit(obj)
-            lowerE = -obj.log1mp * obj.e_mean;
-            lowerG = -obj.log1mp * obj.g_scale;
-            obj.LowerBound = lowerE + obj.g_shape*lowerG;  % NEWJEFF
-            upperE = -obj.log1 * obj.e_mean;
-            upperG = -obj.log1 * obj.g_scale;
-            obj.UpperBound = upperE + obj.g_shape*upperG;  % NEWJEFF
+            obj.BasisE.ResetParms(1/obj.e_mean);
+            obj.BasisG.ResetParms([obj.g_shape, 1/obj.g_scale]);
+            CDFextremeEach = sqrt(obj.CDFNearlyZero);
+            obj.LowerBound = obj.BasisE.InverseCDF(CDFextremeEach) + obj.BasisG.InverseCDF(CDFextremeEach);
+            obj.UpperBound = obj.BasisE.InverseCDF(1 - CDFextremeEach) + obj.BasisG.InverseCDF(1 - CDFextremeEach);
+%             lowerE = -obj.log1mp * obj.e_mean;
+%             lowerG = -obj.log1mp * obj.g_scale;
+%             obj.LowerBound = lowerE + obj.g_shape*lowerG;  % NEWJEFF
+%             upperE = -obj.log1 * obj.e_mean;
+%             upperG = -obj.log1 * obj.g_scale;
+%             obj.UpperBound = upperE + obj.g_shape*upperG;  % NEWJEFF
             obj.Initialized = true;
             if (obj.NameBuilding)
                 BuildMyName(obj);
@@ -176,7 +196,7 @@ classdef ExGamma < dContinuous
         end
         
         function tvals = T(obj,X)
-            % CSX p 3059: T is used in the PDF of the ExGamma
+            % CSX p 3059: T is used in the PDF of the ExGamma with cases 1 & 3
             if obj.g_scale < obj.e_mean
                 tvals = obj.const1 * obj.G(X);
             else
@@ -204,6 +224,9 @@ classdef ExGamma < dContinuous
                     temp_exp = exp(-X(InBounds)/obj.e_mean);
                     temp_T = obj.T(X(InBounds));
                     thispdf(InBounds) = 1/obj.e_mean * temp_exp(:) .* temp_T(:);
+                    if sum(isnan(thispdf)) > 0
+                        warning('nan pdf value(s) encountered');
+                    end
                 case 2
                     thispdf(InBounds) = obj.utilGamma.PDF(X(InBounds)-obj.e_mean);
             end

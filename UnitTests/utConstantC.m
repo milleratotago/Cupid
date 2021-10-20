@@ -23,7 +23,11 @@ classdef utConstantC < utContinuous
             testCase.Dist = ConstantC(thisconstant);
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 
-            SetupXs(testCase,100,2000);
+            global WantPlots;
+            WantPlots = false;
+            
+            % SetupXs(testCase,100,2000);
+            testCase.xvalues = thisconstant;
             
             % Compute whatever values known are known from other sources:
             testCase.Expected.Mean = thisconstant;

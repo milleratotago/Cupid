@@ -89,6 +89,13 @@ classdef ExGauMn < ExGauss
 %             obj.ResetParms(HoldParms);
         end
 
+        function []=EstMom(obj,TargetVals,varargin)
+            EstMom@ExGauss(obj,TargetVals,varargin{:});
+            obj.exmean = obj.rate;
+            obj.rate = 1 / obj.exmean;
+            obj.ReInit;
+        end
+
     end
     
 end  % class ExGauMn

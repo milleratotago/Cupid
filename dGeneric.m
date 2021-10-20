@@ -644,7 +644,7 @@ classdef dGeneric < handle  % Calls by reference
                     Err = (1000*NextObservedProp)^2;
                 end
                 Sum = Sum + Err;
-            end;
+            end
             if (SumObservedProp < 1)
                 % Consider an implicit additional bin.
                 NextObservedProp = 1 - SumObservedProp;
@@ -772,16 +772,17 @@ classdef dGeneric < handle  % Calls by reference
             PTRFn = @obj.ParmsToReals;
             ErrFn = @MyErrFunc;
             StartingVals = ParmValues(obj);
+            StartingVals = double(StartingVals);  % fminsearch requires doubles.
             HoldWarn = obj.SkipImpossibleWarn;
             obj.SkipImpossibleWarn = true;  % Do not warn about impossible values when parameter searching.
             [EndingVals,fval,exitflag,output] = fminsearcharb(ErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
             obj.SkipImpossibleWarn = HoldWarn;
             obj.ResetParms(EndingVals);
             obj.PopNameBuilding;
-            if exitflag == 0
-                fprintf('NEWJEFF DEBUG exitflag %d\n',exitflag);
-                EndingVals = EndingVals * 1;
-            end
+%            if exitflag == 0
+%                fprintf('NWJEFF DEBUG exitflag %d\n',exitflag);
+%                EndingVals = EndingVals * 1;
+%            end
             BuildMyName(obj);
             s=obj.StringName;
             function thiserrval=MyErrFunc(X)

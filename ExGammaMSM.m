@@ -1,9 +1,14 @@
 classdef ExGammaMSM < ExGamma
     % ExGammaMSM distribution (sum of gamma and exponential) with parameters gamma mean, gamma SD, exponential mean.
-    % Constraint to avoid numerical errors: muG >= sigmaG
+    % I once implemented the constraint muG >= sigmaG in an effort to avoid numerical errors,
+    % but this is too restrictive so I have now relaxed it to muSigmaFac*muG >= sigmaG
     
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
         muG, sigmaG, muE
+    end
+    
+    properties(SetAccess = public)
+        muSigmaFac
     end
     
     methods (Static)
@@ -28,6 +33,7 @@ classdef ExGammaMSM < ExGamma
             obj.ParmNames{1} = 'muG';
             obj.ParmNames{2} = 'sigmaG';
             obj.ParmNames{3} = 'muE';
+            obj.muSigmaFac = 1.5;
             switch nargin
                 case 0
                 case 3
@@ -70,13 +76,19 @@ classdef ExGammaMSM < ExGamma
 %         end
         
         function Reals = ParmsToReals(obj,Parms,~)
-            muG = Parms(1);
-            Reals = [NumTrans.GT2Real(eps,muG) NumTrans.Bounded2Real(eps,muG,Parms(2)) NumTrans.GT2Real(eps,Parms(3))];
+            % NEWJEFF: Here I assume muG>sigmaG but is that ever false?
+            tmpmuG = Parms(1);
+            sigmaGmax = obj.muSigmaFac * tmpmuG;
+            if sigmaGmax < Parms(2)
+                warning('obj.muSigmaFac*muG<sigmaG');
+            end
+            Reals = [NumTrans.GT2Real(eps,tmpmuG) NumTrans.Bounded2Real(eps,sigmaGmax,Parms(2)) NumTrans.GT2Real(eps,Parms(3))];
         end
         
         function Parms = RealsToParms(obj,Reals,~)
-            muG = NumTrans.Real2GT(eps,Reals(1));
-            Parms = [muG NumTrans.Real2Bounded(eps,muG,Reals(2)) NumTrans.Real2GT(eps,Reals(3))];
+            tmpmuG = NumTrans.Real2GT(eps,Reals(1));
+            sigmaGmax = obj.muSigmaFac * tmpmuG;
+            Parms = [tmpmuG NumTrans.Real2Bounded(eps,sigmaGmax,Reals(2)) NumTrans.Real2GT(eps,Reals(3))];
         end
         
     end  % methods

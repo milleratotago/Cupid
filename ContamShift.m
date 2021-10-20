@@ -19,6 +19,7 @@ classdef ContamShift < Mixture
         function obj=ContamShift(varargin)
             obj=obj@Mixture;
             obj.FamilyName = 'ContamShift';
+            obj.TrimBounds = true;  % to avoid warnings about impossible values where PDF is 0 for observations in bounds.
             switch nargin
                 case 3
                     Setup(obj,varargin(:));

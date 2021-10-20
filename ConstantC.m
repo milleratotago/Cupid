@@ -90,6 +90,24 @@ classdef ConstantC < dContinuous
             thisval = ones(varargin{:})* obj.value;
         end
         
+        function thisval=IntegralXToNxPDF(obj,FromX,ToX,N)
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
+            if (FromX <= obj.value) && (obj.value <= ToX)
+                thisval = obj.value^N;
+            else
+                thisval = 0;
+            end
+        end
+        
+        function thisval=IntegralX_CToNxPDF(obj,FromX,ToX,C,N)
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
+            thisval = 0^N;
+        end
+        
         function thisval=ConditionalRawMoment(obj, FromX, ToX, I)
             if (FromX <= obj.value) && (ToX >= obj.value)
                 thisval = RawMoment(obj,I);

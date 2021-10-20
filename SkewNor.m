@@ -9,16 +9,10 @@ classdef SkewNor < dContinuous
         InverseCDF02  % An arbitrary cutoff below which I integrate the PDF to get the CDF
     end
     
-    methods (Static)
-        
-        function Reals = ParmsToReals(Parms,~)
-            Reals = [Parms(1) NumTrans.GT2Real(0,Parms(2)) Parms(3)] ;
-        end
-        
-        function Parms = RealsToParms(Reals,~)
-            Parms = [Reals(1) NumTrans.Real2GT(0,Reals(2)) Reals(3)];
-        end
-        
+    properties(SetAccess = public)
+        maxAbsShape  % Set a max to avoid numerical errors, especially in TfnOwen.
+        % For example, TfnOwen(3e-10, 2.738263039656345e+04) results in infinite loop during Computation of truncation point by Newton iteration.
+        % A max abs(shape) of about 50 (default) seems to produce nearly the max possible skew while avoiding numerical errors.
     end
     
     methods
@@ -32,6 +26,7 @@ classdef SkewNor < dContinuous
             obj.Sqrt2OverPi = sqrt(2/pi);
             obj.ZExtreme = 30;
             obj.StartParmsMLEfn = @obj.StartParmsMLE;
+            obj.maxAbsShape = 50;
             switch nargin
                 case 0
                 case 3
@@ -62,6 +57,10 @@ classdef SkewNor < dContinuous
         
         function []=ReInit(obj)
             assert(obj.Scale>0,'SkewNor Scale must be positive.');
+            if abs(obj.Shape) > obj.maxAbsShape
+                warning('Shifting obj.Shape to min or max allowable value.');
+            end
+            obj.Shape = obj.BoundShape(obj.Shape);
             obj.Delta = obj.Shape / sqrt(1 + obj.Shape^2);
             obj.EX = obj.Sqrt2OverPi*obj.Delta;
             obj.VarX = 1 - 2*obj.Delta^2/pi;
@@ -122,7 +121,15 @@ classdef SkewNor < dContinuous
                 end
                 thiscdf(wantpos(i)) = thisone;
             end
-%             thiscdf(thiscdf<0) = 0;  % CLUGE HERE
+            %             thiscdf(thiscdf<0) = 0;  % CLUGE HERE
+        end
+        
+        function Reals = ParmsToReals(obj,Parms,~)
+            Reals = [Parms(1) NumTrans.GT2Real(0,Parms(2)) NumTrans.Bounded2Real(-obj.maxAbsShape,obj.maxAbsShape,Parms(3))] ;
+        end
+        
+        function Parms = RealsToParms(obj,Reals,~)
+            Parms = [Reals(1) NumTrans.Real2GT(0,Reals(2)) NumTrans.Real2Bounded(-obj.maxAbsShape,obj.maxAbsShape,Reals(3))];
         end
         
         function thisval=Mean(obj)
@@ -186,7 +193,17 @@ classdef SkewNor < dContinuous
             thisMedian = obs(2);
             thissd = std(X);
             shapeguess = 10*(obs(1) + obs(3) - 2*thisMedian) / thissd;
+            shapeguess = obj.BoundShape(shapeguess);
             parms = [thisMedian 1.5*thissd shapeguess];
+        end
+        
+        
+        function shapeguess = BoundShape(obj,shapeguess)
+            if shapeguess <= -obj.maxAbsShape
+                shapeguess = -obj.maxAbsShape + eps;
+            elseif shapeguess >= obj.maxAbsShape
+                shapeguess = obj.maxAbsShape - eps;
+            end
         end
         
     end  % methods

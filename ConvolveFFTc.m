@@ -157,6 +157,7 @@ classdef ConvolveFFTc < dContinuous
                 % Y(i,:) = ifftshift(obj.BasisRV{i}.PDF(X+lowerb(i)));
                 Y(i,:) = obj.BasisRV{i}.PDF(X+lowerb(i));
             end
+            Y(isnan(Y)) = 0;  % ifft produces all nan's if any Y is nan
             
             % Compute PDF of convolution via FFT
             % I don't really understand this

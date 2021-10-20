@@ -66,6 +66,14 @@ classdef ExGauRatio < ExGauss
 %             parms(3) = 1 / (parms(2) * parms(3));
 %         end
         
+        function []=EstMom(obj,TargetVals,varargin)
+            EstMom@ExGauss(obj,TargetVals,varargin{:});
+            obj.ratio = obj.rate;
+            obj.tau = obj.sigma * obj.ratio;
+            obj.rate = 1/obj.tau;
+            obj.ReInit;
+        end
+
     end
     
 end  % class ExGauRatio

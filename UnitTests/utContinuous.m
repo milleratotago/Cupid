@@ -15,24 +15,24 @@ classdef utContinuous < utGeneric
         function testCase=utContinuous(varargin)  % Constructor
             testCase=testCase@utGeneric(varargin{:});
             % utGeneric initializes these properties:
-%             testCase.HighestMoment = 4;
-%             testCase.ChiSqNRands = ;
-%             testCase.ChiSqNBins = ;
-%             testCase.ChiSqNTries = ;
-%             testCase.ChiSqCriticalp = ;
+            %             testCase.HighestMoment = 4;
+            %             testCase.ChiSqNRands = ;
+            %             testCase.ChiSqNBins = ;
+            %             testCase.ChiSqNTries = ;
+            %             testCase.ChiSqCriticalp = ;
             % utContinuous initializes these properties:
         end
-
+        
         function SetupXs(testCase,nxs,nxmles)
-
+            
             % Set up some X values at which PDF, CDF, etc should be evaluated (also used in non-MLE estimation);
             testCase.xvalues = testCase.Dist.InverseCDF( (1:2:(2*nxs-1)) / (2*nxs) );
-
+            
             % Set up some X values for which MLE should return (very close to) the true parameters:
             testCase.xMLE = testCase.Dist.InverseCDF( (1:2:(2*nxmles-1)) / (2*nxmles) );
-
-        end
             
+        end
+        
     end  % regular methods
     
     methods (Test)
@@ -42,11 +42,15 @@ classdef utContinuous < utGeneric
             % Check for consistency of CDF with integral of PDF:
             NSegments = numel(testCase.xvalues);
             IntegralPieces = zeros(1,NSegments);
-            LowerLimit = testCase.Dist.LowerBound;
-            for iSegment=1:NSegments
-                UpperLimit = testCase.xvalues(iSegment);
-                IntegralPieces(iSegment) = testCase.Dist.IntegralXToNxPDF(LowerLimit+eps(LowerLimit),UpperLimit,0);
-                LowerLimit = UpperLimit;
+            if NSegments==1  % special handling for ConstantC
+                IntegralPieces(1) = testCase.Dist.IntegralXToNxPDF( testCase.Dist.LowerBound, testCase.Dist.UpperBound,0);
+            else
+                LowerLimit = testCase.Dist.LowerBound;
+                for iSegment=1:NSegments
+                    UpperLimit = testCase.xvalues(iSegment);
+                    IntegralPieces(iSegment) = testCase.Dist.IntegralXToNxPDF(LowerLimit+eps(LowerLimit),UpperLimit,0);
+                    LowerLimit = UpperLimit;
+                end
             end
             IntegralPieces = cumsum(IntegralPieces);
             testCase.verifyEqual(testCase.Computed.CDF,IntegralPieces,'AbsTol',testCase.CDFAbsTol,'RelTol',testCase.CDFRelTol,'CDF values are not consistent with integrated PDF');

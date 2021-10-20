@@ -158,21 +158,38 @@ classdef Frechet < dContinuous
         end
         
         function parms = StartParmsMLE(obj,X)
-            % Based on the following quartile functions from Wikipedia:
-            % q1 = m + s * log(4)^(-1/alpha)
-            % q2 = m + s * log(2)^(-1/alpha)
-            % q3 = m + s * log(4/3)^(-1/alpha)
-            obs = double(prctile(X,[25 50 75]));
-            % Here is the array of functions, all of which are to be zero'ed
-            F = @(p) [...
-                ( (obs(1)-p(3))/p(2) )^(-p(1)) - log(4); ...
-                ( (obs(2)-p(3))/p(2) )^(-p(1)) - log(2); ...
-                ( (obs(3)-p(3))/p(2) )^(-p(1)) - log(4/3) ...
-                ];
-            startm = min(X) / 2;
-            starts = mean(X) - startm;
-            x0 = double([3 starts startm]);
-            parms = fsolve(F,x0,obj.fsolveoptions);
+            holdparms = obj.ParmValues;
+            startshape = 5;
+            startm = min(X) - 2;
+            starts = (mean(X) - startm) / 1.16;  % 1.16 = gamma(1-1/5);
+            parms = double([startshape starts startm]);
+            if min(parms(1:2)) < eps
+                warning('StartParmsMLE suggested negative shape and/or scale value(s).');
+                parms %#ok<NOPRT>
+                parms = holdparms;  % use original values.
+            end
+% Here are some old attempts that gave numerical errors with many data sets.
+% These were based on the following quartile functions from Wikipedia:
+% q1 = m + s * log(4)^(-1/alpha)
+% q2 = m + s * log(2)^(-1/alpha)
+% q3 = m + s * log(4/3)^(-1/alpha)
+%             obs = double(prctile(X,[25 50 75]));
+%             % Here is the array of functions, all of which are to be zero'ed
+%             F = @(p) [...
+%                 ( obs(1) - ( p(3) + p(2)^2 * log(4  )^(-1/(p(1)^2)) ) ); ...
+%                 ( obs(2) - ( p(3) + p(2)^2 * log(2  )^(-1/(p(1)^2)) ) ); ...
+%                 ( obs(3) - ( p(3) + p(2)^2 * log(4/3)^(-1/(p(1)^2)) ) ); ...
+%                 ];
+%             F = @(p) [...
+%                 ( (obs(1)-p(3))/p(2) )^(-p(1)) - log(4); ...
+%                 ( (obs(2)-p(3))/p(2) )^(-p(1)) - log(2); ...
+%                 ( (obs(3)-p(3))/p(2) )^(-p(1)) - log(4/3) ...
+%                 ];
+%             startm = min(X) / 2;
+%             starts = mean(X) - startm;
+%             x0 = double([3 starts startm]);
+%             parms = fsolve(F,x0,obj.fsolveoptions);
+%             parms(1:2) = parms(1:2).^2;
         end
         
     end  % methods

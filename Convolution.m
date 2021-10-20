@@ -1,10 +1,10 @@
 classdef Convolution < dTransDuo
     % Convolution(BasisRV1,BasisRV2) creates a random variable that is
-    %  the sum of two independent basis random variables,
-    %  BasisRV1+BasisRV2
+    % the sum of two independent basis random variables, BasisRV1+BasisRV2
     
     properties(SetAccess = public)
         PDFIntAbsTol, PDFIntRelTol  % NOTE: I find these have remarkably little influence on speed of EstML
+        TrimBounds  % set to true if you want Lower & Upper bounds trimmed
     end
     
     methods
@@ -13,6 +13,7 @@ classdef Convolution < dTransDuo
             obj=obj@dTransDuo('Convolution',Basis1,Basis2);
             obj.PDFIntAbsTol = 1e-10;  % MATLAB integral defaults
             obj.PDFIntRelTol = 1e-6;   % MATLAB integral defaults
+            obj.TrimBounds = false;
         end
 
         function FNXY = FofDuo(obj,X,Y)
@@ -26,6 +27,10 @@ classdef Convolution < dTransDuo
         function [] = SetBoundsContin(obj)
             obj.LowerBound = obj.BasisRV1.LowerBound + obj.BasisRV2.LowerBound;
             obj.UpperBound = obj.BasisRV1.UpperBound + obj.BasisRV2.UpperBound;
+            if obj.TrimBounds
+                obj.LowerBound = obj.InverseCDF(obj.CDFNearlyZero);
+                obj.UpperBound = obj.InverseCDF(obj.CDFNearlyOne);
+            end
         end
 
         function thispdf=PDF(obj,X)
