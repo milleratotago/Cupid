@@ -415,7 +415,7 @@ classdef dDiscrete < dGeneric  % NWJEFF: Not vectorized
             end
         end
 
-        function [obschisq, obschisqp] = ObsChiSq(obj,Data)  % NEWJEFF: Not documented
+        function [obschisq, obschisqp] = ObsChiSq(obj,Data)
             % Compute observed chi-square and it's p value for a given set of data.
             NBins = length(obj.DiscreteX);
             % Count the observed frequency of each possible score

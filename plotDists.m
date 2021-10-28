@@ -1,4 +1,4 @@
-function [x, y] = plotDists(Dists,PdfCdf,varargin)   % NEWJEFF: Undocumented
+function [x, y] = plotDists(Dists,PdfCdf,varargin)
     % Utility function to plot one PDF or CDF for each of several Cupid probability distributions.
     % Dists: a cell array of the probability distributions to be plotted.
     % PdfCdf = 1/2 to plot PDF or CDF

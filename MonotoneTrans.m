@@ -1,4 +1,4 @@
-classdef MonotoneTrans < dTransMono  % NWJEFF: Not documented.
+classdef MonotoneTrans < dTransMono
     % MonotoneTrans(BasisRV,TransFunc,InverseFunc) produces any monotonic transformation of the original BasisRV.
     % TransFunc is the function that does the transformation
     % InverseFunc is the function that does the inverse of the transformation

@@ -1407,6 +1407,29 @@ classdef dGeneric < handle  % Calls by reference
             end
         end
         
+        function PlotHaz(obj,varargin)  % NWJEFF: More work needed.
+            % Extend to bounds if the tails are not too stretched.
+            % Parameters to specify X range or CDF(X) range
+            % Parameters to select out only PDF or CDF or Hazard
+            % Nice numbers for PDF ticks
+            [SkipFig, varargin] = ExtractNamei({'NoFig','SkipFig'},varargin);
+            nvarargin = numel(varargin);
+            nticks = 5;
+            x = XsToPlot(obj);
+            hazy = Hazard(obj,x);
+            if ~SkipFig
+                figure;
+            end
+            plot(x,hazy);
+            % ylim(AX(2),[-0.02 1.02]);
+            xlabel('X');
+            ylabel('H(X)');
+            title(obj.StringName)
+            if obj.DistType == 'd'
+                set(H1,'linestyle','none','marker','o');
+            end
+        end
+        
         function BinProb=FindBinProbs(obj, BinMax)
             % This function creates an output vector of length NBins giving the probability in each bin.
             % The bottom of the first bin is implicitly obj.LowerBound, and the top of bin I is BinMax(I).

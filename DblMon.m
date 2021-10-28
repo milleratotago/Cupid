@@ -29,6 +29,7 @@ classdef DblMon < dContinuous
             obj.XNearlyZero = eps;
             obj.CDFNearlyZero = 1e-7;  % Heavy trimming due to long tails. e-4 serious numerical errors
             obj.CDFNearlyOne = 1 - obj.CDFNearlyZero;
+            obj.StartParmsMLEfn = @obj.StartParmsMLE;
             switch nargin
                 case 0
                 case 3
@@ -155,7 +156,7 @@ classdef DblMon < dContinuous
             end
         end
         
-        %         function thisval=Hazard(obj,x)  % Luce gives this it does not agree with the PDF/CDF values so I do not think it is correct.
+        %         function thisval=Hazard(obj,x)  % Luce gives this but it does not agree with the PDF/CDF values so I do not think it is correct.
         %             assert(obj.Initialized,UninitializedError(obj));
         %             thisval=zeros(size(x));
         %             for i=1:numel(x)
@@ -168,6 +169,13 @@ classdef DblMon < dContinuous
         %                 end
         %             end
         %         end
+        
+        function parms = StartParmsMLE(obj,X)
+            starttzero = median(X);
+            startdelta = 10;
+            startepsilon = 5;
+            parms = double([starttzero startdelta startepsilon]);
+        end
         
     end  % methods
     

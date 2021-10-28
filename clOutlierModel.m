@@ -27,7 +27,7 @@ classdef clOutlierModel < handle
 
         % Properties derived from the input properties:
         NConds     % N of conditions described by the model
-        ObsDists  % Cell array of Cupid distributions of observed scores in the N conditions, including outliers.
+        ObsDists   % Cell array of Cupid distributions of observed scores in the N conditions, including outliers.
         
         DefaultParmCodes
         SearchOptions
