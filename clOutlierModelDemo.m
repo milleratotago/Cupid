@@ -84,3 +84,22 @@ parmCodes([1 3]) = 'f';
 % replacement is a simple mixture distribution without the Convolution
 % or Product components used with Shift & Stretch.
 [EndingVals,fval,exitflag,output] = EstML(ModelWithContam,X,parmCodes)
+
+%% Example 5: 2 conditions, contamination by replacement, iterative estimation
+
+prOutlier = 0.05;   % Probability that a true score is affected by the outlier process.
+
+TrueDists = {RNGammaMS(400,40), RNGammaMS(450,45)};
+Contam = RNGammaMS(1000,100);
+ConType = clOutlierModel.Replace;
+
+ModelWithContam = clOutlierModel(TrueDists,prOutlier,Contam,ConType);
+X = ModelWithContam.Random(2000,1);
+
+% Change the model to see if it can recover the right prOutlier!
+ModelWithContam = clOutlierModel(TrueDists,2*prOutlier,Contam,ConType);
+
+% This is very fast, both because some parameters are fixed and because
+% replacement is a simple mixture distribution without the Convolution
+% or Product components used with Shift & Stretch.
+[EndingVals,fval,exitflag,output] = EstMLiter(ModelWithContam,X)

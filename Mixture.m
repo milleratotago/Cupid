@@ -11,7 +11,7 @@ classdef Mixture < dEither
         NDists           % Number of distributions that contribute to the mixture.
         BasisRV          % Cell array with the individual distributions in the mixture.
         CumNParms        % Cumulative count of parameters up to & including the i'th distrib (includes MixtureP's).
-        DistParmCodes    % Cell array with parmcodes for each distribution separately.
+%        DistParmCodes    % Cell array with parmcodes for each distribution separately.  UNUSED
         % Note: The P arrays have NDist positions but the last one is always fixed, because its P is determined by the others.
         % Therefore, the last P is NOT counted as a parameter.
         MixtureP         % Probability of each distribution within the mixture.
@@ -80,7 +80,7 @@ classdef Mixture < dEither
             obj.CumulativeP = zeros(obj.NDists,1);
             obj.CumNParms =zeros(obj.NDists,1);
             obj.DistParmP = char(obj.NDists);
-            obj.DistParmCodes = cell(obj.NDists,1);
+%            obj.DistParmCodes = cell(obj.NDists,1);   UNUSED
             nextptr = 0;
             for iDist=1:obj.NDists
                 nextptr = nextptr + 1;

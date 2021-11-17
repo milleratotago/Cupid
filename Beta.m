@@ -31,6 +31,7 @@ classdef Beta < dContinuous
             obj.DefaultParmCodes = 'rr';
             obj.NDistParms = 2;
             obj.Log4 = log(4);
+            obj.StartParmsMLEfn = @obj.StartParmsMLE;
             
             % Handle constructor calls with different numbers of parameters.
             switch nargin
@@ -184,6 +185,15 @@ classdef Beta < dContinuous
                 [s,EndingVals,fval,exitflag,output]=EstMom@dGeneric(obj,TargetVals,varargin{:});
             end
             
+        end
+        
+        function parms = StartParmsMLE(obj,X)
+            obsmean = mean(X);
+            obssd = std(X);
+            HoldParms = obj.ParmValues;
+            obj.EstMom([obsmean,obssd^2]);
+            parms = obj.ParmValues;
+            obj.ResetParms(HoldParms);
         end
         
     end  % methods

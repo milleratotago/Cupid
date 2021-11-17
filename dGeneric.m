@@ -1430,6 +1430,21 @@ classdef dGeneric < handle  % Calls by reference
             end
         end
         
+        function [x, y] = Vals2Plot(obj,Type)
+            % Compute arrays of x & y values for PDF, CDF, or HazardFn plot.
+            x = XsToPlot(obj);
+            switch Type
+                case 1
+                    y = PDF(obj,x);
+                case 2
+                    y = CDF(obj,x);
+                case 3
+                    y = Hazard(obj,x);
+                otherwise
+                    error('Unrecognized value type');
+            end        
+        end
+        
         function BinProb=FindBinProbs(obj, BinMax)
             % This function creates an output vector of length NBins giving the probability in each bin.
             % The bottom of the first bin is implicitly obj.LowerBound, and the top of bin I is BinMax(I).

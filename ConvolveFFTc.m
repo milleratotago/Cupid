@@ -161,7 +161,7 @@ classdef ConvolveFFTc < dContinuous
             
             % Compute PDF of convolution via FFT
             % I don't really understand this
-            fftpdf = real(ifft(prod(fft(Y,[],2))));
+            fftpdf = real(ifft(prod(fft(Y,[],2))));  % Problem: Could be all zeros and nans
             % fftpdf = fftshift(fftpdf);
             % NEWJEFF: Following line seems redundant with later normalization
             fftpdf = fftpdf / trapz(X,fftpdf);  % normalize pdf values for integral=1

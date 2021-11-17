@@ -2,10 +2,6 @@ classdef Normal < dContinuous
     % Normal(mu,sigma[,ZExtreme]):  Normal random variable with mean "mu" and standard dev "sigma"
     % Optional 3rd parameter is ZExtreme
     
-    properties (SetAccess = public)
-        EstMLreturnsLikelihood
-    end
-    
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
         mu         % distribution mean
         sigma      % distribution standard deviation
@@ -16,6 +12,11 @@ classdef Normal < dContinuous
         HaveStoredZCDFLookupTable
         MinTableZ, MaxTableZ, StepTableZ
         ZTableCDFs, ZTableLen
+    end
+    
+    properties (SetAccess = public)
+        EstMLreturnsLikelihood  % Default is true to get likelihood from MLE as usual.
+                                % Slight speedup available by setting this to false if you just want parameter estimates.
     end
     
     methods (Static)
@@ -47,7 +48,7 @@ classdef Normal < dContinuous
             obj.NDistParms = 2;
             obj.ZExtreme = 25;
             obj.HaveStoredZCDFLookupTable = false;
-            obj.EstMLreturnsLikelihood = false;
+            obj.EstMLreturnsLikelihood = true;
             switch nargin
                 case 0
                 case 2

@@ -1,8 +1,8 @@
 classdef Uniform < dContinuous
-    % Uniform(min,max)
+    % Uniform(minX,maxX)
     
     properties(SetAccess = protected)
-        min, max, Range, FlatPDF
+        minX, maxX, Range, FlatPDF
     end
     
     methods (Static)
@@ -49,8 +49,8 @@ classdef Uniform < dContinuous
         
         function []=ResetParms(obj,newparmvalues)
             ClearBeforeResetParmsC(obj);
-            obj.min = newparmvalues(1);
-            obj.max = newparmvalues(2);
+            obj.minX = newparmvalues(1);
+            obj.maxX = newparmvalues(2);
             ReInit(obj);
         end
         
@@ -66,10 +66,10 @@ classdef Uniform < dContinuous
         end
         
         function []=ReInit(obj)
-            assert(obj.min<obj.max,'Uniform must satisfy min<max.');
-            obj.LowerBound = obj.min;
-            obj.UpperBound = obj.max;
-            obj.Range = obj.max - obj.min;
+            assert(obj.minX<obj.maxX,'Uniform must satisfy minX<maxX.');
+            obj.LowerBound = obj.minX;
+            obj.UpperBound = obj.maxX;
+            obj.Range = obj.maxX - obj.minX;
             obj.FlatPDF = 1 / obj.Range;
             obj.Initialized = true;
             if (obj.NameBuilding)
@@ -119,7 +119,7 @@ classdef Uniform < dContinuous
             thisval = obj.LowerBound + obj.Range * rand(varargin{:});
         end
         
-        function s=EstML(obj,Observations,varargin)
+        function [s,EndingVals,fval,exitflag,outstruc]=EstML(obj,Observations,varargin)
             assert(obj.Initialized,UninitializedError(obj));
             if numel(varargin)<1
                 ParmCodes = obj.DefaultParmCodes;
@@ -137,6 +137,10 @@ classdef Uniform < dContinuous
             ResetParms(obj,[minObs maxObs]);
             BuildMyName(obj);
             s=obj.StringName;
+            EndingVals = [minObs maxObs];
+            fval = -numel(Observations) * log(obj.FlatPDF);
+            exitflag = 1;
+            outstruc.funcCount = 1;
         end
         
     end  % methods
