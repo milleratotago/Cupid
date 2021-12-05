@@ -3,6 +3,7 @@ classdef ConvolveFFTcIID < dContinuous
     % Convolution of NDists i.i.d. random variables with distribution BasisRV{1}
     % NEWJEFF: There is a lot of code overlap with ConvolveFFTc, but it will be tough
     % to do this right (even just initial constructors!).
+    % NEWJEFF: It would be nice to add a discrete approx. for convolveFFTcIID like convolveFFTc
 
     properties (Constant)
         defaultNxPoints = 2^16;

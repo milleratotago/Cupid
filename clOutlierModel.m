@@ -42,6 +42,10 @@ classdef clOutlierModel < handle
         
     end
     
+    properties (SetAccess = public)
+       minPrOutlier, maxPrOutlier % Boundaries on prOutlier used in parameter searches.
+    end
+
     methods
         
         function obj = clOutlierModel(TrueDists,prOutlier,Contam,ConType,varargin)
@@ -62,6 +66,8 @@ classdef clOutlierModel < handle
                 obj.TrueDists = {TrueDists};
             end
             obj.prOutlier = prOutlier;
+            obj.minPrOutlier = min(0.00001,prOutlier);  % Defaults can be overridden
+            obj.maxPrOutlier = max(0.20,prOutlier);
             obj.Contam = Contam;
             obj.ConType = ConType;
             obj.NConds = numel(TrueDists);
@@ -142,11 +148,19 @@ classdef clOutlierModel < handle
             else
                 ParmCodes = varargin{1};
             end
+            holdWarnStates = true(obj.NConds,1);
+            for iCond=1:obj.NConds
+               holdWarnStates(iCond) = obj.ObsDists{iCond}.SkipImpossibleWarn;
+               obj.ObsDists{iCond}.SkipImpossibleWarn = true;
+            end
             Real2ParmFn = @obj.RealsToParms;
             Parm2ReamFn = @obj.ParmsToReals;
             ErrFn = @MyErrFunc;
             StartingVals = ParmValues(obj);
             [EndingVals,fval,exitflag,output] = fminsearcharb(ErrFn,StartingVals,Real2ParmFn,Parm2ReamFn,ParmCodes,obj.SearchOptions);
+            for iCond=1:obj.NConds
+               obj.ObsDists{iCond}.SkipImpossibleWarn = holdWarnStates(iCond);
+            end
             obj.ResetParms(EndingVals);
             
             function thiserrval=MyErrFunc(realParms)
@@ -241,7 +255,7 @@ classdef clOutlierModel < handle
                 theseIndices = obj.TrueParmIndices{iCond};
                 realList(theseIndices) = obj.TrueDists{iCond}.ParmsToReals(Parms(theseIndices));
             end
-            realList(obj.prOutlierIndex) = NumTrans.Bounded2Real(0,1,Parms(obj.prOutlierIndex));
+            realList(obj.prOutlierIndex) = NumTrans.Bounded2Real(obj.minPrOutlier,obj.maxPrOutlier,Parms(obj.prOutlierIndex));
             realList(obj.ContamParmIndices) = obj.Contam.ParmsToReals(Parms(obj.ContamParmIndices));
         end
         
@@ -253,7 +267,7 @@ classdef clOutlierModel < handle
                 theseIndices = obj.TrueParmIndices{iCond};
                 parmList(theseIndices) = obj.TrueDists{iCond}.RealsToParms(Reals(theseIndices));
             end
-            parmList(obj.prOutlierIndex) = NumTrans.Real2Bounded(0,1,Reals(obj.prOutlierIndex));
+            parmList(obj.prOutlierIndex) = NumTrans.Real2Bounded(obj.minPrOutlier,obj.maxPrOutlier,Reals(obj.prOutlierIndex));
             parmList(obj.ContamParmIndices) = obj.Contam.RealsToParms(Reals(obj.ContamParmIndices));
         end
         
