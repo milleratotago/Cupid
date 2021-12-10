@@ -356,7 +356,7 @@ classdef dGeneric < handle  % Calls by reference
             for k=0:I
                 Sign = -Sign;
                 thisval = thisval + Sign * nchoosek(I,k) * obj.RawMoment(I-k) * Mu^k;
-            end;
+            end
         end
         
         function thisval=Median(obj)
@@ -501,6 +501,8 @@ classdef dGeneric < handle  % Calls by reference
             ZeroPos = find(Like==0);
             if numel(ZeroPos) && ~(obj.SkipImpossibleWarn > 0)
                 warning([obj.FamilyName ' checking likelihood of impossible data values.']);
+                fprintf('%f ',Observations(ZeroPos));
+                fprintf('\n');
             end
             for I = 1:length(ZeroPos)
                 J = ZeroPos(I);

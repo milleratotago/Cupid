@@ -224,16 +224,33 @@ classdef clOutlierModel < handle
             output = 'unknown';
         end
         
+        % Old version: this worked but MakeObsDists recreates ObsDists overwriting e.g., SkipImpossibleWarn
+%         function ResetParms(obj,newparmvalues)
+%             for iCond=1:obj.NConds
+%                 theseIndices = obj.TrueParmIndices{iCond};
+%                 obj.TrueDists{iCond}.ResetParms(newparmvalues(theseIndices));
+%             end
+%             obj.prOutlier = newparmvalues(obj.prOutlierIndex);
+%             obj.Contam.ResetParms(newparmvalues(obj.ContamParmIndices));
+%             obj.MakeObsDists;
+%         end
         
-        function ResetParms(obj,newparmvalues)
+function ResetParms(obj,newparmvalues)
+    % For each ObsDist distribution, find its parameters and then
+    % call its reset parms function
+    newPrOutlier = newparmvalues(obj.prOutlierIndex);
+    switch obj.ConType
+        case obj.Replace
+            contamIndices = obj.ContamParmIndices;
             for iCond=1:obj.NConds
-                theseIndices = obj.TrueParmIndices{iCond};
-                obj.TrueDists{iCond}.ResetParms(newparmvalues(theseIndices));
+                theseIndices = [obj.TrueParmIndices{iCond}, contamIndices];  % indices of parameters for true distribution
+                newparms4dist = newparmvalues(theseIndices);
+                obj.ObsDists{iCond}.ResetParms([1-newPrOutlier; newparms4dist]);
             end
-            obj.prOutlier = newparmvalues(obj.prOutlierIndex);
-            obj.Contam.ResetParms(newparmvalues(obj.ContamParmIndices));
-            obj.MakeObsDists;
-        end
+        otherwise
+            error('Other cases not handled yet.')
+    end
+end
         
         function parms = ParmValues(obj)
             % Retrieve the current parameter values
