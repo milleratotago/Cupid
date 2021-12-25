@@ -41,8 +41,8 @@ classdef UniformCW < Uniform
         
         function []=ReInit(obj)
             assert(obj.width>0,'UniformCW must satisfy width>0.');
-            obj.min = obj.center - obj.width/2;
-            obj.max = obj.center + obj.width/2;
+            obj.minX = obj.center - obj.width/2;
+            obj.maxX = obj.center + obj.width/2;
             ReInit@Uniform(obj);
         end
         

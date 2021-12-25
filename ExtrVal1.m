@@ -30,6 +30,7 @@ classdef ExtrVal1 < dContinuous
             obj.CDFNearlyOne = 1-0.1e-15;
             obj.NDistParms = 2;
             obj.EulerConstant = double(eulergamma);
+            obj.StartParmsMLEfn = @obj.StartParmsMLE;
             switch nargin
                 case 0
                 case 2
@@ -111,6 +112,14 @@ classdef ExtrVal1 < dContinuous
                 error(UninitializedError(obj));
             end
             thisval = 5.4;  % 27 / 5
+        end
+        
+        function parms = StartParmsMLE(obj,X)
+            xmn = mean(X);
+            xvar = var(X);
+            parm2 = sqrt(6*xvar)/pi;
+            parm1 = xmn - parm2*obj.EulerConstant;
+            parms = [parm1, parm2];
         end
         
     end  % methods

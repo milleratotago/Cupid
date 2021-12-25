@@ -52,8 +52,8 @@ classdef ContamShift < Mixture
         end
         
         function []=ResetParms(obj,newparmvalues)
-            % the newparmvalues are pContam, SingleBasisRV parms, shiftRV parms
-            % mixture wants 1-pContam, SingleBasisRV parms, SinglBasisRV parms again for convolu, shift parms
+            % The newparmvalues are in the order SingleBasisRV parms, pContam, shiftRV parms.
+            % Mixture wants 1-pContam, SingleBasisRV parms, SinglBasisRV parms again for convolu, shift parms
             SingleBasisParms = newparmvalues(obj.SBparms);
             obj.pContam = newparmvalues(obj.Pparm);
             ShiftParms = newparmvalues(obj.Shiftparms);

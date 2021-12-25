@@ -53,8 +53,8 @@ classdef ContamStretch < Mixture  % NEWJEFF: Lots of code duplication with Conta
         end
         
         function []=ResetParms(obj,newparmvalues)
-            % the newparmvalues are pContam, SingleBasisRV parms, StretchRV parms
-            % mixture wants 1-pContam, SingleBasisRV parms, SinglBasisRV parms again for convolu, shift parms
+            % The newparmvalues are in the order SingleBasisRV parms, pContam, StretchRV parms.
+            % Mixture wants 1-pContam, SingleBasisRV parms, SinglBasisRV parms again for convolu, shift parms
             SingleBasisParms = newparmvalues(obj.SBparms);
             obj.pContam = newparmvalues(obj.Pparm);
             StretchParms = newparmvalues(obj.Stretchparms);
