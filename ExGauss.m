@@ -237,6 +237,10 @@ classdef ExGauss < dContinuous
             % - log(CurrentRNG.RealRNG) / obj.rate;
         end
         
+        function thisval=MGF(obj,s)
+            thisval = exp(s*obj.mu + ((s*obj.sigma)^2)/2) / (1 - s/obj.rate);
+        end
+
         function []=EstMom(obj,TargetVals,varargin)
             % Estimate from 1st 3 moments = mean, variance, and 3rd central moment (as a skewness measure) of data values
             % Following dGeneric.EstMom, the skewness measure in TargetVals(3) is

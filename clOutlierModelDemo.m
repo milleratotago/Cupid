@@ -22,6 +22,8 @@ X = ModelWithContam.Random(200,1);
 % Example of parameter search (this takes a minute or two):
 [EndingVals,fval,exitflag,output] = ModelWithContam.EstML(X)
 
+return
+
 %% Example 2:  Two different true distributions, each sometimes shifted by an outlier process.
 
 TrueDist = {Normal(400,40), Normal(450,45)};       % CELL ARRAY with he distributions of true scores in two conditions
