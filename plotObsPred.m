@@ -36,8 +36,30 @@ function [hx, hp] = plotObsPred(X,P,plotType,varargin)
         case 1  % PDF
             hx = histogram(X,'normalization','pdf');
             hold on
-            ppdf = P.PDF(ppts);
-            hp = plot(ppts,ppdf);
+            % Plotting PDFs may not look right if the PDF
+            % changes sharply within a bin.
+            % ppdf = P.PDF(ppts);
+            % hp = plot(ppts,ppdf);
+            % For that reason, it is better to plot
+            % the probabilities in the different bins.
+            BinCDFs = P.CDF(hx.BinEdges);  % CDFs at the top of each bin
+            BinPDFs = diff(BinCDFs) / hx.BinWidth;
+            NBins = length(hx.BinEdges) - 1;
+            % Now represent each bin with 2 X values
+            % for its top and bottom edges, both having same PDF
+            % to get a flat line.
+            fnlBinEdges = zeros(2*NBins-1,1);
+            fnlBinPDFs = zeros(2*NBins-1,1);
+            fnliBin = 0;
+            for iBin=1:NBins
+                fnliBin = fnliBin + 1;
+                fnlBinEdges(fnliBin) = hx.BinEdges(iBin);
+                fnlBinPDFs(fnliBin) = BinPDFs(iBin);
+                fnliBin = fnliBin + 1;
+                fnlBinEdges(fnliBin) = hx.BinEdges(iBin+1) - eps;
+                fnlBinPDFs(fnliBin) = BinPDFs(iBin);
+           end
+            plot(fnlBinEdges,fnlBinPDFs);
         case 2   % CDF
             hx = histogram(X,'normalization','cdf');
 %             [xpts, ~, ~, xcdf] = ehaz(X);

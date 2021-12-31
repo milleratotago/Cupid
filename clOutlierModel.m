@@ -234,10 +234,16 @@ classdef clOutlierModel < handle
         
         function ll = LnLikelihood(obj,X)
             % Compute likelihood of the data in X with current model parameters.
-            % X is a cell array, 1:NConds, of scores in the different conditions.
-            perCondll = zeros(obj.NConds,1);
-            for iCond = 1:obj.NConds
-                perCondll(iCond) = obj.ObsDists{iCond}.LnLikelihood(X{iCond});
+            % X is a cell array, 1:NDataConds, of scores in the different conditions.
+            % If the number of data conditions does not equal the number of model
+            % conditions, then e.g. data conditions 1,2,3,4 correspond to model
+            % conditions 1,2,1,2.
+            X = EnsureCell(X);
+            NDataConds = numel(X);
+            perCondll = zeros(NDataConds,1);
+            for iDataCond = 1:NDataConds
+                iModelCond = JMod(iDataCond,obj.NConds);
+                perCondll(iDataCond) = obj.ObsDists{iModelCond}.LnLikelihood(X{iDataCond});
             end
             ll = sum(perCondll);
         end
