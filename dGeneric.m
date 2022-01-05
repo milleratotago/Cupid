@@ -1457,6 +1457,34 @@ classdef dGeneric < handle  % Calls by reference
             end
         end
         
+        function X = ScoresForHist(obj,BinEdges,TotalN)
+            % Generate a vector X containing TotalN scores distributed across the indicated bins.
+            % The number of scores in each bin will match the predicted probabilities according to
+            % distribution obj for that bin (conditioning on the total probability across all bins),
+            % as closely as possible with whole numbers of scores.
+            BinCDFs = obj.CDF(BinEdges);
+            BinProbs = diff(BinCDFs);
+            BinCenters = (BinEdges(1:end-1) + BinEdges(2:end)) / 2;
+            rBinNs = BinProbs*TotalN/sum(BinProbs);  % Note conditional probability given these bins
+            
+        %     iBinNs = round(rBinNs);  % might not add up to TotalN due to rounding.
+            
+            % Due to rounding, the total N across bins may not exactly match
+            % the desired TotalN.  The following algorithm handles that case.
+            iBinNs = floor(rBinNs);
+            while sum(iBinNs) < TotalN
+                BinRemainders = rBinNs - iBinNs;
+                [~, maxPos] = max(BinRemainders);
+                iBinNs(maxPos) = iBinNs(maxPos) + 1;
+            end
+        
+            X = [];
+            for iBin = 1:numel(BinProbs)
+                Xhere = ones(1,iBinNs(iBin)) * BinCenters(iBin);
+                X = [X, Xhere]; %#ok<AGROW>
+            end
+        end
+
         % *** Spline approximation starts here
         
         function UseSplinePDFOn(obj,NBinsOrListOfX)
