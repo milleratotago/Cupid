@@ -23,12 +23,12 @@ classdef AttainP < dContinuous % dEither  % Discrete not implemented yet. Maybe 
         % The next two booleans control options:
         TwoTailed,  % default=true,  so attained p value of True value is computed 2-tailed rather than 1-tailed.
         UpperTail   % default=false, relevant only when TwoTailed is false.
-        % Then determines whether p value is computed from upper or lower tail of Null distribution.
+                    % It then determines whether p value is computed from upper or lower tail of Null distribution.
     end
     
     properties(SetAccess = private)
         NTrueParms   % Holds the number of parameters in the True distribution.
-        % These appear at the start of parameter lists.
+                     % These appear at the start of parameter lists.
     end
     
     methods
