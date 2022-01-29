@@ -342,6 +342,27 @@ classdef Mixture < dEither
                 thisdist(iel) = iDist;
             end
         end
+
+        function condps = CondPrs(obj,X)
+            % For each value of X, compute the conditional probability that that value
+            % comes from each distribution in the mixture.
+            % X is a vector(1:NValues) of random variable values.
+            % condps is a matrix(1:NDists,1:NValues) of conditional probabilities.
+            NValues = numel(X);
+            % Get the PDF of X within each distribution, weighted by MixtureP
+            weightedPDFs = zeros(obj.NDists,NValues);
+            for iDist=1:obj.NDists
+                weightedPDFs(iDist,:) = obj.BasisRV{iDist}.PDF(X) * obj.MixtureP(iDist);
+            end
+            % Get the totals of the weighted PDFs for each X
+            weightedTotals = sum(weightedPDFs,1);  % sum over the distributions for each X
+            % For each X, compute the conditional prob for each distribution as the weighted PDF
+            % divided by the total, across distributions, of the weighted PDFs.
+            condps = zeros(obj.NDists,NValues);
+            for iValue=1:NValues
+                condps(:,iValue) = weightedPDFs(:,iValue) / weightedTotals(iValue);
+            end
+        end
         
     end  % methods
     

@@ -132,6 +132,7 @@ function Run(CaseNs)
             rpt{end+1} = SingleTest('ArcsinTrans');
             rpt{end+1} = SingleTest('ConvUnif');
             rpt{end+1} = SingleTest('ExpTrans');
+            rpt{end+1} = SingleTest('GIPT');
             rpt{end+1} = SingleTest('InverseTrans');
             rpt{end+1} = SingleTest('LinearTrans');
             rpt{end+1} = SingleTest('LikeRatioC');
