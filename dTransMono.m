@@ -53,6 +53,7 @@ classdef (Abstract) dTransMono < dEither
             obj.SplineXnPoints = 200;
             obj.ReviseBounds = true;
             obj.fzeroOpts = optimset;
+            obj.StartParmsMLEwarnWanted = false;
             switch nargin
                 case 1
                 case 2
@@ -71,7 +72,7 @@ classdef (Abstract) dTransMono < dEither
         end
 
         function []=AddParms(obj,NTransParms,TransParmCodes)
-            obj.NTransParms = NTransParms;
+            obj.NTransParms = obj.NTransParms + NTransParms;
             obj.DefaultParmCodes = [obj.DefaultParmCodes TransParmCodes];
             obj.NDistParms = obj.NDistParms + NTransParms;
         end

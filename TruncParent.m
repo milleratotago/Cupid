@@ -6,7 +6,7 @@ classdef TruncParent < dTransMono
         LowerCutoffP, UpperCutoffP,   % Distribution cutoffs in terms of probs.
         UnconditionalP, XTolerance,
         IthValOffset
-        FixedCutoffLow  % Booleans indicating whether truncation cutoffs are free parameters or Fixed.
+        FixedCutoffLow  % Booleans indicating whether truncation cutoffs are free parameters or fixed.
         FixedCutoffHi
     end
     

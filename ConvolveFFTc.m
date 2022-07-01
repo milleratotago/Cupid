@@ -174,6 +174,7 @@ classdef ConvolveFFTc < dContinuous
             % Trim X and fftpdf vectors to get rid of leading & trailing zeros, if any.
             % (zero's at each end are added below)
             pos_pdfs = find(fftpdf>0);
+            % Bombs here if fftpdf has no entries greater than 0 (presumably all NaN)
             first_pos_pdf = pos_pdfs(1);
             last_pos_pdf = pos_pdfs(end);
             X = X(first_pos_pdf:last_pos_pdf);

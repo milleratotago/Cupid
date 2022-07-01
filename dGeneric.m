@@ -30,6 +30,7 @@ classdef dGeneric < handle  % Calls by reference
         StartParmsMLEfn   % A function used to compute starting parameters for an MLE search from a set of observations
                           % Note that this function does NOT reset the parameters of the current distribution,
                           %  but only returns plausible values to which one might reset the distribution.
+        StartParmsMLEwarnWanted
     end
     
     properties(SetAccess = private)    % These properties can only be set by the methods of this class.
@@ -135,6 +136,7 @@ classdef dGeneric < handle  % Calls by reference
             obj.NBStored = zeros(10,1);
             obj.SkipImpossibleWarn = false;
             obj.StartParmsMLEfn = @obj.StartParmsMLE;
+            obj.StartParmsMLEwarnWanted = true;
             obj.StartParmsMLEwarned = false;
         end
         
@@ -743,7 +745,7 @@ classdef dGeneric < handle  % Calls by reference
             % Default function to find starting parameters for MLE search.
             % Individual distributions should override this.
             parms = obj.ParmValues;  % Use the current parameters if the distribution has not provided a guess.
-            if ~obj.StartParmsMLEwarned
+            if obj.StartParmsMLEwarnWanted && ~obj.StartParmsMLEwarned
                 obj.StartParmsMLEwarned = true;
                 warning(['No StartParmsMLE function has been provided for ' obj.FamilyName ' so using current parameters.']);
             end
@@ -1150,6 +1152,59 @@ classdef dGeneric < handle  % Calls by reference
                     end
                 end
                 totalerr = totalerr + Err^2;
+            end
+        end
+        
+        function totalerr=DensityError(obj, XValues, TargetPDFs)
+            % Compute sum of squared difference between given PDF values
+            % and those PDF values associated with the distribution.
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
+            totalerr = 0;
+            NToFit = numel(XValues);
+            for I = 1:NToFit
+                % The next 2 lines provide some sensitivity to size of error at boundaries. }
+                if ((XValues(I) < obj.LowerBound) && (TargetPDFs(I) > 0))
+                    Err = obj.LowerBound - XValues(I);
+                elseif ((XValues(I) > obj.UpperBound) && (TargetPDFs(I) < 1))
+                    Err = XValues(I) - obj.UpperBound;
+                else
+                    PredictedPDF = PDF(obj,XValues(I));
+                    % The next 2 lines provide further sensitivity to size of error at boundaries.
+%                    if  ( (PredictedPDF <= 0) && (TargetPDFs(I) > 0) ) ...
+%                            || ( (PredictedPDF >= 1) && (TargetPDFs(I) < 1)  )
+%                        Err = ( XValues(I) - InverseCDF(obj,TargetPDFs(I)) ) * 10;
+%                    else
+                        Err = PredictedPDF - TargetPDFs(I);
+%                    end
+                end
+                totalerr = totalerr + Err^2;
+            end
+        end
+        
+        function [s,EndingVals,fval,exitflag,output]=EstDensity(obj,XValues,TargetPDFs,varargin)
+            if ~obj.Initialized
+                error(UninitializedError(obj));
+            end
+            if numel(varargin)<1
+                ParmCodes = obj.DefaultParmCodes;
+            else
+                ParmCodes = varargin{1};
+            end
+            RTPFn = @obj.RealsToParms;
+            PTRFn = @obj.ParmsToReals;
+            ErrFn = @MyErrFunc;
+            StartingVals = ParmValues(obj);
+            obj.PushAndStopNameBuilding;
+            [EndingVals,fval,exitflag,output] = fminsearcharb(ErrFn,StartingVals,RTPFn,PTRFn,ParmCodes,obj.SearchOptions);
+            obj.ResetParms(EndingVals);
+            obj.PopNameBuilding;
+            BuildMyName(obj);
+            s=obj.StringName;
+            function thiserrval=MyErrFunc(X)
+                ResetParms(obj,X)
+                thiserrval = DensityError(obj,XValues,TargetPDFs);
             end
         end
         
