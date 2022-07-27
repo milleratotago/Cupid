@@ -14,8 +14,11 @@ classdef ConvolveFFTc < dContinuous
         defaultNxPoints = 2^12;  % 4096 is a reasonable speed/accuracy compromise in cases examined so far.
     end
     
-    properties(SetAccess = private)
+    properties(SetAccess = public)
         NxPoints
+    end
+
+    properties(SetAccess = private)
         delx
         BasisRV
         NDists
@@ -121,6 +124,7 @@ classdef ConvolveFFTc < dContinuous
         
         function []=ReInit(obj)
             % Using existing bases, find bounds, set up Xs, run FFT
+            % 2022-07-06 bombs in this routine because of empty pos_pdfs associated with SD=0 for one basis.
             
             % collect lower/upper bound info about bases:
             lowerb = zeros(obj.NDists,1);
@@ -147,6 +151,42 @@ classdef ConvolveFFTc < dContinuous
             end
             X = linspace(x_min,x_max,useNxPoints);
             
+            % 2022-07-07 experimental NEWJEFF
+            % if there are only 2 distributions and one of them accounts for >99% of the variance,
+            % just use the PDFs for that one (adjusting for the constant shift of the other).
+            if obj.NDists == 2
+                Var1 = obj.BasisRV{1}.Variance;
+                Var2 = obj.BasisRV{2}.Variance;
+                TtlVar = Var1 + Var2;
+                MostlyVar1 = Var1 / TtlVar > 0.99;
+                MostlyVar2 = Var2 / TtlVar > 0.99;
+            else
+                MostlyVar1 = false;
+                MostlyVar2 = false;
+            end
+            if MostlyVar1
+                ConstMu = obj.BasisRV{2}.Mean;
+                obj.DiscretePDFs = obj.BasisRV{1}.PDF(X-ConstMu);
+            end
+            if MostlyVar2
+                ConstMu = obj.BasisRV{1}.Mean;
+                obj.DiscretePDFs = obj.BasisRV{2}.PDF(X-ConstMu);
+            end
+            if MostlyVar1 || MostlyVar2
+                obj.DiscreteXs = X;
+                obj.DiscreteCDFs = cumsum(obj.DiscretePDFs);
+                obj.DiscreteCDFs = obj.DiscreteCDFs / obj.DiscreteCDFs(end);
+                xStep = obj.DiscreteXs(2) - obj.DiscreteXs(1)           ;
+                obj.DiscretePDFs = obj.DiscretePDFs / xStep;
+                obj.LowerBound = X(1);
+                obj.UpperBound = X(end);
+                obj.Initialized = true;
+                if obj.NameBuilding
+                    obj.BuildMyName;
+                end
+                return
+            end
+            
             % Load Y with PDFs of bases:
             % I don't understand the various discussions about using fftshift & ifftshift
             % but it seems correct without them.
@@ -158,6 +198,19 @@ classdef ConvolveFFTc < dContinuous
                 Y(i,:) = obj.BasisRV{i}.PDF(X+lowerb(i));
             end
             Y(isnan(Y)) = 0;  % ifft produces all nan's if any Y is nan
+            
+%             % NEWJEFF: Experimental
+%             % Get rid of the Y's for any RV with too-small variance
+%             % because these cause problems for fft
+%             totalVar = 0;
+%             for iDist=1:obj.NDists
+%                 totalVar = totalVar + obj.BasisRV{iDist}.Variance;
+%             end
+%             tooSmallVar = false(obj.NDists,1);
+%             for iDist=1:obj.NDists
+%                 tooSmallVar(iDist) = obj.BasisRV{iDist}.SD < 0.001*sqrt(totalVar);
+%             end
+%             Y(tooSmallVar,:) = [];
             
             % Compute PDF of convolution via FFT
             % I don't really understand this

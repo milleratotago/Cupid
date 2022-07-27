@@ -6,6 +6,8 @@ classdef TruncatedX < TruncParent
         
         function obj=TruncatedX(BasisDist,LowerX,UpperX,varargin)
             obj=obj@TruncParent('TruncatedX',BasisDist,varargin{:});
+            obj.LowerCutoffX = LowerX;
+            obj.UpperCutoffX = UpperX;
             obj.NewCutoffs(LowerX,UpperX);
             if ~obj.FixedCutoffLow
                 obj.AddParms(1,'r');

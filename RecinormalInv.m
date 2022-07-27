@@ -2,6 +2,8 @@ classdef RecinormalInv < Recinormal
     % Distribution of Y = 1/Z, where Z is normally distributed.
     % The parameters of this version are 1/mu_z and sqrt(1/sigma_z),
     % which are more convenient units for parameter estimation in some cases.
+    % 1/mu_z is close to the mean of the final distribution of Y, and
+    % increases in the second parameter sqrt(1/sigma_z) produce more variance in Y.
 
     properties(SetAccess = protected)  % These properties can only be set by the methods of this class and its descendants.
         OneOverMu, OneOverSigma

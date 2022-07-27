@@ -32,8 +32,8 @@ classdef TruncParent < dTransMono
             if ~obj.FixedCutoffHi
                obj.UpperCutoffX = UpperX;
             end
-            obj.LowerCutoffP = obj.BasisRV.CDF(LowerX);
-            obj.UpperCutoffP = obj.BasisRV.CDF(UpperX);
+            obj.LowerCutoffP = obj.BasisRV.CDF(obj.LowerCutoffX);
+            obj.UpperCutoffP = obj.BasisRV.CDF(obj.UpperCutoffX);
             obj.UnconditionalP = obj.UpperCutoffP - obj.LowerCutoffP;
             if obj.BasisRV.DistType == 'd'
                 obj.UnconditionalP = obj.UnconditionalP + obj.BasisRV.PDF(obj.LowerCutoffX);

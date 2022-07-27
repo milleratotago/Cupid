@@ -29,7 +29,7 @@ classdef RNGammaMS < RNGamma
         function []=ResetParms(obj,newparmvalues)
             ClearBeforeResetParmsC(obj);
             obj.mu = newparmvalues(1);
-            obj.sigma = newparmvalues(2);
+            obj.sigma = newparmvalues(2) + 1e-4;
             assert(obj.mu>0,'RNGammaMS mu must be > 0.');
             assert(obj.sigma>0,'RNGammaMS sigma must be > 0.');
             tempN = (obj.mu/obj.sigma)^2;
