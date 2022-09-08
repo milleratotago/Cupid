@@ -1,4 +1,4 @@
-classdef SpearKar < dContinuous
+classdef SpearKarDist < dContinuous
     % Spearman-Kaerber distribution
     % This distribution is characterized by a discrete set of k X's: X(1)...X(k) and
     %   k associated CDF values such that Pr(x<X(i) = CDF(i).
@@ -69,8 +69,8 @@ classdef SpearKar < dContinuous
     
     methods
         
-        function obj=SpearKar(varargin)   % Constructor
-            obj=obj@dContinuous('SpearKar');
+        function obj=SpearKarDist(varargin)   % Constructor
+            obj=obj@dContinuous('SpearKarDist');
             obj.ParmTypes = '';
             obj.DefaultParmCodes = '';
             obj.NDistParms = 0;
@@ -80,8 +80,8 @@ classdef SpearKar < dContinuous
                 case 2
                     ResetParms(obj,varargin{1},varargin{2});
                 otherwise
-                    ME = MException('SpearKar:Constructor', ...
-                        'Too many arguments passed to SpearKar constructor.');
+                    ME = MException('SpearKarDist:Constructor', ...
+                        'Too many arguments passed to SpearKarDist constructor.');
                     throw(ME);
             end
         end
@@ -180,5 +180,5 @@ classdef SpearKar < dContinuous
         
     end  % methods
     
-end  % class SpearKar
+end  % class SpearKarDist
 

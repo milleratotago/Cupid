@@ -43,14 +43,14 @@ mydist.EstProbitYNChiSq(Cs,Ns,Gs)
 NTrialsPerC = 100;
 CgreaterCount = binornd(NTrialsPerC,PrCgreaterthanX);
 ClesserCount = NTrialsPerC - CgreaterCount;
-monoCDFs = SpearKar.monotonize(ClesserCount,CgreaterCount);
+monoCDFs = SpearKarDist.monotonize(ClesserCount,CgreaterCount);
 
 % Augment Cs and monoCDFs, if necessary, so that monoCDFs includes 0 and 1.
 % The choice of corresponding min and max Cs is somewhat arbitrary.
-[Cs,monoCDFs] = SpearKar.Stretch01(Cs,monoCDFs);
+[Cs,monoCDFs] = SpearKarDist.Stretch01(Cs,monoCDFs);
 
 % Create a SpearKar distribution based on these values
-SK = SpearKar(Cs,monoCDFs);
+SK = SpearKarDist(Cs,monoCDFs);
 
 % Compute nonparametric estimates of the mean, variance, etc
 SK.Mean

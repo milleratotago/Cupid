@@ -3,7 +3,7 @@
 % of transformations, this demo shows how to make a _Log-Pearson III_ distribution.
 % According to http://daad.wb.tu-harburg.de/?id=522 ,
 % the Pearson III distribution is a shifted gamma with shift c,
-% and the Log-Pearson III is the exponentiate version of that.
+% and the Log-Pearson III is the exponentiated version of that.
 % So, to build this distribution we need the following sequence of steps:
 % # Make a gamma distribution.
 % # Shift the gamma distribution with an additive constant.
