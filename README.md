@@ -154,12 +154,12 @@ ExtractNameVal package from https://github.com/milleratotago/ExtractNameVal.
 [6] Installation
 ------------------------------------------------------------
 
-The easiest way to install Cupid is to download the MATLAB toolbox file Cupid.mltbx
+The easiest way to install Cupid is to download the latest version of the MATLAB toolbox file Cupid*.mltbx
 and then let MATLAB itself manage the installation.
 In a Windows environment, simply double-click the toolbox file, and a MATLAB will
 start and guide you through the installation.
 
-Copyright (C) 2018-2019 Jeffrey Owen Miller
+Copyright (C) 2018-2022 Jeffrey Owen Miller
   
       This program is free software: you can redistribute it and/or modify
       it under the terms of the GNU General Public License as published by
