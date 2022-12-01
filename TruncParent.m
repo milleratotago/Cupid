@@ -23,9 +23,11 @@ classdef TruncParent < dTransMono
             obj.TransReverses = false;
         end
 
-        function []=NewCutoffs(obj,LowerX,UpperX)
-%             obj.LowerCutoffX = max(LowerX,obj.BasisRV.LowerBound);  % NWJEFF: This can lead to Fixed cutoffs seeming to be adjusted
-%             obj.UpperCutoffX = min(UpperX,obj.BasisRV.UpperBound);  % if the BasisRV does not extend to the lower/upper bounds.
+        function []=NewCutoffXs(obj,LowerX,UpperX)
+            % Set new values of non-fixed lower and upper X cutoffs
+            % and recompute cutoff P's.
+            % obj.LowerCutoffX = max(LowerX,obj.BasisRV.LowerBound);  % NWJEFF: This can lead to Fixed cutoffs seeming to be adjusted
+            % obj.UpperCutoffX = min(UpperX,obj.BasisRV.UpperBound);  % if the BasisRV does not extend to the lower/upper bounds.
             if ~obj.FixedCutoffLow
                 obj.LowerCutoffX = LowerX;
             end

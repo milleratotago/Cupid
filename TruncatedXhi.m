@@ -6,7 +6,7 @@ classdef TruncatedXhi < TruncParent
         
         function obj=TruncatedXhi(BasisDist,UpperX,varargin)
             obj=obj@TruncParent('TruncatedXhi',BasisDist,varargin{:});
-            obj.NewCutoffs(obj.BasisRV.LowerBound,UpperX);
+            obj.NewCutoffXs(obj.BasisRV.LowerBound,UpperX);
             if ~obj.FixedCutoffHi
                 obj.AddParms(1,'r');
             end
@@ -16,7 +16,7 @@ classdef TruncatedXhi < TruncParent
         function []=ResetParms(obj,newparmvalues)
             ClearBeforeResetParms(obj)
             obj.BasisRV.ResetParms(newparmvalues(1:obj.BasisRV.NDistParms));
-            obj.NewCutoffs(obj.BasisRV.LowerBound,newparmvalues(end));
+            obj.NewCutoffXs(obj.BasisRV.LowerBound,newparmvalues(end));
             obj.Initialized = true;
             ReInit(obj);
         end

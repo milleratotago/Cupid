@@ -6,7 +6,7 @@ classdef TruncatedXlow < TruncParent
         
         function obj=TruncatedXlow(BasisDist,LowerX,varargin)
             obj=obj@TruncParent('TruncatedXlow',BasisDist,varargin{:});
-            obj.NewCutoffs(LowerX,obj.BasisRV.UpperBound);
+            obj.NewCutoffXs(LowerX,obj.BasisRV.UpperBound);
             if ~obj.FixedCutoffLow
                 obj.AddParms(1,'r');
             end
@@ -16,7 +16,7 @@ classdef TruncatedXlow < TruncParent
         function []=ResetParms(obj,newparmvalues)
             ClearBeforeResetParms(obj)
             obj.BasisRV.ResetParms(newparmvalues(1:obj.BasisRV.NDistParms));
-            obj.NewCutoffs(newparmvalues(end),obj.BasisRV.UpperBound);
+            obj.NewCutoffXs(newparmvalues(end),obj.BasisRV.UpperBound);
             obj.Initialized = true;
             ReInit(obj);
         end

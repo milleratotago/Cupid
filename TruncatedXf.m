@@ -6,7 +6,7 @@ classdef TruncatedXf < TruncParent  % NEWJEFF: NEW, NO UNITTESTS OR DOCS This ve
         
         function obj=TruncatedXf(BasisDist,LowerX,UpperX)
             obj=obj@TruncParent('TruncatedXf',BasisDist);
-            obj.NewCutoffs(LowerX,UpperX);
+            obj.NewCutoffXs(LowerX,UpperX);
             % obj.AddParms(2,'rr');
             obj.ReInit;
         end

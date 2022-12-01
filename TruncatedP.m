@@ -9,7 +9,9 @@ classdef TruncatedP < TruncParent
         
         function obj=TruncatedP(BasisDist,LowerP,UpperP,varargin)
             obj=obj@TruncParent('TruncatedP',BasisDist,varargin{:});
-            obj.NewCutoffs(obj.BasisRV.InverseCDF(LowerP),obj.BasisRV.InverseCDF(UpperP));
+            obj.LowerCutoffP = LowerP;
+            obj.UpperCutoffP = UpperP;
+            obj.NewCutoffPs(LowerP,UpperP);
             if ~obj.FixedCutoffLow
                 obj.AddParms(1,'r');
             end
@@ -19,6 +21,23 @@ classdef TruncatedP < TruncParent
             obj.ReInit;
         end
         
+        function []=NewCutoffPs(obj,LowerP,UpperP)
+            % Set new values of non-fixed lower and upper P cutoffs
+            %  and recompute cutoff X's.
+            if ~obj.FixedCutoffLow
+                obj.LowerCutoffP = LowerP;
+            end
+            if ~obj.FixedCutoffHi
+               obj.UpperCutoffP = UpperP;
+            end
+            obj.UnconditionalP = obj.UpperCutoffP - obj.LowerCutoffP;
+            if obj.BasisRV.DistType == 'd'
+                obj.UnconditionalP = obj.UnconditionalP + obj.BasisRV.PDF(obj.LowerCutoffX);
+            end
+            obj.LowerCutoffX = obj.BasisRV.InverseCDF(obj.LowerCutoffP);
+            obj.UpperCutoffX = obj.BasisRV.InverseCDF(obj.UpperCutoffP);
+        end
+            
         function []=ResetParms(obj,newparmvalues)
             ClearBeforeResetParms(obj)
             obj.BasisRV.ResetParms(newparmvalues(1:obj.BasisRV.NDistParms));
@@ -33,7 +52,7 @@ classdef TruncatedP < TruncParent
             else
                 LowP = newparmvalues(end);
             end
-            obj.NewCutoffs(obj.BasisRV.InverseCDF(LowP),obj.BasisRV.InverseCDF(HiP));
+            obj.NewCutoffPs(LowP,HiP);
             obj.Initialized = true;
             ReInit(obj);
         end
