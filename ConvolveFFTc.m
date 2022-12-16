@@ -125,6 +125,7 @@ classdef ConvolveFFTc < dContinuous
         function []=ReInit(obj)
             % Using existing bases, find bounds, set up Xs, run FFT
             % 2022-07-06 bombs in this routine because of empty pos_pdfs associated with SD=0 for one basis.
+            % 2022-12-06 bombs for exGamma(2.568147394198137e-07,63.335183209196250,625.1190965420082) because of empty pos_pdfs
             
             % collect lower/upper bound info about bases:
             lowerb = zeros(obj.NDists,1);

@@ -267,6 +267,12 @@ classdef ExGamma < dContinuous
             elseif parms(1) > obj.max_g_shape
                 parms(1) = obj.max_g_shape;
             end
+            if parms(2) < eps
+                parms(2) = eps;
+            end
+            if parms(3) < eps
+                parms(3) = eps;
+            end
             obj.ResetParms(HoldParms);
         end
         

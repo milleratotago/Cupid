@@ -66,6 +66,8 @@ function Run(CaseNs)
             rpt{end+1} = SingleTest('ExWaldMSM');
             rpt{end+1} = SingleTest('F');
             rpt{end+1} = SingleTest('Frechet');
+            rpt{end+1} = SingleTest('Frechet2');
+            rpt{end+1} = SingleTest('FrechetPos');
             rpt{end+1} = SingleTest('Gamma');
             rpt{end+1} = SingleTest('Geary');
             rpt{end+1} = SingleTest('GenNor1');

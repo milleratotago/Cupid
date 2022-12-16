@@ -39,9 +39,19 @@ classdef ExConvFFTc < ConvolveFFTc
             % at the CDF of BasisRV1 for hiT and lesserT but I have not yet worked out how.
             
             % Now we can estimate the remaining mean & sd of the non-exponential
+            % A problem can arise here if there are large outliers--namely,
+            % nonExpMean and/or nonExpVar can sometimes be estimated to be negative.
+            % Here we make sure nonExpVar is positive; individual distributions
+            % will have to take care of the mean if a negative is not allowed.
             nonExpMean = mean(X) - estExpMean;
-            nonExpVar = max(0.1*nonExpMean,std(X)^2 - estExpMean^2);
+            nonExpVar = max([eps, 0.1*nonExpMean, std(X)^2 - estExpMean^2]);
+            % CLUGE: Temporarily increase tolerance of parameter searches since we are just looking for starting values:
+            IncreaseFactor = 1e4;
+            obj.BasisRV{1}.SearchOptions.TolFun = obj.BasisRV{1}.SearchOptions.TolFun * IncreaseFactor;
+            obj.BasisRV{1}.SearchOptions.TolX = obj.BasisRV{1}.SearchOptions.TolX * IncreaseFactor;
             obj.BasisRV{1}.EstMom([nonExpMean, nonExpVar]);
+            obj.BasisRV{1}.SearchOptions.TolFun = obj.BasisRV{1}.SearchOptions.TolFun / IncreaseFactor;
+            obj.BasisRV{1}.SearchOptions.TolX = obj.BasisRV{1}.SearchOptions.TolX / IncreaseFactor;
             parms = [obj.BasisRV{1}.ParmValues estExpMean];  % 10 is mean of fast exponential
        end
        

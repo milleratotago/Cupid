@@ -20,6 +20,8 @@ classdef dGeneric < handle  % Calls by reference
     
     % NewJeff: Code duplication warning! I should be able to combine EstML & EstMLcensored, plus MLSE & MLSEcensored.
     % NEWJEFF: linear interp1 should be an option instead of spline interpolation. Also, interpolation should be moved to dContinuous.
+    % NEWJEFF: It would be nice to define the domain for each distribution; for example, in some cases it would
+    %   be helpful in parameter estimation to know whether negative values are allowed in principle (e.g., ExConvFFTc nonExpMean).
     
     properties(Hidden)  % Properties seen only by class methods
     end

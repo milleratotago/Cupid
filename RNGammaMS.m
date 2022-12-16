@@ -29,8 +29,12 @@ classdef RNGammaMS < RNGamma
         function []=ResetParms(obj,newparmvalues)
             ClearBeforeResetParmsC(obj);
             obj.mu = newparmvalues(1);
+            if obj.mu <= 0
+                warning('Setting too-small obj.mu to eps');
+                obj.mu = eps;
+            end
             obj.sigma = newparmvalues(2) + 1e-4;
-            assert(obj.mu>0,'RNGammaMS mu must be > 0.');
+%             assert(obj.mu>0,'RNGammaMS mu must be > 0.');
             assert(obj.sigma>0,'RNGammaMS sigma must be > 0.');
             tempN = (obj.mu/obj.sigma)^2;
             tempRate = tempN / obj.mu;
@@ -55,6 +59,15 @@ classdef RNGammaMS < RNGamma
         end
         
         function s = EstMom(obj,TargetVals,varargin)
+            % CLUGE: Protection against illegal starting values:
+            if ~isreal(TargetVals)
+                TargetVals = [1 0.1];
+            elseif TargetVals(1) < 0
+                TargetVals(1) = 1;
+            end
+            if TargetVals(2) < 0
+                TargetVals(1) = 0.2;
+            end
             s = EstMomMS(obj,TargetVals,varargin{:});
         end
 

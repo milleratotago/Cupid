@@ -1,9 +1,9 @@
-classdef utFrechet < utContinuous
+classdef utFrechetPos < utContinuous
     
     properties (ClassSetupParameter)
-        parmshape  = struct( 'p2_5',2.5   , 'p1_2',1.2 , 'p4'   ,4    );
-        parmscale  = struct( 'p1_15',1.15 , 'p_9',0.9  , 'p2_25',2.25 );
-        parmminval = struct( 'p0',0       , 'p2',2     , 'm5'   ,-5    );
+        parmshape  = struct( 'p2_5',2.5   , 'p1_2',1.2 , 'p8'   ,8    );
+        parmscale  = struct( 'p_105',.105 , 'p10',10   , 'p2_25',2.25 );
+        parmminval = struct( 'p0',0       , 'p2',2     , 'p5'   ,5    );
     end
     
     properties
@@ -12,7 +12,7 @@ classdef utFrechet < utContinuous
 
     methods
         
-        function testCase=utFrechet(varargin)  % Constructor
+        function testCase=utFrechetPos(varargin)  % Constructor
             testCase=testCase@utContinuous(varargin{:});
         end
         
@@ -21,8 +21,8 @@ classdef utFrechet < utContinuous
     methods (TestClassSetup, ParameterCombination='sequential')
         
         function ClassSetup(testCase,parmshape,parmscale,parmminval)
-            % Computations specific to the Frechet distribution.
-            testCase.Dist = Frechet(parmshape,parmscale,parmminval);
+            % Computations specific to the FrechetPos distribution.
+            testCase.Dist = FrechetPos(parmshape,parmscale,parmminval);
             fprintf('\nInitialized %s\n',testCase.Dist.StringName)
 
             SetupXs(testCase,40,500);
@@ -41,6 +41,6 @@ classdef utFrechet < utContinuous
         
     end  % TestClassSetup
     
-end  % utFrechet
+end  % utFrechetPos
 
 

@@ -49,6 +49,7 @@ classdef Normal < dContinuous
             obj.ZExtreme = 25;
             obj.HaveStoredZCDFLookupTable = false;
             obj.EstMLreturnsLikelihood = true;
+            obj.StartParmsMLEfn = @obj.StartParmsMLE;
             switch nargin
                 case 0
                 case 2
@@ -228,6 +229,10 @@ classdef Normal < dContinuous
             outstruc.funcCount = 1;
             BuildMyName(obj);
             s=obj.StringName;
+        end
+        
+        function parms = StartParmsMLE(obj,~)
+            parms = 0:1;  % Dummy function; not needed because EstML computes parms from data without searching.
         end
         
     end  % methods
