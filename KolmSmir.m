@@ -1,5 +1,6 @@
 classdef KolmSmir < dContinuous
     % Kolmogorov-Smirnov distribution for a sample size of N.
+    % This distribution is computed entirely from its CDF, which is evaluated with Java code provided by \cite{SimardLEcuyer2011}.
     
     properties(SetAccess = protected)
         N     % Sample size
@@ -19,7 +20,7 @@ classdef KolmSmir < dContinuous
             obj.NDistParms = 1;
             p = mfilename('fullpath');
             mypath = fileparts(p);
-            javaaddpath([mypath '\' obj.sJarFileName]);
+            javaaddpath([mypath filesep obj.sJarFileName]);
             switch nargin
                 case 0
                 case 1

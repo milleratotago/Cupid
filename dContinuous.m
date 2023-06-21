@@ -390,5 +390,5 @@ classdef dContinuous < dGeneric   % Calls by reference
         
     end  % methods
     
-end  % class dContinRV
+end  % class dContinuous
 

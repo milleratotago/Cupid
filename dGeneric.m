@@ -504,9 +504,13 @@ classdef dGeneric < handle  % Calls by reference
             Like = PDF(obj,Observations);
             ZeroPos = find(Like==0);
             if numel(ZeroPos) && ~(obj.SkipImpossibleWarn > 0)
-                warning([obj.FamilyName ' checking likelihood of impossible data values.']);
-                fprintf('%f ',Observations(ZeroPos));
-                fprintf('\n');
+                warning('dGeneric:LnLikelihood:OutOfRange',...  % set warning ID so that it can be turned off
+                   [obj.FamilyName ' checking likelihood of impossible data values.']);
+                w = warning('query','dGeneric:LnLikelihood:OutOfRange');
+                if strcmp(w.state,'on')
+                   fprintf('%f ',Observations(ZeroPos));
+                   fprintf('\n');
+                end
             end
             for I = 1:length(ZeroPos)
                 J = ZeroPos(I);
